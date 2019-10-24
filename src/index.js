@@ -20,9 +20,6 @@ const app = new App({
 
 app.command("/alfred", ({ command, ack, respond, context }) => {
   ack();
-  console.log("in new");
-  console.log(command);
-  // respond({text: command.text})
   const method = command.text.split(" ")[0].toUpperCase();
 
   switch (method) {
@@ -32,5 +29,18 @@ app.command("/alfred", ({ command, ack, respond, context }) => {
         view: MODALS.newProject,
         trigger_id: command.trigger_id
       });
+      break;
+    case "HELP":
+      respond({ text: "Something about help here" });
+    default:
+      respond({ text: "Something about help here" });
   }
 });
+
+app.view(ACTIONS.createNewProject, ({ ack, body, view, context }) => {
+  ack()
+  console.log('got a modal', view);
+  const projectName = view.state.values['project_name']['project_name'].value;
+  const projectDescription = view.state.values['project_description']['project_description'].value;
+  
+})

@@ -47,7 +47,7 @@ const MESSAGES = {
 const MODALS = {
   newProject: {
     type: "modal",
-    // callback_id: ACTIONS.createNewProject,
+    callback_id: ACTIONS.createNewProject,
     title: {
       type: "plain_text",
       text: "Alfred",
@@ -67,9 +67,10 @@ const MODALS = {
     blocks: [
       {
         type: "input",
+        block_id: "project_name",
         element: {
           type: "plain_text_input",
-          action_id: "name",
+          action_id: "project_name",
           placeholder: {
             type: "plain_text",
             text: "BatIQ"
@@ -82,6 +83,7 @@ const MODALS = {
       },
       {
         type: "input",
+        block_id: "project_description",
         label: {
           type: "plain_text",
           text: "And how would you describe this new project?",
@@ -89,6 +91,7 @@ const MODALS = {
         },
         element: {
           type: "plain_text_input",
+          action_id: "project_description",
           placeholder: {
             type: "plain_text",
             text:
@@ -100,44 +103,6 @@ const MODALS = {
       }
     ]
   },
-  newProjectDialog: {
-    // callback_id: ACTIONS.createNewProject,
-    callback_id: "tacos",
-    title: "Alfred",
-    submit_label: "Really?",
-    notify_on_cancel: false,
-    elements: [
-      {
-        type: "text",
-        label: "What project are we creating today then?",
-        name: "name"
-      },
-      {
-        type: "text",
-        label: "And how would you describe this new project?",
-        name: "description"
-      }
-    ]
-  },
-  testDialog: {
-    callback_id: ACTIONS.createNewProject,
-    title: "Alfred",
-    submit_label: "GoAhead",
-    notify_on_cancel: true,
-    state: "Limo",
-    elements: [
-      {
-        type: "text",
-        label: "Pickup Location",
-        name: "loc_origin"
-      },
-      {
-        type: "text",
-        label: "Dropoff Location",
-        name: "loc_destination"
-      }
-    ]
-  }
 };
 
 // const DEFAULT_PROJECT
