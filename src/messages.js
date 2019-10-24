@@ -18,12 +18,12 @@ export const buildProjectBlocks = (project, editable) => {
         type: "plain_text",
         emoji: true,
         text: "edit",
-        value: project.id
-      }
+      },
+      value: `${project.id}`
     }
   }
 
-  return [
+  let projectBlocks = [
     {
       type: "section",
       text: {
@@ -35,45 +35,77 @@ export const buildProjectBlocks = (project, editable) => {
       type: "divider"
     },
     descriptionBlock,
-    ...buildSectionBlocks(project.sections, project.id),
-    {
-      type: 'divider'
-    },
-    {
-      type: "actions",
-      elements: [
-        {
-          type: "button",
-          action_id: "edit_mode",
-          text: {
-            type: "plain_text",
-            emoji: true,
-            text: "I need to edit this"
-          },
-          style: "primary",
-          value: `${project.id}`
-        }
-      ]
-    }
+    ...buildSectionBlocks(project.sections, editable)
   ];
+
+  if (!editable) {
+    projectBlocks = projectBlocks.concat([
+      {
+        type: 'divider'
+      },
+      {
+        type: "actions",
+        elements: [
+          {
+            type: "button",
+            action_id: "edit_mode",
+            text: {
+              type: "plain_text",
+              emoji: true,
+              text: "I need to edit this"
+            },
+            style: "primary",
+            value: `${project.name}`
+          }
+        ]
+      }
+    ]);
+  }
+  return projectBlocks;
 };
 
-const buildSectionBlocks = (sections, productId) => {
+const buildSectionBlocks = (sections, editable) => {
   const blocks = R.pipe(
     R.values,
     R.map(section => {
+      const sectionBlock =
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `*${section.name}*`
+        }
+      };
+      if (editable) {
+        sectionBlock.accessory = {
+          type: "overflow",
+          action_id: 'mod_section',
+          options: [
+            {
+              text: {
+                type: "plain_text",
+                emoji: true,
+                text: "Edit Section Name",
+              },
+              value: `edit_${section.id}`
+            },
+            {
+              text: {
+                type: "plain_text",
+                emoji: true,
+                text: "Delete Whole Section",
+              },
+              value: `delete_${section.id}`
+            }
+          ]
+        }
+      }
       return [
         {
           type: "divider"
         },
-        {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: `*${section.name}*`
-          }
-        },
-        ...buildItemBlocks(section.items, productId)
+        sectionBlock,
+        ...buildItemBlocks(section.items, editable)
       ];
     }),
     R.flatten
@@ -82,7 +114,7 @@ const buildSectionBlocks = (sections, productId) => {
   return blocks;
 };
 
-const buildItemBlocks = (items, projectId) => {
+const buildItemBlocks = (items, editable) => {
   if (!items.length) {
     return [
       {
@@ -92,42 +124,57 @@ const buildItemBlocks = (items, projectId) => {
           text:
             "I didn't find anything for this section. Perhaps you would like to edit the project?"
         }
-      },
-      // {
-      //   type: "actions",
-      //   elements: [
-      //     {
-      //       type: "button",
-      //       action_id: "edit_mode",
-      //       text: {
-      //         type: "plain_text",
-      //         emoji: true,
-      //         text: "Edit"
-      //       },
-      //       style: "primary",
-      //       value: `${projectId}`
-      //     }
-      //   ]
-      // }
+      }
     ];
   }
   return R.pipe(
     R.map(item => {
+      const itemBlock = {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `<${item.url}|${item.name} - ${item.url}>`
+        }
+      };
+
+      if (editable) {
+        itemBlock.accessory = {
+          type: "overflow",
+          action_id: 'mod_item',
+          options: [
+            {
+              text: {
+                type: "plain_text",
+                emoji: true,
+                text: "Edit",
+              },
+              value: `edit_${item.id}`
+            },
+            {
+              text: {
+                type: "plain_text",
+                emoji: true,
+                text: "Delete",
+              },
+              value: `delete_${item.id}`
+            }
+          ]
+        }
+      }
+
       return [
+        itemBlock,
         {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: `<${item.url}|${item.name}> - ${item.description}`
-          }
+          type: "context",
+          elements: [
+            {
+              type: 'mrkdwn',
+              text: item.description
+            }
+          ]
         }
       ];
     }),
     R.flatten
   )(items);
 };
-
-export const buildEditableProjectBlocks = project => {
-
-
-}

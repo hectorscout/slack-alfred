@@ -23,6 +23,7 @@ const app = new App({
 
 const lookupProject = (projectName, editable, respond) => {
   getProject(projectName, (error, project) => {
+    console.log('got a project... maybe', project);
     if (error) {
       respond({
         response_type: "ephemeral",
@@ -41,7 +42,9 @@ const lookupProject = (projectName, editable, respond) => {
         });
       });
     } else {
+      console.log('trying to respond');
       respond({
+        // replace_original: true,
         response_type: "ephemeral",
         blocks: buildProjectBlocks(project, editable)
       });
@@ -101,9 +104,11 @@ app.view(
   }
 );
 
-app.action("edit_mode", ({ action, ack, respond }) => {
+app.action("edit_mode", ({ action, ack, respond, say }) => {
   ack();
   console.log("Enter edit mode", action);
+  say('tacos');
+  // lookupProject(action.value, true, respond);
 });
 
 app.action("edit_project", ({ action, ack, respond }) => {
