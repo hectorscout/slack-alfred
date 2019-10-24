@@ -18,7 +18,8 @@
   "dependencies": {
     "@slack/bolt": "^1.4.1",
     "dotenv": "^8.2.0",
-    "pg": "^7.12.1"
+    "pg": "^7.12.1",
+    "ramda": "^0.26.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.6.4",

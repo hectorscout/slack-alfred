@@ -1,11 +1,12 @@
+import * as R from 'ramda';
 import * as dotenv from "dotenv";
+dotenv.config();
 
 import { App } from "@slack/bolt";
 import { ACTIONS, MESSAGES, MODALS } from "./constants";
 
-dotenv.config();
+import { addProject, getProject, getProjects } from "./models";
 
-console.log(process.env.SLACK_SIGNING_SECRET);
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   token: process.env.SLACK_BOT_ACCESS_TOKEN
@@ -31,16 +32,45 @@ app.command("/alfred", ({ command, ack, respond, context }) => {
       });
       break;
     case "HELP":
-      respond({ text: "Something about help here" });
+      getProjects((projects) => {
+        respond({text: `The following projects are available: \`${R.join('\`, \`', R.pluck('name', projects))}\``});
+      });
+      break;
     default:
-      respond({ text: "Something about help here" });
+      getProject(command.text, (error, results) => {
+        console.log('projects', results)
+        if (error) {
+          respond({text: "I had some difficulty getting that project... Maybe I'll take a nap."})
+          throw error;
+        }
+        else if (!results.rows.length) {
+          getProjects((projects) => {
+            respond({text: `Couldn't find ${command.text}. The following projects are available: \`${R.join('\`, \`', R.pluck('name', projects))}\``});
+          });
+        }
+        else {
+          respond({text: `Got these projects: \`${R.join('\`, \`', R.pluck('name', results.rows))}\``});
+        }
+      });
   }
 });
 
-app.view(ACTIONS.createNewProject, ({ ack, body, view, context }) => {
+app.view(ACTIONS.createNewProject, ({ ack, body, view, context, respond, say }) => {
   ack()
   console.log('got a modal', view);
+  console.log('body', body);
   const projectName = view.state.values['project_name']['project_name'].value;
   const projectDescription = view.state.values['project_description']['project_description'].value;
-  
+
+  addProject(projectName, projectDescription, (error) => {
+    let msg = 'I had a bit of trouble making that new project for some reason.';
+    if (!error) {
+      msg = `I made that project. You know, "${projectName}"`
+    }
+    app.client.chat.postMessage({
+      token: context.botToken,
+      channel: body['user']['id'],
+      text: msg,
+    });
+  })
 })
