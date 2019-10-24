@@ -1,9 +1,9 @@
 import * as dotenv from 'dotenv';
-dotenv.config();
-
-import { ACTIONS, MESSAGES, MODALS } from './constants'
 
 import { App } from '@slack/bolt';
+import { ACTIONS, MESSAGES, MODALS } from './constants';
+
+dotenv.config();
 
 console.log(process.env.SLACK_SIGNING_SECRET);
 const app = new App({
@@ -19,19 +19,21 @@ const app = new App({
   console.log(`Bolt app is running on port ${port}`);
 })();
 
-app.command('/alfred', ({ command, ack, respond, context }) => {
+app.command('/alfred', ({
+  command, ack, respond, context,
+}) => {
   ack();
   console.log('in new');
-  console.log(command)
+  console.log(command);
   // respond({text: command.text})
-  const method = command.text.split(' ')[0].toUpperCase()
+  const method = command.text.split(' ')[0].toUpperCase();
 
   switch (method) {
     case 'NEW':
       app.client.views.open({
         token: context.botToken,
         view: MODALS.newProject,
-        trigger_id: command.trigger_id
-      })
+        trigger_id: command.trigger_id,
+      });
   }
 });
