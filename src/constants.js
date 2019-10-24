@@ -140,7 +140,7 @@ const MODALS = {
 
 // const DEFAULT_PROJECT
 
-module.exports = {
+export {
   ACTIONS,
   MESSAGES,
   MODALS

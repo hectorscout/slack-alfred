@@ -1,8 +1,9 @@
-require('dotenv').config();
+import * as dotenv from 'dotenv';
+dotenv.config();
 
-const { ACTIONS, MESSAGES, MODALS } = require('./constants')
+import { ACTIONS, MESSAGES, MODALS } from './constants'
 
-const { App } = require('@slack/bolt');
+import { App } from '@slack/bolt';
 
 console.log(process.env.SLACK_SIGNING_SECRET);
 const app = new App({
