@@ -102,7 +102,7 @@ const MODALS = {
         optional: true
       }
     ]
-  },
+  }
 };
 
 // const DEFAULT_PROJECT

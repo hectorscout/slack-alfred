@@ -1,35 +1,36 @@
-import * as R from 'ramda'
+import * as R from "ramda";
 
-export const buildProjectBlocks = (project) => {
+export const buildProjectBlocks = project => {
   return [
     {
-      type: 'section',
+      type: "section",
       text: {
-        type: 'mrkdwn',
+        type: "mrkdwn",
         text: `The \`${project.name}\` project resources, sir.`
       }
     },
     {
-      type: 'divider'
+      type: "divider"
     },
-    ...buildSectionBlocks(project.sections),
-  ]
+    ...buildSectionBlocks(project.sections)
+  ];
 };
 
-const buildSectionBlocks = (sections) => {
-
-  return R.flatten(R.map((section) => {
-    return [
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: `*${section.name}*`
+const buildSectionBlocks = sections => {
+  return R.flatten(
+    R.map(section => {
+      return [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `*${section.name}*`
+          }
+        },
+        {
+          type: "divider"
         }
-      },
-      {
-        type: 'divider'
-      }
-    ]
-  })(sections))
+      ];
+    })(sections)
+  );
 };

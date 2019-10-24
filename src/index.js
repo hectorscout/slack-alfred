@@ -1,12 +1,13 @@
-import * as R from 'ramda';
+import * as R from "ramda";
 import * as dotenv from "dotenv";
-dotenv.config();
 
 import { App } from "@slack/bolt";
 import { ACTIONS, MESSAGES, MODALS } from "./constants";
-import { buildProjectBlocks} from "./messages";
+import { buildProjectBlocks } from "./messages";
 
 import { addProject, getProject, getProjects } from "./models";
+
+dotenv.config();
 
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -24,27 +25,29 @@ const lookupProject = (projectName, respond) => {
   getProject(projectName, (error, project) => {
     if (error) {
       respond({
-        response_type: 'ephemeral',
-        text: "I had some difficulty getting that project... Maybe I'll take a nap."
+        response_type: "ephemeral",
+        text:
+          "I had some difficulty getting that project... Maybe I'll take a nap."
       });
       throw error;
-    }
-    else if (!project) {
-      getProjects((projects) => {
+    } else if (!project) {
+      getProjects(projects => {
         respond({
-          response_type: 'ephemeral', // TODO: not working?
-          text: `Couldn't find ${projectName}. The following projects are available: \`${R.join('\`, \`', R.pluck('projectName', projects))}\``
+          response_type: "ephemeral", // TODO: not working?
+          text: `Couldn't find ${projectName}. The following projects are available: \`${R.join(
+            "`, `",
+            R.pluck("projectName", projects)
+          )}\``
         });
       });
-    }
-    else {
+    } else {
       respond({
-        response_type: 'ephemeral',
+        response_type: "ephemeral",
         blocks: buildProjectBlocks(project)
       });
     }
   });
-}
+};
 
 app.command("/alfred", ({ command, ack, respond, context }) => {
   ack();
@@ -59,8 +62,13 @@ app.command("/alfred", ({ command, ack, respond, context }) => {
       });
       break;
     case "HELP":
-      getProjects((projects) => {
-        respond({text: `The following projects are available: \`${R.join('\`, \`', R.pluck('name', projects))}\``});
+      getProjects(projects => {
+        respond({
+          text: `The following projects are available: \`${R.join(
+            "`, `",
+            R.pluck("name", projects)
+          )}\``
+        });
       });
       break;
     default:
@@ -68,22 +76,27 @@ app.command("/alfred", ({ command, ack, respond, context }) => {
   }
 });
 
-app.view(ACTIONS.createNewProject, ({ ack, body, view, context, respond, say }) => {
-  ack();
-  console.log('got a modal', view);
-  console.log('body', body);
-  const projectName = view.state.values['project_name']['project_name'].value;
-  const projectDescription = view.state.values['project_description']['project_description'].value;
+app.view(
+  ACTIONS.createNewProject,
+  ({ ack, body, view, context, respond, say }) => {
+    ack();
+    console.log("got a modal", view);
+    console.log("body", body);
+    const projectName = view.state.values.project_name.project_name.value;
+    const projectDescription =
+      view.state.values.project_description.project_description.value;
 
-  addProject(projectName, projectDescription, (error) => {
-    let msg = 'I had a bit of trouble making that new project for some reason.';
-    if (!error) {
-      msg = `I made that project. You know, "${projectName}"`
-    }
-    app.client.chat.postMessage({
-      token: context.botToken,
-      channel: body['user']['id'],
-      text: msg,
+    addProject(projectName, projectDescription, error => {
+      let msg =
+        "I had a bit of trouble making that new project for some reason.";
+      if (!error) {
+        msg = `I made that project. You know, "${projectName}"`;
+      }
+      app.client.chat.postMessage({
+        token: context.botToken,
+        channel: body.user.id,
+        text: msg
+      });
     });
-  })
-})
+  }
+);
