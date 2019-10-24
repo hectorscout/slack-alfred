@@ -21,7 +21,7 @@ const app = new App({
   console.log(`Bolt app is running on port ${port}`);
 })();
 
-const lookupProject = (projectName, respond) => {
+const lookupProject = (projectName, editable, respond) => {
   getProject(projectName, (error, project) => {
     if (error) {
       respond({
@@ -43,7 +43,7 @@ const lookupProject = (projectName, respond) => {
     } else {
       respond({
         response_type: "ephemeral",
-        blocks: buildProjectBlocks(project)
+        blocks: buildProjectBlocks(project, editable)
       });
     }
   });
@@ -72,7 +72,7 @@ app.command("/alfred", ({ command, ack, respond, context }) => {
       });
       break;
     default:
-      lookupProject(command.text, respond);
+      lookupProject(command.text, false, respond);
   }
 });
 
@@ -104,4 +104,9 @@ app.view(
 app.action("edit_mode", ({ action, ack, respond }) => {
   ack();
   console.log("Enter edit mode", action);
+});
+
+app.action("edit_project", ({ action, ack, respond }) => {
+  ack();
+  console.log("Edit a project", action);
 });

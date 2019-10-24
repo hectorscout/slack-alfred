@@ -1,6 +1,28 @@
 import * as R from "ramda";
 
-export const buildProjectBlocks = project => {
+export const buildProjectBlocks = (project, editable) => {
+
+  const descriptionBlock = {
+    type: "section",
+    text: {
+      type: "mrkdwn",
+      text: `${project.description}`
+    },
+  };
+
+  if (editable) {
+    descriptionBlock.accessory = {
+      type: "button",
+      action_id: 'edit_project',
+      text: {
+        type: "plain_text",
+        emoji: true,
+        text: "edit",
+        value: project.id
+      }
+    }
+  }
+
   return [
     {
       type: "section",
@@ -12,14 +34,27 @@ export const buildProjectBlocks = project => {
     {
       type: "divider"
     },
+    descriptionBlock,
+    ...buildSectionBlocks(project.sections, project.id),
     {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        text: `${project.description}`
-      }
+      type: 'divider'
     },
-    ...buildSectionBlocks(project.sections, project.id)
+    {
+      type: "actions",
+      elements: [
+        {
+          type: "button",
+          action_id: "edit_mode",
+          text: {
+            type: "plain_text",
+            emoji: true,
+            text: "I need to edit this"
+          },
+          style: "primary",
+          value: `${project.id}`
+        }
+      ]
+    }
   ];
 };
 
@@ -58,22 +93,22 @@ const buildItemBlocks = (items, projectId) => {
             "I didn't find anything for this section. Perhaps you would like to edit the project?"
         }
       },
-      {
-        type: "actions",
-        elements: [
-          {
-            type: "button",
-            action_id: "edit_mode",
-            text: {
-              type: "plain_text",
-              emoji: true,
-              text: "Edit"
-            },
-            style: "primary",
-            value: `${projectId}`
-          }
-        ]
-      }
+      // {
+      //   type: "actions",
+      //   elements: [
+      //     {
+      //       type: "button",
+      //       action_id: "edit_mode",
+      //       text: {
+      //         type: "plain_text",
+      //         emoji: true,
+      //         text: "Edit"
+      //       },
+      //       style: "primary",
+      //       value: `${projectId}`
+      //     }
+      //   ]
+      // }
     ];
   }
   return R.pipe(
@@ -91,3 +126,8 @@ const buildItemBlocks = (items, projectId) => {
     R.flatten
   )(items);
 };
+
+export const buildEditableProjectBlocks = project => {
+
+
+}
