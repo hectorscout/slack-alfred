@@ -21,7 +21,7 @@ const app = new App({
   console.log(`Bolt app is running on port ${port}`);
 })();
 
-const lookupProject = (projectName, editable, respond) => {
+const lookupProject = (projectName, editable, respond, token) => {
   getProject(projectName, (error, project) => {
     console.log('got a project... maybe', project);
     if (error) {
@@ -44,7 +44,8 @@ const lookupProject = (projectName, editable, respond) => {
     } else {
       console.log('trying to respond');
       respond({
-        // replace_original: true,
+        token,
+        replace_original: true,
         response_type: "ephemeral",
         blocks: buildProjectBlocks(project, editable)
       });
@@ -75,7 +76,7 @@ app.command("/alfred", ({ command, ack, respond, context }) => {
       });
       break;
     default:
-      lookupProject(command.text, false, respond);
+      lookupProject(command.text, false, respond, context.botToken);
   }
 });
 
@@ -83,8 +84,6 @@ app.view(
   ACTIONS.createNewProject,
   ({ ack, body, view, context, respond, say }) => {
     ack();
-    // console.log("got a modal", view);
-    // console.log("body", body);
     const projectName = view.state.values.project_name.project_name.value;
     const projectDescription =
       view.state.values.project_description.project_description.value;
@@ -104,11 +103,9 @@ app.view(
   }
 );
 
-app.action("edit_mode", ({ action, ack, respond, say }) => {
+app.action("edit_mode", ({ action, ack, respond, say, context }) => {
   ack();
-  console.log("Enter edit mode", action);
-  say('tacos');
-  // lookupProject(action.value, true, respond);
+  lookupProject(action.value, true, respond, context.botToken);
 });
 
 app.action("edit_project", ({ action, ack, respond }) => {
