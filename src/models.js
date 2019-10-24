@@ -31,11 +31,9 @@ export const addProject = (name, description, next) => {
               throw error;
             }
             const projectId = results.rows[0].id;
-            console.log("projectId", projectId);
-            addSection(
-              "design",
-              projectId,
-              () => addSection("environments", projectId, next)
+            // console.log("projectId", projectId);
+            addSection("Design", projectId, () =>
+              addSection("Environments", projectId, next)
             );
           }
         );
@@ -66,11 +64,11 @@ export const getProject = (projectName, next) => {
   `,
     [projectName],
     (error, results) => {
-      console.log("uh......", results);
+      // console.log("uh......", results);
       const project = R.reduce(
         (project, row) => {
-          console.log("row&&&&&&&&&&&&&&&&&&&&&&F", row);
-          console.log("1111111", project);
+          // console.log("row&&&&&&&&&&&&&&&&&&&&&&F", row);
+          // console.log("1111111", project);
           if (!project.id) {
             project.id = row.project_id;
           }
@@ -100,7 +98,7 @@ export const getProject = (projectName, next) => {
         { sections: {} },
         results.rows
       );
-      console.log("end", project);
+      // console.log("end", project);
       next(error, project);
     }
   );
@@ -108,7 +106,7 @@ export const getProject = (projectName, next) => {
 
 export const getProjects = next => {
   pool.query("SELECT * from projects", (error, results) => {
-    console.log(results.rows);
+    // console.log(results.rows);
     next(results.rows);
   });
 };

@@ -6,7 +6,7 @@ export const buildProjectBlocks = project => {
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `Here's what I know about the \`${project.name}\` project, sir.`
+        text: `Here's what I know about \`${project.name}\`, Master Bruce.`
       }
     },
     {
@@ -19,32 +19,75 @@ export const buildProjectBlocks = project => {
         text: `${project.description}`
       }
     },
-    {
-      type: "divider"
-    },
-    ...buildSectionBlocks(project.sections)
+    ...buildSectionBlocks(project.sections, project.id)
   ];
 };
 
-const buildSectionBlocks = sections => {
-  const sectionBlocks =
-    R.pipe(
-      R.values,
-      R.map(section => {
-        return [
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: `*${section.name}*`
-            }
-          },
-          {
-            type: "divider"
+const buildSectionBlocks = (sections, productId) => {
+  const blocks = R.pipe(
+    R.values,
+    R.map(section => {
+      return [
+        {
+          type: "divider"
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `*${section.name}*`
           }
-        ];
-      }),
-      R.flatten
-    )(sections);
-  return sectionBlocks;
+        },
+        ...buildItemBlocks(section.items, productId)
+      ];
+    }),
+    R.flatten
+  )(sections);
+  // console.log('((((((((((((((((((((((((((((((((((((((((((', blocks);
+  return blocks;
+};
+
+const buildItemBlocks = (items, projectId) => {
+  if (!items.length) {
+    return [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text:
+            "I didn't find anything for this section. Perhaps you would like to edit the project?"
+        }
+      },
+      {
+        type: "actions",
+        elements: [
+          {
+            type: "button",
+            action_id: "edit_mode",
+            text: {
+              type: "plain_text",
+              emoji: true,
+              text: "Edit"
+            },
+            style: "primary",
+            value: `${projectId}`
+          }
+        ]
+      }
+    ];
+  }
+  return R.pipe(
+    R.map(item => {
+      return [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `<${item.url}|${item.name}> - ${item.description}`
+          }
+        }
+      ];
+    }),
+    R.flatten
+  )(items);
 };

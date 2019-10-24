@@ -80,8 +80,8 @@ app.view(
   ACTIONS.createNewProject,
   ({ ack, body, view, context, respond, say }) => {
     ack();
-    console.log("got a modal", view);
-    console.log("body", body);
+    // console.log("got a modal", view);
+    // console.log("body", body);
     const projectName = view.state.values.project_name.project_name.value;
     const projectDescription =
       view.state.values.project_description.project_description.value;
@@ -100,3 +100,8 @@ app.view(
     });
   }
 );
+
+app.action("edit_mode", ({ action, ack, respond }) => {
+  ack();
+  console.log("Enter edit mode", action);
+});
