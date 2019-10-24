@@ -1,0 +1,23 @@
+{
+  "name": "slack-alfred",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Alfred helps Mr. Wayne keep track of his projects in Slack",
+  "main": "index.js",
+  "engines": {
+    "node": "11.x"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "start:dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified \" && exit 1"
+  },
+  "dependencies": {
+    "@slack/bolt": "^1.4.1",
+    "dotenv": "^8.2.0",
+    "pg": "^7.12.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.4"
+  }
+}
