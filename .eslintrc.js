@@ -11,5 +11,5 @@ module.exports = {
     // allow use of Ecmascript modules
     sourceType: "module"
   },
-  extends: ["airbnb-base"]
+  extends: ["airbnb-base", "plugin:prettier/recommended"]
 }
