@@ -6,7 +6,17 @@ export const buildProjectBlocks = project => {
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `The \`${project.name}\` project resources, sir.`
+        text: `Here's what I know about the \`${project.name}\` project, sir.`
+      }
+    },
+    {
+      type: "divider"
+    },
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `${project.description}`
       }
     },
     {
@@ -17,20 +27,24 @@ export const buildProjectBlocks = project => {
 };
 
 const buildSectionBlocks = sections => {
-  return R.flatten(
-    R.map(section => {
-      return [
-        {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: `*${section.name}*`
+  const sectionBlocks =
+    R.pipe(
+      R.values,
+      R.map(section => {
+        return [
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: `*${section.name}*`
+            }
+          },
+          {
+            type: "divider"
           }
-        },
-        {
-          type: "divider"
-        }
-      ];
-    })(sections)
-  );
+        ];
+      }),
+      R.flatten
+    )(sections);
+  return sectionBlocks;
 };

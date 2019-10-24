@@ -4,7 +4,7 @@ import { pool } from "./config";
 const addSection = (name, projectId, next) => {
   pool.query(
     "INSERT INTO sections (name, projectId) VALUES ($1, $2)",
-    ["design", projectId],
+    [name, projectId],
     error => {
       if (error) {
         throw error;
@@ -30,12 +30,12 @@ export const addProject = (name, description, next) => {
             if (error) {
               throw error;
             }
-            const projectId = results.rows[0].ID;
+            const projectId = results.rows[0].id;
             console.log("projectId", projectId);
             addSection(
               "design",
               projectId,
-              addSection("environments", projectId, next(false))
+              () => addSection("environments", projectId, next)
             );
           }
         );
@@ -87,12 +87,14 @@ export const getProject = (projectName, next) => {
               items: []
             };
           }
-          project.sections[row.section_name].items.push({
-            id: row.item_id,
-            name: row.item_name,
-            description: row.item_description,
-            url: row.item_url
-          });
+          if (row.item_id) {
+            project.sections[row.section_name].items.push({
+              id: row.item_id,
+              name: row.item_name,
+              description: row.item_description,
+              url: row.item_url
+            });
+          }
           return project;
         },
         { sections: {} },
