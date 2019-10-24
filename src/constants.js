@@ -1,6 +1,6 @@
 const ACTIONS = {
   openNewProjectDialog: "OPEN_NEW_PROJECT_DIALOG",
-  createNewProject: "CREATE_NEW_PROJECT"
+  saveProject: "SAVE_PROJECT"
 };
 
 const MESSAGES = {
@@ -41,23 +41,23 @@ const MESSAGES = {
         ]
       }
     ]
-  }
+  },
 };
 
 const MODALS = {
-  newProject: {
+  newProject: (values) => ({
     type: "modal",
-    callback_id: ACTIONS.createNewProject,
+    callback_id: ACTIONS.saveProject,
+    private_metadata: values.id ? `${values.id}` : '',
     title: {
       type: "plain_text",
       text: "Alfred",
       emoji: true
     },
     submit: {
-      // "action_id": ACTIONS.createNewProject,
       type: "plain_text",
       text: "Go Ahead",
-      emoji: true
+      emoji: true,
     },
     close: {
       type: "plain_text",
@@ -74,11 +74,12 @@ const MODALS = {
           placeholder: {
             type: "plain_text",
             text: "BatIQ"
-          }
+          },
+          initial_value: values.name || ''
         },
         label: {
           type: "plain_text",
-          text: "What project are we creating today then?"
+          text: "What should the project be called then?"
         }
       },
       {
@@ -86,7 +87,7 @@ const MODALS = {
         block_id: "project_description",
         label: {
           type: "plain_text",
-          text: "And how would you describe this new project?",
+          text: "And how would you describe the project, sir?",
           emoji: true
         },
         element: {
@@ -95,16 +96,14 @@ const MODALS = {
           placeholder: {
             type: "plain_text",
             text:
-              "The best product ever created for understanding and managing your Batcave."
+              "The best product ever created for understanding and managing your Batcave and the darkness within."
           },
-          multiline: true
+          multiline: true,
+          initial_value: values.description || ''
         },
-        optional: true
       }
     ]
-  }
+  })
 };
-
-// const DEFAULT_PROJECT
 
 export { ACTIONS, MESSAGES, MODALS };

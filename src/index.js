@@ -5,7 +5,12 @@ import { App } from "@slack/bolt";
 import { ACTIONS, MESSAGES, MODALS } from "./constants";
 import { buildProjectBlocks } from "./messages";
 
-import { addProject, getProject, getProjects } from "./models";
+import {
+  addProject,
+  getFullProject,
+  getProjectById,
+  getProjects,
+  updateProject } from "./models";
 
 dotenv.config();
 
@@ -22,7 +27,7 @@ const app = new App({
 })();
 
 const lookupProject = (projectName, editable, respond, token) => {
-  getProject(projectName, (error, project) => {
+  getFullProject(projectName, (error, project) => {
     console.log('got a project... maybe', project);
     if (error) {
       respond({
@@ -61,7 +66,7 @@ app.command("/alfred", ({ command, ack, respond, context }) => {
     case "NEW":
       app.client.views.open({
         token: context.botToken,
-        view: MODALS.newProject,
+        view: MODALS.newProject({}),
         trigger_id: command.trigger_id
       });
       break;
@@ -81,25 +86,45 @@ app.command("/alfred", ({ command, ack, respond, context }) => {
 });
 
 app.view(
-  ACTIONS.createNewProject,
+  ACTIONS.saveProject,
   ({ ack, body, view, context, respond, say }) => {
     ack();
     const projectName = view.state.values.project_name.project_name.value;
     const projectDescription =
       view.state.values.project_description.project_description.value;
+    const projectId = view.private_metadata;
+    console.log('view.......', view);
 
-    addProject(projectName, projectDescription, error => {
-      let msg =
-        "I had a bit of trouble making that new project for some reason.";
-      if (!error) {
-        msg = `I made that project. You know, "${projectName}"`;
-      }
-      app.client.chat.postMessage({
-        token: context.botToken,
-        channel: body.user.id,
-        text: msg
+    if (projectId) {
+      console.log('it exists')
+      updateProject(projectId, projectName, projectDescription, error => {
+        let msg =
+          "I had a bit of trouble updating that project for some reason.";
+        if (!error) {
+          msg = `I've updated that \`${projectName}\` project. You're welcome.`;
+        }
+        app.client.chat.postMessage({
+          token: context.botToken,
+          channel: body.user.id,
+          text: msg
+        });
       });
-    });
+    }
+    else {
+      addProject(projectName, projectDescription, error => {
+        let msg =
+          "I had a bit of trouble making that new project for some reason.";
+        if (!error) {
+          msg = `I made that project. You know, "${projectName}"`;
+        }
+        app.client.chat.postMessage({
+          token: context.botToken,
+          channel: body.user.id,
+          text: msg
+        });
+      });
+    }
+
   }
 );
 
@@ -108,7 +133,18 @@ app.action("edit_mode", ({ action, ack, respond, say, context }) => {
   lookupProject(action.value, true, respond, context.botToken);
 });
 
-app.action("edit_project", ({ action, ack, respond }) => {
+app.action("edit_project", ({ action, ack, context, body }) => {
   ack();
-  console.log("Edit a project", action);
+  // console.log("Edit a project", action);
+  console.log(body);
+  getProjectById(action.value, (error, project) => {
+    const blocks = MODALS.newProject(project)
+    console.log(blocks.blocks);
+    app.client.views.open({
+      token: context.botToken,
+      view: blocks,
+      trigger_id: body.trigger_id
+    });
+  });
+
 });

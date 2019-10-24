@@ -31,7 +31,6 @@ export const addProject = (name, description, next) => {
               throw error;
             }
             const projectId = results.rows[0].id;
-            // console.log("projectId", projectId);
             addSection("Design", projectId, () =>
               addSection("Environments", projectId, next)
             );
@@ -44,7 +43,20 @@ export const addProject = (name, description, next) => {
   }
 };
 
-export const getProject = (projectName, next) => {
+export const updateProject = (projectId, name, description, next) => {
+  pool.query("UPDATE projects set name = $1, description = $2 WHERE ID = $3", [name, description, projectId], next);
+}
+
+export const getProjectById = (projectId, next) => {
+  pool.query(`SELECT * FROM projects WHERE ID = $1`, [projectId], (error, results) => {
+    if (error) {
+      return next(error)
+    }
+    return next(null, results.rows[0]);
+  });
+};
+
+export const getFullProject = (projectName, next) => {
   pool.query(
     `
     SELECT
