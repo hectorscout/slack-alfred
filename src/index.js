@@ -4,6 +4,7 @@ dotenv.config();
 
 import { App } from "@slack/bolt";
 import { ACTIONS, MESSAGES, MODALS } from "./constants";
+import { buildProjectBlocks} from "./messages";
 
 import { addProject, getProject, getProjects } from "./models";
 
@@ -18,6 +19,32 @@ const app = new App({
 
   console.log(`Bolt app is running on port ${port}`);
 })();
+
+const lookupProject = (projectName, respond) => {
+  getProject(projectName, (error, project) => {
+    if (error) {
+      respond({
+        response_type: 'ephemeral',
+        text: "I had some difficulty getting that project... Maybe I'll take a nap."
+      });
+      throw error;
+    }
+    else if (!project) {
+      getProjects((projects) => {
+        respond({
+          response_type: 'ephemeral', // TODO: not working?
+          text: `Couldn't find ${projectName}. The following projects are available: \`${R.join('\`, \`', R.pluck('projectName', projects))}\``
+        });
+      });
+    }
+    else {
+      respond({
+        response_type: 'ephemeral',
+        blocks: buildProjectBlocks(project)
+      });
+    }
+  });
+}
 
 app.command("/alfred", ({ command, ack, respond, context }) => {
   ack();
@@ -37,26 +64,12 @@ app.command("/alfred", ({ command, ack, respond, context }) => {
       });
       break;
     default:
-      getProject(command.text, (error, results) => {
-        console.log('projects', results)
-        if (error) {
-          respond({text: "I had some difficulty getting that project... Maybe I'll take a nap."})
-          throw error;
-        }
-        else if (!results.rows.length) {
-          getProjects((projects) => {
-            respond({text: `Couldn't find ${command.text}. The following projects are available: \`${R.join('\`, \`', R.pluck('name', projects))}\``});
-          });
-        }
-        else {
-          respond({text: `Got these projects: \`${R.join('\`, \`', R.pluck('name', results.rows))}\``});
-        }
-      });
+      lookupProject(command.text, respond);
   }
 });
 
 app.view(ACTIONS.createNewProject, ({ ack, body, view, context, respond, say }) => {
-  ack()
+  ack();
   console.log('got a modal', view);
   console.log('body', body);
   const projectName = view.state.values['project_name']['project_name'].value;
