@@ -66,7 +66,7 @@ export const buildProjectBlocks = (project, editable) => {
 
 const buildSectionBlocks = (sections, projectName, editable) => {
   const blocks = R.pipe(
-    R.values,
+    // R.values,
     R.map(section => {
       const sectionBlock =
       {
@@ -87,34 +87,47 @@ const buildSectionBlocks = (sections, projectName, editable) => {
                 emoji: true,
                 text: "Edit Section Name",
               },
-              value: `edit_${section.id}`
-            },
-            {
-              text: {
-                type: "plain_text",
-                emoji: true,
-                text: "Move Up",
-              },
-              value: `up_${section.id}`
-            },
-            {
-              text: {
-                type: "plain_text",
-                emoji: true,
-                text: "Move Down",
-              },
-              value: `down_${section.id}`
-            },
-            {
-              text: {
-                type: "plain_text",
-                emoji: true,
-                text: "Delete Whole Section",
-              },
-              value: `delete_${section.id}`
+              value: `edit_${projectName}_${section.id}`
             }
           ]
+        };
+
+        if (section.rank !== 0) {
+          sectionBlock.accessory.options.push({
+            text: {
+              type: "plain_text",
+              emoji: true,
+              text: "Move Section Up",
+            },
+            value: `up_${projectName}_${section.id}`
+          });
         }
+        if (section.rank !== sections.length - 1) {
+          sectionBlock.accessory.options.push({
+            text: {
+              type: "plain_text",
+              emoji: true,
+              text: "Move Section Down",
+            },
+            value: `down_${projectName}_${section.id}`
+          });
+        }
+        sectionBlock.accessory.options.push({
+          text: {
+            type: "plain_text",
+            emoji: true,
+            text: "Add A New Item"
+          },
+          value: `newitem_${projectName}_${section.id}`
+        });
+        sectionBlock.accessory.options.push({
+          text: {
+            type: "plain_text",
+            emoji: true,
+            text: "Delete Whole Section",
+          },
+          value: `delete_${projectName}_${section.id}`
+        });
       }
       return [
         {

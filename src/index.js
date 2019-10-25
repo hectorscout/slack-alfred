@@ -11,6 +11,7 @@ import {
   getProjectById,
   getProjects,
   moveItem,
+  moveSection,
   updateProject } from "./models";
 
 dotenv.config();
@@ -139,7 +140,7 @@ app.action("edit_project", ({ action, ack, context, body }) => {
   // console.log("Edit a project", action);
   // console.log(body);
   getProjectById(action.value, (error, project) => {
-    const blocks = MODALS.newProject(project)
+    const blocks = MODALS.newProject(project);
     console.log(blocks.blocks);
     app.client.views.open({
       token: context.botToken,
@@ -149,12 +150,47 @@ app.action("edit_project", ({ action, ack, context, body }) => {
   });
 });
 
+app.action("mod_section", ({action, ack, context, body, respond}) => {
+  ack();
+  const [command, projectName, sectionId] = action.selected_option.value.split('_');
+
+  switch (command) {
+    case 'edit':
+      // getItemById(itemId, (error, item) => {
+      // const blocks = MODALS.newProject(project)
+      // console.log(blocks.blocks);
+      // app.client.views.open({
+      //   token: context.botToken,
+      //   view: blocks,
+      //   trigger_id: body.trigger_id
+      // });
+      // });
+      break;
+    case 'newitem':
+      console.log('make a new item dialog');
+      break;
+    case 'up':
+    case 'down':
+      moveSection(sectionId, command, error => {
+        if (error) {
+          respond({
+            token: context.botToken,
+            response_type: "ephemeral",
+            text:
+              "I appear to have run into some problems trying to move that. I apologize."
+          });
+          return;
+        }
+        lookupProject(projectName, true, respond, context.botToken);
+      });
+      break;
+  }
+});
+
 app.action("mod_item", ({action, ack, context, body, respond}) => {
   ack();
-  console.log(action);
   const [command, projectName, itemId] = action.selected_option.value.split('_');
 
-  console.log(command, projectName, itemId);
   switch (command) {
     case 'edit':
       // getItemById(itemId, (error, item) => {
