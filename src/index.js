@@ -10,6 +10,7 @@ import {
   getFullProject,
   getProjectById,
   getProjects,
+  moveItem,
   updateProject } from "./models";
 
 dotenv.config();
@@ -28,9 +29,9 @@ const app = new App({
 
 const lookupProject = (projectName, editable, respond, token) => {
   getFullProject(projectName, (error, project) => {
-    console.log('got a project... maybe', project);
     if (error) {
       respond({
+        token,
         response_type: "ephemeral",
         text:
           "I had some difficulty getting that project... Maybe I'll take a nap."
@@ -39,6 +40,7 @@ const lookupProject = (projectName, editable, respond, token) => {
     } else if (!project) {
       getProjects(projects => {
         respond({
+          token,
           response_type: "ephemeral", // TODO: not working?
           text: `Couldn't find ${projectName}. The following projects are available: \`${R.join(
             "`, `",
@@ -47,7 +49,6 @@ const lookupProject = (projectName, editable, respond, token) => {
         });
       });
     } else {
-      console.log('trying to respond');
       respond({
         token,
         replace_original: true,
@@ -128,7 +129,7 @@ app.view(
   }
 );
 
-app.action("edit_mode", ({ action, ack, respond, say, context }) => {
+app.action("edit_mode", ({ action, ack, respond, context }) => {
   ack();
   lookupProject(action.value, true, respond, context.botToken);
 });
@@ -136,7 +137,7 @@ app.action("edit_mode", ({ action, ack, respond, say, context }) => {
 app.action("edit_project", ({ action, ack, context, body }) => {
   ack();
   // console.log("Edit a project", action);
-  console.log(body);
+  // console.log(body);
   getProjectById(action.value, (error, project) => {
     const blocks = MODALS.newProject(project)
     console.log(blocks.blocks);
@@ -146,5 +147,40 @@ app.action("edit_project", ({ action, ack, context, body }) => {
       trigger_id: body.trigger_id
     });
   });
+});
 
+app.action("mod_item", ({action, ack, context, body, respond}) => {
+  ack();
+  console.log(action);
+  const [command, projectName, itemId] = action.selected_option.value.split('_');
+
+  console.log(command, projectName, itemId);
+  switch (command) {
+    case 'edit':
+      // getItemById(itemId, (error, item) => {
+        // const blocks = MODALS.newProject(project)
+        // console.log(blocks.blocks);
+        // app.client.views.open({
+        //   token: context.botToken,
+        //   view: blocks,
+        //   trigger_id: body.trigger_id
+        // });
+      // });
+      break;
+    case 'up':
+    case 'down':
+      moveItem(itemId, command, error => {
+        if (error) {
+          respond({
+            token: context.botToken,
+            response_type: "ephemeral",
+            text:
+              "I appear to have run into some problems trying to move that. I apologize."
+          });
+          return;
+        }
+        lookupProject(projectName, true, respond, context.botToken);
+      });
+      break;
+  }
 });

@@ -68,11 +68,13 @@ export const getFullProject = (projectName, next) => {
      items.ID as item_id,
      items.name as item_name,
      items.url as item_url,
-     items.description as item_description
+     items.description as item_description,
+     items.rank as item_rank
     FROM projects
     LEFT JOIN sections ON projects.ID = sections.projectId
-    LEFT JOIN items ON sections.ID = items.sectionID 
+    LEFT JOIN items ON sections.ID = items.sectionId 
     WHERE projects.name ilike $1
+    ORDER BY items.rank
   `,
     [projectName],
     (error, results) => {
@@ -102,7 +104,8 @@ export const getFullProject = (projectName, next) => {
               id: row.item_id,
               name: row.item_name,
               description: row.item_description,
-              url: row.item_url
+              url: row.item_url,
+              rank: row.item_rank
             });
           }
           return project;
@@ -121,4 +124,28 @@ export const getProjects = next => {
     // console.log(results.rows);
     next(results.rows);
   });
+};
+
+export const moveItem = (itemId, command, next) => {
+  try {
+    pool.query('SELECT rank, sectionID FROM items WHERE ID = $1', [itemId], (error, results) => {
+      if (error) { throw error; }
+      const sectionId = results.rows[0].sectionid;
+      const origRank = results.rows[0].rank;
+      const targetRank = origRank + (command === 'up' ? -1 : 1);
+      pool.query('SELECT ID FROM items WHERE sectionId = $1 AND rank = $2', [sectionId, targetRank], (error, results) => {
+        if (error) { throw error; }
+        const targetItemId = results.rows[0].id;
+        pool.query('UPDATE items SET rank = $1 WHERE id = $2', [targetRank, itemId], error => {
+          if (error) { throw error; }
+          pool.query('UPDATE items SET rank = $1 WHERE id = $2', [origRank, targetItemId], error => {
+            if (error) { throw error; }
+            next();
+          });
+        });
+      });
+    });
+  } catch(error) {
+    next(error);
+  }
 };

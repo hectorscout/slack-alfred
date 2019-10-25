@@ -7,6 +7,7 @@ CREATE TABLE projects (
 CREATE TABLE sections (
   ID SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
+  rank integer NOT NULL,
   projectId integer NOT NULL
 );
 
@@ -16,5 +17,6 @@ CREATE TABLE items (
   url VARCHAR(255) NOT NULL,
   description VARCHAR(255),
   type VARCHAR(32) NOT NULL,
+  rank integer NOT NULL,
   sectionId integer NOT NULL
 );
