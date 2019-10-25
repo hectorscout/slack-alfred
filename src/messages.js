@@ -1,25 +1,24 @@
 import * as R from "ramda";
 
 export const buildProjectBlocks = (project, editable) => {
-
   const descriptionBlock = {
     type: "section",
     text: {
       type: "mrkdwn",
       text: `${project.description}`
-    },
+    }
   };
 
   if (editable) {
     descriptionBlock.accessory = {
       type: "overflow",
-      action_id: 'mod_project',
+      action_id: "mod_project",
       options: [
         {
           text: {
             type: "plain_text",
             emoji: true,
-            text: "Edit Project Name/Description",
+            text: "Edit Project Name/Description"
           },
           value: `edit_${project.name}_${project.id}`
         },
@@ -27,12 +26,12 @@ export const buildProjectBlocks = (project, editable) => {
           text: {
             type: "plain_text",
             emoji: true,
-            text: "Add A New Section",
+            text: "Add A New Section"
           },
           value: `newsection_${project.name}_${project.id}`
         }
       ]
-    }
+    };
   }
 
   let projectBlocks = [
@@ -53,7 +52,7 @@ export const buildProjectBlocks = (project, editable) => {
   if (!editable) {
     projectBlocks = projectBlocks.concat([
       {
-        type: 'divider'
+        type: "divider"
       },
       {
         type: "actions",
@@ -80,8 +79,7 @@ const buildSectionBlocks = (sections, projectName, editable) => {
   const blocks = R.pipe(
     // R.values,
     R.map(section => {
-      const sectionBlock =
-      {
+      const sectionBlock = {
         type: "section",
         text: {
           type: "mrkdwn",
@@ -91,13 +89,13 @@ const buildSectionBlocks = (sections, projectName, editable) => {
       if (editable) {
         sectionBlock.accessory = {
           type: "overflow",
-          action_id: 'mod_section',
+          action_id: "mod_section",
           options: [
             {
               text: {
                 type: "plain_text",
                 emoji: true,
-                text: ":pencil: Edit Section Name",
+                text: ":pencil: Edit Section Name"
               },
               value: `edit_${projectName}_${section.id}`
             }
@@ -109,7 +107,7 @@ const buildSectionBlocks = (sections, projectName, editable) => {
             text: {
               type: "plain_text",
               emoji: true,
-              text: ":arrow_up_small: Move Section Up",
+              text: ":arrow_up_small: Move Section Up"
             },
             value: `up_${projectName}_${section.id}`
           });
@@ -119,7 +117,7 @@ const buildSectionBlocks = (sections, projectName, editable) => {
             text: {
               type: "plain_text",
               emoji: true,
-              text: ":arrow_down_small: Move Section Down",
+              text: ":arrow_down_small: Move Section Down"
             },
             value: `down_${projectName}_${section.id}`
           });
@@ -136,7 +134,7 @@ const buildSectionBlocks = (sections, projectName, editable) => {
           text: {
             type: "plain_text",
             emoji: true,
-            text: ":no_entry_sign: Delete Whole Section",
+            text: ":no_entry_sign: Delete Whole Section"
           },
           value: `delete_${projectName}_${section.id}`
         });
@@ -180,13 +178,13 @@ const buildItemBlocks = (items, projectName, editable) => {
       if (editable) {
         itemBlock.accessory = {
           type: "overflow",
-          action_id: 'mod_item',
+          action_id: "mod_item",
           options: [
             {
               text: {
                 type: "plain_text",
                 emoji: true,
-                text: "Edit",
+                text: "Edit"
               },
               value: `edit_${projectName}_${item.id}`
             }
@@ -197,17 +195,17 @@ const buildItemBlocks = (items, projectName, editable) => {
             text: {
               type: "plain_text",
               emoji: true,
-              text: "Move Item Up",
+              text: "Move Item Up"
             },
             value: `up_${projectName}_${item.id}`
-          })
+          });
         }
         if (item.rank !== items.length - 1) {
           itemBlock.accessory.options.push({
             text: {
               type: "plain_text",
               emoji: true,
-              text: "Move Item Down",
+              text: "Move Item Down"
             },
             value: `down_${projectName}_${item.id}`
           });
@@ -216,7 +214,7 @@ const buildItemBlocks = (items, projectName, editable) => {
           text: {
             type: "plain_text",
             emoji: true,
-            text: "Delete",
+            text: "Delete"
           },
           value: `delete_${projectName}_${item.id}`
         });
@@ -228,7 +226,7 @@ const buildItemBlocks = (items, projectName, editable) => {
           type: "context",
           elements: [
             {
-              type: 'mrkdwn',
+              type: "mrkdwn",
               text: item.description
             }
           ]

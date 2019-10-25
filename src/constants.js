@@ -41,14 +41,14 @@ const MESSAGES = {
         ]
       }
     ]
-  },
+  }
 };
 
 const MODALS = {
-  newProject: (values) => ({
+  newProject: values => ({
     type: "modal",
     callback_id: ACTIONS.saveProject,
-    private_metadata: values.id ? `${values.id}` : '',
+    private_metadata: values.id ? `${values.id}` : "",
     title: {
       type: "plain_text",
       text: "Alfred",
@@ -57,7 +57,7 @@ const MODALS = {
     submit: {
       type: "plain_text",
       text: "Go Ahead",
-      emoji: true,
+      emoji: true
     },
     close: {
       type: "plain_text",
@@ -75,7 +75,7 @@ const MODALS = {
             type: "plain_text",
             text: "BatIQ"
           },
-          initial_value: values.name || ''
+          initial_value: values.name || ""
         },
         label: {
           type: "plain_text",
@@ -99,8 +99,8 @@ const MODALS = {
               "The best product ever created for understanding and managing your Batcave and the darkness within."
           },
           multiline: true,
-          initial_value: values.description || ''
-        },
+          initial_value: values.description || ""
+        }
       }
     ]
   })
