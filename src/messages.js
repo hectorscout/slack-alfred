@@ -12,14 +12,26 @@ export const buildProjectBlocks = (project, editable) => {
 
   if (editable) {
     descriptionBlock.accessory = {
-      type: "button",
-      action_id: 'edit_project',
-      text: {
-        type: "plain_text",
-        emoji: true,
-        text: "edit",
-      },
-      value: `${project.id}`
+      type: "overflow",
+      action_id: 'mod_project',
+      options: [
+        {
+          text: {
+            type: "plain_text",
+            emoji: true,
+            text: "Edit Project Name/Description",
+          },
+          value: `edit_${project.name}_${project.id}`
+        },
+        {
+          text: {
+            type: "plain_text",
+            emoji: true,
+            text: "Add A New Section",
+          },
+          value: `newsection_${project.name}_${project.id}`
+        }
+      ]
     }
   }
 
@@ -85,7 +97,7 @@ const buildSectionBlocks = (sections, projectName, editable) => {
               text: {
                 type: "plain_text",
                 emoji: true,
-                text: "Edit Section Name",
+                text: ":pencil: Edit Section Name",
               },
               value: `edit_${projectName}_${section.id}`
             }
@@ -97,7 +109,7 @@ const buildSectionBlocks = (sections, projectName, editable) => {
             text: {
               type: "plain_text",
               emoji: true,
-              text: "Move Section Up",
+              text: ":arrow_up_small: Move Section Up",
             },
             value: `up_${projectName}_${section.id}`
           });
@@ -107,7 +119,7 @@ const buildSectionBlocks = (sections, projectName, editable) => {
             text: {
               type: "plain_text",
               emoji: true,
-              text: "Move Section Down",
+              text: ":arrow_down_small: Move Section Down",
             },
             value: `down_${projectName}_${section.id}`
           });
@@ -116,7 +128,7 @@ const buildSectionBlocks = (sections, projectName, editable) => {
           text: {
             type: "plain_text",
             emoji: true,
-            text: "Add A New Item"
+            text: ":heavy_plus_sign: Add A New Item"
           },
           value: `newitem_${projectName}_${section.id}`
         });
@@ -124,7 +136,7 @@ const buildSectionBlocks = (sections, projectName, editable) => {
           text: {
             type: "plain_text",
             emoji: true,
-            text: "Delete Whole Section",
+            text: ":no_entry_sign: Delete Whole Section",
           },
           value: `delete_${projectName}_${section.id}`
         });
@@ -139,7 +151,6 @@ const buildSectionBlocks = (sections, projectName, editable) => {
     }),
     R.flatten
   )(sections);
-  // console.log('((((((((((((((((((((((((((((((((((((((((((', blocks);
   return blocks;
 };
 

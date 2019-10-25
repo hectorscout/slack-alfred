@@ -135,19 +135,27 @@ app.action("edit_mode", ({ action, ack, respond, context }) => {
   lookupProject(action.value, true, respond, context.botToken);
 });
 
-app.action("edit_project", ({ action, ack, context, body }) => {
+app.action("mod_project", ({ action, ack, context, body }) => {
   ack();
   // console.log("Edit a project", action);
   // console.log(body);
-  getProjectById(action.value, (error, project) => {
-    const blocks = MODALS.newProject(project);
-    console.log(blocks.blocks);
-    app.client.views.open({
-      token: context.botToken,
-      view: blocks,
-      trigger_id: body.trigger_id
-    });
-  });
+  const [command, projectName, projectId] = action.selected_option.value.split('_');
+
+  switch (command) {
+    case ('edit'):
+      getProjectById(projectId, (error, project) => {
+        const blocks = MODALS.newProject(project);
+        app.client.views.open({
+          token: context.botToken,
+          view: blocks,
+          trigger_id: body.trigger_id
+        });
+      });
+      break;
+    case ('newsection'):
+      console.log('need to make a new section');
+      break;
+  }
 });
 
 app.action("mod_section", ({action, ack, context, body, respond}) => {
