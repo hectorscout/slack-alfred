@@ -1,7 +1,31 @@
 import * as R from "ramda";
 import pool from "./config";
 
-const addSection = (name, projectId, next) => {
+export const addItem = (name, sectionId, url, description, next) => {
+  pool.query(
+    "SELECT MAX(rank) FROM items WHERE sectionId = $1",
+    [sectionId],
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      const maxRank = results.rows[0].max;
+      const rank = maxRank === null ? 0 : maxRank + 1;
+      pool.query(
+        "INSERT INTO items (name, url, description, sectionId, rank) VALUES ($1, $2, $3, $4, $5)",
+        [name, url, description, sectionId, rank],
+        error => {
+          if (error) {
+            throw error;
+          }
+          next();
+        }
+      );
+    }
+  );
+};
+
+export const addSection = (name, projectId, next) => {
   pool.query(
     "SELECT MAX(rank) FROM sections WHERE projectId = $1",
     [projectId],
@@ -54,6 +78,22 @@ export const addProject = (name, description, next) => {
   }
 };
 
+export const updateItem = (itemId, name, url, description, next) => {
+  pool.query(
+    "UPDATE items set name = $1, url = $2, description = $3 WHERE ID = $4",
+    [name, url, description, itemId],
+    next
+  );
+};
+
+export const updateSection = (sectionId, name, next) => {
+  pool.query(
+    "UPDATE sections set name = $1 WHERE ID = $2",
+    [name, sectionId],
+    next
+  );
+};
+
 export const updateProject = (projectId, name, description, next) => {
   pool.query(
     "UPDATE projects set name = $1, description = $2 WHERE ID = $3",
@@ -62,17 +102,25 @@ export const updateProject = (projectId, name, description, next) => {
   );
 };
 
-export const getProjectById = (projectId, next) => {
-  pool.query(
-    `SELECT * FROM projects WHERE ID = $1`,
-    [projectId],
-    (error, results) => {
-      if (error) {
-        return next(error);
-      }
-      return next(null, results.rows[0]);
+const getById = (table, id, next) => {
+  pool.query(`SELECT * FROM ${table} WHERE ID = $1`, [id], (error, results) => {
+    if (error) {
+      return next(error);
     }
-  );
+    return next(null, results.rows[0]);
+  });
+};
+
+export const getItemById = (itemId, next) => {
+  getById("items", itemId, next);
+};
+
+export const getSectionById = (sectionId, next) => {
+  getById("sections", sectionId, next);
+};
+
+export const getProjectById = (projectId, next) => {
+  getById("projects", projectId, next);
 };
 
 export const getFullProject = (projectName, next) => {

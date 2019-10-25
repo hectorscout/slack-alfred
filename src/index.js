@@ -7,12 +7,15 @@ import { buildProjectBlocks } from "./messages";
 
 import {
   addProject,
+  addSection,
   getFullProject,
   getProjectById,
   getProjects,
+  getSectionById,
   moveItem,
   moveSection,
-  updateProject
+  updateProject,
+  updateSection
 } from "./models";
 
 dotenv.config();
@@ -90,6 +93,36 @@ app.command("/alfred", ({ command, ack, respond, context }) => {
   }
 });
 
+app.view(ACTIONS.saveSection, ({ ack, body, view }) => {
+  ack();
+  const sectionName = view.state.values.section_name.section_name.value;
+  const { id, projectId } = JSON.parse(view.private_metadata);
+  const sectionId = id;
+
+  const convo = convoStore.get(body.user.id);
+  if (sectionId) {
+    updateSection(sectionId, sectionName, error => {
+      if (error) {
+        // TODO
+        console.log("handle this error in ACTIONS.saveSection", error);
+      }
+      convo.then(({ respond, token, projectName }) => {
+        lookupProject(projectName, true, respond, token);
+      });
+    });
+  } else {
+    addSection(sectionName, projectId, error => {
+      if (error) {
+        // TODO
+        console.log("handle this error in ACTIONS.saveSection", error);
+      }
+      convo.then(({ respond, token, projectName }) => {
+        lookupProject(projectName, true, respond, token);
+      });
+    });
+  }
+});
+
 app.view(ACTIONS.saveProject, ({ ack, body, view, context }) => {
   ack();
 
@@ -97,16 +130,15 @@ app.view(ACTIONS.saveProject, ({ ack, body, view, context }) => {
   const projectDescription =
     view.state.values.project_description.project_description.value;
   const projectId = view.private_metadata;
-  // console.log("view.......", view);
 
   if (projectId) {
-    const { respond, token } = convoStore.get("body.user.id");
+    const convo = convoStore.get(body.user.id);
     updateProject(projectId, projectName, projectDescription, error => {
       if (error) {
         // TODO
         console.log("handle this error in ACTIONS.saveProject");
       }
-      convo.then(({ respond, token }) => {
+      convo.then(({ respond, token, projectName }) => {
         lookupProject(projectName, true, respond, token);
       });
     });
@@ -136,17 +168,17 @@ app.action("edit_mode", ({ action, ack, respond, context }) => {
 
 app.action("mod_project", ({ action, ack, context, body, respond }) => {
   ack();
-  // console.log("Edit a project", action);
-  console.log(body);
   const [command, projectName, projectId] = action.selected_option.value.split(
     "_"
   );
 
-  // console.log(app);
-  convoStore.set("body.user.id", { respond, token: context.botToken });
-
   switch (command) {
     case "edit":
+      convoStore.set(body.user.id, {
+        respond,
+        token: context.botToken,
+        projectName
+      });
       getProjectById(projectId, (error, project) => {
         const blocks = MODALS.newProject(project);
         app.client.views.open({
@@ -157,7 +189,17 @@ app.action("mod_project", ({ action, ack, context, body, respond }) => {
       });
       break;
     case "newsection":
-      console.log("need to make a new section");
+      convoStore.set(body.user.id, {
+        respond,
+        token: context.botToken,
+        projectName
+      });
+      const blocks = MODALS.newSection({ projectId });
+      app.client.views.open({
+        token: context.botToken,
+        view: blocks,
+        trigger_id: body.trigger_id
+      });
       break;
     default:
       console.log("How did they even do this...?");
@@ -172,18 +214,22 @@ app.action("mod_section", ({ action, ack, context, body, respond }) => {
 
   switch (command) {
     case "edit":
-      // getItemById(itemId, (error, item) => {
-      // const blocks = MODALS.newProject(project)
-      // console.log(blocks.blocks);
-      // app.client.views.open({
-      //   token: context.botToken,
-      //   view: blocks,
-      //   trigger_id: body.trigger_id
-      // });
-      // });
+      convoStore.set(body.user.id, {
+        respond,
+        token: context.botToken,
+        projectName
+      });
+      getSectionById(sectionId, (error, section) => {
+        const blocks = MODALS.newSection(section);
+        app.client.views.open({
+          token: context.botToken,
+          view: blocks,
+          trigger_id: body.trigger_id
+        });
+      });
       break;
     case "newitem":
-      console.log("make a new item dialog");
+      // TODO
       break;
     case "up":
     case "down":
