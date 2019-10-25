@@ -3,13 +3,24 @@ import pool from "./config";
 
 const addSection = (name, projectId, next) => {
   pool.query(
-    "INSERT INTO sections (name, projectId) VALUES ($1, $2)",
-    [name, projectId],
-    error => {
+    "SELECT MAX(rank) FROM sections WHERE projectId = $1",
+    [projectId],
+    (error, results) => {
       if (error) {
         throw error;
       }
-      next();
+      const maxRank = results.rows[0].max;
+      const rank = maxRank === null ? 0 : maxRank + 1;
+      pool.query(
+        "INSERT INTO sections (name, projectId, rank) VALUES ($1, $2, $3)",
+        [name, projectId, rank],
+        error => {
+          if (error) {
+            throw error;
+          }
+          next();
+        }
+      );
     }
   );
 };

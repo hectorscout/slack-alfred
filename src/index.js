@@ -19,9 +19,10 @@ dotenv.config();
 
 const app = new App({
   token: process.env.SLACK_BOT_ACCESS_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET,
-  convoStore: new MemoryStore()
+  signingSecret: process.env.SLACK_SIGNING_SECRET
 });
+
+const convoStore = new MemoryStore();
 
 (async () => {
   const port = process.env.PORT || 3000;
@@ -89,28 +90,24 @@ app.command("/alfred", ({ command, ack, respond, context }) => {
   }
 });
 
-app.view(ACTIONS.saveProject, ({ ack, body, view, context}) => {
+app.view(ACTIONS.saveProject, ({ ack, body, view, context }) => {
   ack();
-  console.log("conversation", context);
-  const convo = app.convoStore.get("body.user.id");
-  console.log("convo", convo);
+
   const projectName = view.state.values.project_name.project_name.value;
   const projectDescription =
     view.state.values.project_description.project_description.value;
   const projectId = view.private_metadata;
-  console.log("view.......", view);
+  // console.log("view.......", view);
 
   if (projectId) {
-    console.log("it exists");
+    const { respond, token } = convoStore.get("body.user.id");
     updateProject(projectId, projectName, projectDescription, error => {
-      let msg = "I had a bit of trouble updating that project for some reason.";
-      if (!error) {
-        msg = `I've updated that \`${projectName}\` project. You're welcome.`;
+      if (error) {
+        // TODO
+        console.log("handle this error in ACTIONS.saveProject");
       }
-      app.client.chat.postMessage({
-        token: context.botToken,
-        channel: body.user.id,
-        text: msg
+      convo.then(({ respond, token }) => {
+        lookupProject(projectName, true, respond, token);
       });
     });
   } else {
@@ -118,7 +115,10 @@ app.view(ACTIONS.saveProject, ({ ack, body, view, context}) => {
       let msg =
         "I had a bit of trouble making that new project for some reason.";
       if (!error) {
-        msg = `I made that project. You know, "${projectName}"`;
+        msg = `I've create the \`${projectName}\` as you requested.
+        It currently consist of a few empty default sections.
+        You can view it at anytime by typing \`/alfred ${projectName}\`.
+        I'd recommend that you do that now and provide some more meaningful content.`;
       }
       app.client.chat.postMessage({
         token: context.botToken,
@@ -142,8 +142,8 @@ app.action("mod_project", ({ action, ack, context, body, respond }) => {
     "_"
   );
 
-  console.log(app);
-  app.convoStore.set("body.user.id", { respond, token: context.botToken });
+  // console.log(app);
+  convoStore.set("body.user.id", { respond, token: context.botToken });
 
   switch (command) {
     case "edit":
@@ -160,7 +160,7 @@ app.action("mod_project", ({ action, ack, context, body, respond }) => {
       console.log("need to make a new section");
       break;
     default:
-      console.log('How did they even do this...?')
+      console.log("How did they even do this...?");
   }
 });
 
