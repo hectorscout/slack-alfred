@@ -297,7 +297,7 @@ app.action("mod_section", ({ action, ack, context, body, respond }) => {
       break;
     case "delete":
       deleteSection(sectionId, error => {
-        if (error){
+        if (error) {
           respond({
             token: context.botToken,
             response_type: "ephemeral",
@@ -349,9 +349,9 @@ app.action("mod_item", ({ action, ack, context, body, respond }) => {
         lookupProject(projectName, true, respond, context.botToken);
       });
       break;
-    case 'delete':
+    case "delete":
       deleteItem(itemId, error => {
-        if (error){
+        if (error) {
           respond({
             token: context.botToken,
             response_type: "ephemeral",
@@ -361,6 +361,6 @@ app.action("mod_item", ({ action, ack, context, body, respond }) => {
           return;
         }
         lookupProject(projectName, true, respond, context.botToken);
-      })
+      });
   }
 });

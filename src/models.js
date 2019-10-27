@@ -287,18 +287,34 @@ export const moveItem = (itemId, command, next) => {
 };
 
 const prepareRankForDelete = (id, table, next) => {
-  pool.query(`SELECT rank FROM ${table} WHERE ID = $1`, [id], (error, results) => {
-    const targetRank = results.rows[0].rank;
+  pool.query(
+    `SELECT rank FROM ${table} WHERE ID = $1`,
+    [id],
+    (error, results) => {
+      const targetRank = results.rows[0].rank;
 
-    // TODO: handle the errors and call next after all the calls are done...
-    pool.query(`SELECT ID, rank FROM ${table} WHERE rank > $1`, [targetRank], (error, results) => {
-      R.map(record => {
-        const {id, rank} = record;
-        pool.query(`UPDATE ${table} SET rank = $1 WHERE id = $2`, [rank - 1, id], error => { if (error) { throw error } })
-      })(results.rows);
-      next();
-    })
-  })
+      // TODO: handle the errors and call next after all the calls are done...
+      pool.query(
+        `SELECT ID, rank FROM ${table} WHERE rank > $1`,
+        [targetRank],
+        (error, results) => {
+          R.map(record => {
+            const { id, rank } = record;
+            pool.query(
+              `UPDATE ${table} SET rank = $1 WHERE id = $2`,
+              [rank - 1, id],
+              error => {
+                if (error) {
+                  throw error;
+                }
+              }
+            );
+          })(results.rows);
+          next();
+        }
+      );
+    }
+  );
 };
 
 const deleteById = (id, table, next) => {
@@ -306,18 +322,17 @@ const deleteById = (id, table, next) => {
 };
 
 export const deleteProject = (projectId, next) => {
-  deleteById(projectId, 'projects', next);
+  deleteById(projectId, "projects", next);
 };
 
 export const deleteSection = (sectionId, next) => {
-  prepareRankForDelete(sectionId, 'sections', () => {
-    deleteById(sectionId, 'sections', next);
+  prepareRankForDelete(sectionId, "sections", () => {
+    deleteById(sectionId, "sections", next);
   });
-
 };
 
 export const deleteItem = (itemId, next) => {
-  prepareRankForDelete(itemId, 'items', () => {
-    deleteById(itemId, 'items', next);
+  prepareRankForDelete(itemId, "items", () => {
+    deleteById(itemId, "items", next);
   });
 };
