@@ -10,6 +10,7 @@ export const buildProjectBlocks = (project, editable) => {
   };
 
   if (editable) {
+    const hasSections = project.sections.length > 0;
     descriptionBlock.accessory = {
       type: "overflow",
       action_id: "mod_project",
@@ -29,6 +30,14 @@ export const buildProjectBlocks = (project, editable) => {
             text: "Add A New Section"
           },
           value: `newsection_${project.name}_${project.id}`
+        },
+        {
+          text: {
+            type: "plain_text",
+            emoji: true,
+            value: hasSections ? "Remove sections to remove project" : ":no_entry_sign: Delete Project"
+          },
+          value: hasSections ? "noop" : `delete_${project.name}_${project.id}`
         }
       ]
     };

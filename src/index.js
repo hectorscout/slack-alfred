@@ -186,7 +186,7 @@ app.view(ACTIONS.saveProject, ({ ack, body, view, context }) => {
       let msg =
         "I had a bit of trouble making that new project for some reason.";
       if (!error) {
-        msg = `I've create the \`${projectName}\` as you requested.
+        msg = `I've create \`${projectName}\` as you requested.
         It currently consist of a few empty default sections.
         You can view it at anytime by typing \`/alfred ${projectName}\`.
         I'd recommend that you do that now and provide some more meaningful content.`;
@@ -240,6 +240,18 @@ app.action("mod_project", ({ action, ack, context, body, respond }) => {
         trigger_id: body.trigger_id
       });
       break;
+    case 'delete':
+      deleteProject(projectId, error => {
+        if (error) {
+          respond({
+            token: context.botToken,
+            response_type: "ephemeral",
+            text:
+              "I appear to have run into some problems trying to remove the project. I apologize."
+          });
+          return;
+        }
+      });
     default:
       console.log("How did they even do this...?");
   }
