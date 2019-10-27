@@ -9,6 +9,9 @@ import {
   addItem,
   addProject,
   addSection,
+  deleteItem,
+  deleteProject,
+  deleteSection,
   getFullProject,
   getItemById,
   getProjectById,
@@ -292,6 +295,20 @@ app.action("mod_section", ({ action, ack, context, body, respond }) => {
         lookupProject(projectName, true, respond, context.botToken);
       });
       break;
+    case "delete":
+      deleteSection(sectionId, error => {
+        if (error){
+          respond({
+            token: context.botToken,
+            response_type: "ephemeral",
+            text:
+              "I appear to have run into some problems trying to remove that. I apologize."
+          });
+          return;
+        }
+        lookupProject(projectName, true, respond, context.botToken);
+      });
+      break;
   }
 });
 
@@ -332,5 +349,18 @@ app.action("mod_item", ({ action, ack, context, body, respond }) => {
         lookupProject(projectName, true, respond, context.botToken);
       });
       break;
+    case 'delete':
+      deleteItem(itemId, error => {
+        if (error){
+          respond({
+            token: context.botToken,
+            response_type: "ephemeral",
+            text:
+              "I appear to have run into some problems trying to remove that. I apologize."
+          });
+          return;
+        }
+        lookupProject(projectName, true, respond, context.botToken);
+      })
   }
 });

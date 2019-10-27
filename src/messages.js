@@ -77,8 +77,9 @@ export const buildProjectBlocks = (project, editable) => {
 
 const buildSectionBlocks = (sections, projectName, editable) => {
   const blocks = R.pipe(
-    // R.values,
     R.map(section => {
+      console.log('section', section);
+      const hasItems = section.items.length > 0
       const sectionBlock = {
         type: "section",
         text: {
@@ -134,9 +135,9 @@ const buildSectionBlocks = (sections, projectName, editable) => {
           text: {
             type: "plain_text",
             emoji: true,
-            text: ":no_entry_sign: Delete Whole Section"
+            text: hasItems ? "Delete items to delete section" : ":no_entry_sign: Delete Section"
           },
-          value: `delete_${projectName}_${section.id}`
+          value: hasItems ? "noop" : `delete_${projectName}_${section.id}`
         });
       }
       return [
