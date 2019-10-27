@@ -6,14 +6,17 @@ import { ACTIONS, MESSAGES, MODALS } from "./constants";
 import { buildProjectBlocks } from "./messages";
 
 import {
+  addItem,
   addProject,
   addSection,
   getFullProject,
+  getItemById,
   getProjectById,
   getProjects,
   getSectionById,
   moveItem,
   moveSection,
+  updateItem,
   updateProject,
   updateSection
 } from "./models";
@@ -93,6 +96,39 @@ app.command("/alfred", ({ command, ack, respond, context }) => {
   }
 });
 
+app.view(ACTIONS.saveItem, ({ ack, body, view }) => {
+  ack();
+  const itemName = view.state.values.item_name.item_name.value;
+  const itemUrl = view.state.values.item_url.item_url.value;
+  const itemDescription =
+    view.state.values.item_description.item_description.value;
+  const { id, sectionId } = JSON.parse(view.private_metadata);
+  const itemId = id;
+
+  const convo = convoStore.get(body.user.id);
+  if (itemId) {
+    updateItem(itemId, itemName, itemUrl, itemDescription, error => {
+      if (error) {
+        // TODO
+        console.log("handle this error in ACTIONS.saveItem", error);
+      }
+      convo.then(({ respond, token, projectName }) => {
+        lookupProject(projectName, true, respond, token);
+      });
+    });
+  } else {
+    addItem(itemName, sectionId, itemUrl, itemDescription, error => {
+      if (error) {
+        // TODO
+        console.log("handle this error in ACTIONS.saveItem", error);
+      }
+      convo.then(({ respond, token, projectName }) => {
+        lookupProject(projectName, true, respond, token);
+      });
+    });
+  }
+});
+
 app.view(ACTIONS.saveSection, ({ ack, body, view }) => {
   ack();
   const sectionName = view.state.values.section_name.section_name.value;
@@ -138,7 +174,7 @@ app.view(ACTIONS.saveProject, ({ ack, body, view, context }) => {
         // TODO
         console.log("handle this error in ACTIONS.saveProject");
       }
-      convo.then(({ respond, token, projectName }) => {
+      convo.then(({ respond, token }) => {
         lookupProject(projectName, true, respond, token);
       });
     });
@@ -229,7 +265,17 @@ app.action("mod_section", ({ action, ack, context, body, respond }) => {
       });
       break;
     case "newitem":
-      // TODO
+      convoStore.set(body.user.id, {
+        respond,
+        token: context.botToken,
+        projectName
+      });
+      const blocks = MODALS.newItem({ sectionId });
+      app.client.views.open({
+        token: context.botToken,
+        view: blocks,
+        trigger_id: body.trigger_id
+      });
       break;
     case "up":
     case "down":
@@ -257,15 +303,19 @@ app.action("mod_item", ({ action, ack, context, body, respond }) => {
 
   switch (command) {
     case "edit":
-      // getItemById(itemId, (error, item) => {
-      // const blocks = MODALS.newProject(project)
-      // console.log(blocks.blocks);
-      // app.client.views.open({
-      //   token: context.botToken,
-      //   view: blocks,
-      //   trigger_id: body.trigger_id
-      // });
-      // });
+      convoStore.set(body.user.id, {
+        respond,
+        token: context.botToken,
+        projectName
+      });
+      getItemById(itemId, (error, item) => {
+        const blocks = MODALS.newItem(item);
+        app.client.views.open({
+          token: context.botToken,
+          view: blocks,
+          trigger_id: body.trigger_id
+        });
+      });
       break;
     case "up":
     case "down":

@@ -12,8 +12,8 @@ export const addItem = (name, sectionId, url, description, next) => {
       const maxRank = results.rows[0].max;
       const rank = maxRank === null ? 0 : maxRank + 1;
       pool.query(
-        "INSERT INTO items (name, url, description, sectionId, rank) VALUES ($1, $2, $3, $4, $5)",
-        [name, url, description, sectionId, rank],
+        "INSERT INTO items (name, url, description, type, sectionId, rank) VALUES ($1, $2, $3, $4, $5, $6)",
+        [name, url, description, "URL", sectionId, rank],
         error => {
           if (error) {
             throw error;
