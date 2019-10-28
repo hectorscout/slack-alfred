@@ -1,5 +1,5 @@
 import * as R from "ramda";
-import { ACTIONS, COMMANDS, ITEM_TYPES } from "./constants";
+import { ACTIONS, COMMANDS, ITEM_TYPES} from "../constants";
 
 const buildProjectBlocks = (project, editable) => {
   const descriptionBlock = {
