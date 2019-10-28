@@ -2,7 +2,7 @@ import * as R from "ramda";
 import * as dotenv from "dotenv";
 
 import { App, MemoryStore } from "@slack/bolt";
-import { ACTIONS, MESSAGES, MODALS, COMMANDS } from "./constants";
+import { ACTIONS, MODALS, COMMANDS } from "./constants";
 
 import projectMessage from "./messages/project_message";
 import availableProjects from "./messages/available_projects";

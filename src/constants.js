@@ -24,47 +24,6 @@ const ITEM_TYPES = {
   channel: "CHANNEL"
 };
 
-const MESSAGES = {
-  newProject: {
-    blocks: [
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text:
-            "Mr. Wayne, are you sure Gotham can _handle_ another project now?"
-        }
-      },
-      {
-        type: "actions",
-        elements: [
-          {
-            type: "button",
-            action_id: ACTIONS.openNewProjectDialog,
-            text: {
-              type: "plain_text",
-              emoji: true,
-              text: "It's the project Gotham needs"
-            },
-            style: "primary",
-            value: "new_project"
-          },
-          {
-            type: "button",
-            text: {
-              type: "plain_text",
-              emoji: true,
-              text: "Right as always Alfred"
-            },
-            style: "danger",
-            value: "noop"
-          }
-        ]
-      }
-    ]
-  }
-};
-
 const MODALS = {
   newSection: values => ({
     type: "modal",
