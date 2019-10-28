@@ -5,6 +5,8 @@ import { App, MemoryStore } from "@slack/bolt";
 import { ACTIONS, MESSAGES, MODALS } from "./constants";
 import { buildProjectBlocks } from "./messages";
 
+import availableProjects from './messages/available_projects';
+
 import {
   addItem,
   addProject,
@@ -54,11 +56,8 @@ const lookupProject = (projectName, editable, respond, token) => {
       getProjects(projects => {
         respond({
           token,
-          response_type: "ephemeral", // TODO: not working?
-          text: `Couldn't find \`${projectName}\`. The following projects are available: \`${R.join(
-            "`, `",
-            R.pluck("name", projects)
-          )}\``
+          response_type: "ephemeral",
+          blocks: availableProjects(projectName, projects)
         });
       });
     } else {
@@ -84,16 +83,16 @@ app.command("/alfred", ({ command, ack, respond, context }) => {
         trigger_id: command.trigger_id
       });
       break;
-    case "HELP":
-      getProjects(projects => {
-        respond({
-          text: `The following projects are available: \`${R.join(
-            "`, `",
-            R.pluck("name", projects)
-          )}\``
-        });
-      });
-      break;
+    // case "HELP":
+    //   getProjects(projects => {
+    //     respond({
+    //       text: `The following projects are available: \`${R.join(
+    //         "`, `",
+    //         R.pluck("name", projects)
+    //       )}\``
+    //     });
+    //   });
+    //   break;
     default:
       lookupProject(command.text, false, respond, context.botToken);
   }
@@ -186,7 +185,7 @@ app.view(ACTIONS.saveProject, ({ ack, body, view, context }) => {
       let msg =
         "I had a bit of trouble making that new project for some reason.";
       if (!error) {
-        msg = `I've create \`${projectName}\` as you requested.
+        msg = `I've create *${projectName}* as you requested.
         It currently consist of a few empty default sections.
         You can view it at anytime by typing \`/alfred ${projectName}\`.
         I'd recommend that you do that now and provide some more meaningful content.`;
@@ -200,12 +199,17 @@ app.view(ACTIONS.saveProject, ({ ack, body, view, context }) => {
   }
 });
 
-app.action("edit_mode", ({ action, ack, respond, context }) => {
+app.action(ACTIONS.editProject, ({ action, ack, respond, context }) => {
   ack();
   lookupProject(action.value, true, respond, context.botToken);
 });
 
-app.action("mod_project", ({ action, ack, context, body, respond }) => {
+app.action(ACTIONS.viewProject, ({ action, ack, respond, context }) => {
+  ack();
+  lookupProject(action.value, false, respond, context.botToken);
+});
+
+app.action(ACTIONS.modProject, ({ action, ack, context, body, respond }) => {
   ack();
   const [command, projectName, projectId] = action.selected_option.value.split(
     "_"
@@ -242,7 +246,7 @@ app.action("mod_project", ({ action, ack, context, body, respond }) => {
       break;
     case "delete":
       deleteProject(projectId, error => {
-        let msg = `I've disposed of \`$}projectName}\` discretely. It shan't be coming back to us, sir.`;
+        let msg = `I've disposed of *$}projectName}* discretely. It shan't be coming back to us, sir.`;
         if (error) {
           msg =
             "I appear to have run into some problems trying to remove the project. I apologize.";

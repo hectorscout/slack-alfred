@@ -1,19 +1,20 @@
 import * as R from "ramda";
+import { ACTIONS } from "./constants";
 
 export const buildProjectBlocks = (project, editable) => {
   const descriptionBlock = {
     type: "section",
     text: {
       type: "mrkdwn",
-      text: `${project.description}`
+      text: `*${project.name}*\n${project.description}`
     }
   };
 
   if (editable) {
     const hasSections = project.sections.length > 0;
     descriptionBlock.accessory = {
-      type: "overflow",
-      action_id: "mod_project",
+      type: "static_select",
+      action_id: ACTIONS.modProject,
       options: [
         {
           text: {
@@ -41,7 +42,12 @@ export const buildProjectBlocks = (project, editable) => {
           },
           value: hasSections ? "noop" : `delete_${project.name}_${project.id}`
         }
-      ]
+      ],
+      placeholder: {
+        type: "plain_text",
+        emoji: true,
+        text: "Modify Project"
+      }
     };
   }
 
@@ -50,27 +56,50 @@ export const buildProjectBlocks = (project, editable) => {
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `Here's what I know about \`${project.name}\`, Master Bruce.`
+        text: `Here's what we know about *${project.name}*, Master Bruce.`
       }
     },
     {
       type: "divider"
     },
     descriptionBlock,
-    ...buildSectionBlocks(project.sections, project.name, editable)
+    {
+      type: "divider"
+    },
+    ...buildSectionBlocks(project.sections, project.name, editable),
+    {
+      type: "divider"
+    }
   ];
 
-  if (!editable) {
-    projectBlocks = projectBlocks.concat([
-      {
-        type: "divider"
-      },
+  if (editable) {
+    projectBlocks.push(
       {
         type: "actions",
         elements: [
           {
             type: "button",
-            action_id: "edit_mode",
+            action_id: ACTIONS.viewProject,
+            text: {
+              type: "plain_text",
+              emoji: true,
+              text: "It's Done"
+            },
+            style: "primary",
+            value: `${project.name}`
+          }
+        ]
+      }
+    )
+  }
+  else {
+    projectBlocks.push(
+      {
+        type: "actions",
+        elements: [
+          {
+            type: "button",
+            action_id: ACTIONS.editProject,
             text: {
               type: "plain_text",
               emoji: true,
@@ -81,7 +110,7 @@ export const buildProjectBlocks = (project, editable) => {
           }
         ]
       }
-    ]);
+    );
   }
   return projectBlocks;
 };
@@ -99,7 +128,7 @@ const buildSectionBlocks = (sections, projectName, editable) => {
       };
       if (editable) {
         sectionBlock.accessory = {
-          type: "overflow",
+          type: "static_select",
           action_id: "mod_section",
           options: [
             {
@@ -110,7 +139,12 @@ const buildSectionBlocks = (sections, projectName, editable) => {
               },
               value: `edit_${projectName}_${section.id}`
             }
-          ]
+          ],
+          placeholder: {
+            type: "plain_text",
+            emoji: true,
+            text: "Modify Section"
+          }
         };
 
         if (section.rank !== 0) {
@@ -153,10 +187,10 @@ const buildSectionBlocks = (sections, projectName, editable) => {
         });
       }
       return [
+        sectionBlock,
         {
           type: "divider"
         },
-        sectionBlock,
         ...buildItemBlocks(section.items, projectName, editable)
       ];
     }),
@@ -178,74 +212,65 @@ const buildItemBlocks = (items, projectName, editable) => {
       }
     ];
   }
-  return R.pipe(
-    R.map(item => {
-      const itemBlock = {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: `<${item.url}|${item.name} - ${item.url}>`
+  return R.map(item => {
+    const itemBlock = {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `*<${item.url}|${item.name} - ${item.url}>*\n${item.description}`
+      }
+    };
+
+    if (editable) {
+      itemBlock.accessory = {
+        type: "static_select",
+        action_id: "mod_item",
+        options: [
+          {
+            text: {
+              type: "plain_text",
+              emoji: true,
+              text: "Edit"
+            },
+            value: `edit_${projectName}_${item.id}`
+          }
+        ],
+        placeholder: {
+          type: "plain_text",
+          emoji: true,
+          text: "Modify Item"
         }
       };
-
-      if (editable) {
-        itemBlock.accessory = {
-          type: "overflow",
-          action_id: "mod_item",
-          options: [
-            {
-              text: {
-                type: "plain_text",
-                emoji: true,
-                text: "Edit"
-              },
-              value: `edit_${projectName}_${item.id}`
-            }
-          ]
-        };
-        if (item.rank !== 0) {
-          itemBlock.accessory.options.push({
-            text: {
-              type: "plain_text",
-              emoji: true,
-              text: "Move Item Up"
-            },
-            value: `up_${projectName}_${item.id}`
-          });
-        }
-        if (item.rank !== items.length - 1) {
-          itemBlock.accessory.options.push({
-            text: {
-              type: "plain_text",
-              emoji: true,
-              text: "Move Item Down"
-            },
-            value: `down_${projectName}_${item.id}`
-          });
-        }
+      if (item.rank !== 0) {
         itemBlock.accessory.options.push({
           text: {
             type: "plain_text",
             emoji: true,
-            text: "Delete"
+            text: "Move Item Up"
           },
-          value: `delete_${projectName}_${item.id}`
+          value: `up_${projectName}_${item.id}`
         });
       }
+      if (item.rank !== items.length - 1) {
+        itemBlock.accessory.options.push({
+          text: {
+            type: "plain_text",
+            emoji: true,
+            text: "Move Item Down"
+          },
+          value: `down_${projectName}_${item.id}`
+        });
+      }
+      itemBlock.accessory.options.push({
+        text: {
+          type: "plain_text",
+          emoji: true,
+          text: "Delete"
+        },
+        value: `delete_${projectName}_${item.id}`
+      });
+    }
 
-      return [
-        itemBlock,
-        {
-          type: "context",
-          elements: [
-            {
-              type: "mrkdwn",
-              text: item.description
-            }
-          ]
-        }
-      ];
-    }),
-    R.flatten
-  )(items);
+    return itemBlock;
+  })(items);
 };

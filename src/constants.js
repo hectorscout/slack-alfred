@@ -1,8 +1,12 @@
 const ACTIONS = {
+  editProject: "EDIT_PROJECT",
+  modProject: "MOD_PROJECT",
   openNewProjectDialog: "OPEN_NEW_PROJECT_DIALOG",
   saveProject: "SAVE_PROJECT",
   saveSection: "SAVE_SECTION",
-  saveItem: "SAVE_ITEM"
+  saveItem: "SAVE_ITEM",
+  viewProject: 'VIEW_PROJECT',
+
 };
 
 const MESSAGES = {
