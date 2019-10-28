@@ -2,12 +2,13 @@ import * as R from "ramda";
 import * as dotenv from "dotenv";
 
 import { App, MemoryStore } from "@slack/bolt";
-import { ACTIONS, MODALS, COMMANDS } from "./constants";
+import { ACTIONS, COMMANDS } from "./constants";
 
 import projectMessage from "./messages/project_message";
 import availableProjects from "./messages/available_projects";
 import projectModal from "./messages/project_modal";
 import itemModal from "./messages/item_modal";
+import sectionModal from "./messages/section_modal";
 
 import {
   addItem,
@@ -250,7 +251,7 @@ app.action(ACTIONS.modProject, ({ action, ack, context, body, respond }) => {
         token: context.botToken,
         projectName
       });
-      const blocks = MODALS.newSection({ projectId });
+      const blocks = sectionModal({ projectId });
       app.client.views.open({
         token: context.botToken,
         view: blocks,
@@ -275,7 +276,7 @@ app.action(ACTIONS.modProject, ({ action, ack, context, body, respond }) => {
   }
 });
 
-app.action("mod_section", ({ action, ack, context, body, respond }) => {
+app.action(ACTIONS.modSection, ({ action, ack, context, body, respond }) => {
   ack();
   const actionValue = JSON.parse(action.selected_option.value);
   const command = actionValue.cmd;
@@ -290,7 +291,7 @@ app.action("mod_section", ({ action, ack, context, body, respond }) => {
         projectName
       });
       getSectionById(sectionId, (error, section) => {
-        const blocks = MODALS.newSection(section);
+        const blocks = sectionModal(section);
         app.client.views.open({
           token: context.botToken,
           view: blocks,
@@ -346,7 +347,7 @@ app.action("mod_section", ({ action, ack, context, body, respond }) => {
   }
 });
 
-app.action("mod_item", ({ action, ack, context, body, respond }) => {
+app.action(ACTIONS.modItem, ({ action, ack, context, body, respond }) => {
   ack();
   const [command, projectName, itemId] = action.selected_option.value.split(
     "_"

@@ -1,5 +1,5 @@
 import * as R from "ramda";
-import { ACTIONS, COMMANDS, ITEM_TYPES} from "../constants";
+import { ACTIONS, COMMANDS, ITEM_TYPES } from "../constants";
 
 const buildProjectBlocks = (project, editable) => {
   const descriptionBlock = {
@@ -129,7 +129,7 @@ const buildSectionBlocks = (sections, projectName, editable) => {
       if (editable) {
         sectionBlock.accessory = {
           type: "static_select",
-          action_id: "mod_section",
+          action_id: ACTIONS.modSection,
           options: [
             {
               text: {
@@ -308,7 +308,7 @@ const buildItemBlocks = (items, projectName, editable) => {
     if (editable) {
       itemBlock.accessory = {
         type: "static_select",
-        action_id: "mod_item",
+        action_id: ACTIONS.modItem,
         options: [
           {
             text: {
