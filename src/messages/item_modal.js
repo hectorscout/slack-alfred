@@ -118,7 +118,62 @@ const getUserBlocks = values => {
 };
 
 const getChannelBlocks = values => {
-  return [];
+  return [
+    {
+      type: "input",
+      block_id: "item_channel",
+      element: {
+        type: "channels_select",
+        action_id: "item_channel",
+        placeholder: {
+          type: "plain_text",
+          text: "same_bat_channel"
+        }
+        // initial_channel: values.url || ""
+      },
+      label: {
+        type: "plain_text",
+        text: "Which channel?"
+      }
+    },
+    {
+      type: "input",
+      block_id: "item_name",
+      element: {
+        type: "plain_text_input",
+        action_id: "item_name",
+        placeholder: {
+          type: "plain_text",
+          text: "What's Next!?"
+        },
+        initial_value: values.name || ""
+      },
+      label: {
+        type: "plain_text",
+        text: "A short name for the channel?"
+      }
+    },
+    {
+      type: "input",
+      block_id: "item_description",
+      label: {
+        type: "plain_text",
+        text: "What would one find in this channel?",
+        emoji: true
+      },
+      element: {
+        type: "plain_text_input",
+        action_id: "item_description",
+        placeholder: {
+          type: "plain_text",
+          text:
+            "It appears the Caped Crusader's \"goose is cooked\". Will Robin's wings be clipped?\nNext week, the exciting conclusion.\nSame bat time, same bat channel!"
+        },
+        multiline: true,
+        initial_value: values.description || ""
+      }
+    }
+  ];
 };
 
 const itemModal = values => {

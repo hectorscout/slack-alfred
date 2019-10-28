@@ -179,7 +179,8 @@ export const getFullProject = (projectName, next) => {
      items.name as item_name,
      items.url as item_url,
      items.description as item_description,
-     items.rank as item_rank
+     items.rank as item_rank,
+     items.type as item_type
     FROM aliases
     LEFT JOIN projects ON projects.ID = aliases.projectId
     LEFT JOIN sections ON projects.ID = sections.projectId
@@ -217,7 +218,8 @@ export const getFullProject = (projectName, next) => {
               name: row.item_name,
               description: row.item_description,
               url: row.item_url,
-              rank: row.item_rank
+              rank: row.item_rank,
+              type: row.item_type
             });
           }
           return project;

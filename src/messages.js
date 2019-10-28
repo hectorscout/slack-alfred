@@ -1,5 +1,5 @@
 import * as R from "ramda";
-import { ACTIONS, COMMANDS } from "./constants";
+import { ACTIONS, COMMANDS, ITEM_TYPES } from "./constants";
 
 export const buildProjectBlocks = (project, editable) => {
   const descriptionBlock = {
@@ -239,6 +239,44 @@ const buildSectionBlocks = (sections, projectName, editable) => {
   return blocks;
 };
 
+const buildLinkItemBlocks = item => {
+  return {
+    type: "section",
+    text: {
+      type: "mrkdwn",
+      text: `*<${item.url}|${item.name} - ${
+        item.url
+      }>*\n>${item.description.replace("\n", "\n>")}`
+    }
+  };
+};
+
+const buildUserItemBlocks = item => {
+  return {
+    type: "section",
+    text: {
+      type: "mrkdwn",
+      text: `*${item.name}:* <@${item.url}>\n>${item.description.replace(
+        "\n",
+        "\n>"
+      )}`
+    }
+  };
+};
+
+const buildChannelItemBlocks = item => {
+  return {
+    type: "section",
+    text: {
+      type: "mrkdwn",
+      text: `*${item.name}:* <#${item.url}>\n>${item.description.replace(
+        "\n",
+        "\n>"
+      )}`
+    }
+  };
+};
+
 const buildItemBlocks = (items, projectName, editable) => {
   if (!items.length) {
     return [
@@ -252,14 +290,20 @@ const buildItemBlocks = (items, projectName, editable) => {
       }
     ];
   }
+
   return R.map(item => {
-    const itemBlock = {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        text: `*<${item.url}|${item.name} - ${item.url}>*\n${item.description}`
-      }
-    };
+    let itemBlock = {};
+    switch (item.type) {
+      case ITEM_TYPES.url:
+        itemBlock = buildLinkItemBlocks(item);
+        break;
+      case ITEM_TYPES.user:
+        itemBlock = buildUserItemBlocks(item);
+        break;
+      case ITEM_TYPES.channel:
+        itemBlock = buildChannelItemBlocks(item);
+        break;
+    }
 
     if (editable) {
       itemBlock.accessory = {

@@ -105,8 +105,12 @@ app.view(ACTIONS.saveItem, ({ ack, body, view }) => {
   const { values } = view.state;
   const itemName = R.path(["item_name", "item_name", "value"], values);
   const itemUrl = R.pathOr(
-    R.path(["item_user", "item_user", "selected_user"], values),
-    ["item_url", "item_url", "value"],
+    R.pathOr(
+      R.path(["item_user", "item_user", "selected_user"], values),
+      ["item_url", "item_url", "value"],
+      values
+    ),
+    ["item_channel", "item_channel", "selected_channel"],
     values
   );
   const itemDescription = R.path(
