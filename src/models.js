@@ -146,6 +146,9 @@ export const getFullProject = (projectName, next) => {
   `,
     [projectName],
     (error, results) => {
+      if (error || results.rows.length === 0) {
+        return next(error, false);
+      }
       const project = R.reduce(
         (project, row) => {
           if (!project.id) {

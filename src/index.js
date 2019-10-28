@@ -55,9 +55,9 @@ const lookupProject = (projectName, editable, respond, token) => {
         respond({
           token,
           response_type: "ephemeral", // TODO: not working?
-          text: `Couldn't find ${projectName}. The following projects are available: \`${R.join(
+          text: `Couldn't find \`${projectName}\`. The following projects are available: \`${R.join(
             "`, `",
-            R.pluck("projectName", projects)
+            R.pluck("name", projects)
           )}\``
         });
       });
@@ -240,17 +240,18 @@ app.action("mod_project", ({ action, ack, context, body, respond }) => {
         trigger_id: body.trigger_id
       });
       break;
-    case 'delete':
+    case "delete":
       deleteProject(projectId, error => {
+        let msg = `I've disposed of \`$}projectName}\` discretely. It shan't be coming back to us, sir.`;
         if (error) {
-          respond({
-            token: context.botToken,
-            response_type: "ephemeral",
-            text:
-              "I appear to have run into some problems trying to remove the project. I apologize."
-          });
-          return;
+          msg =
+            "I appear to have run into some problems trying to remove the project. I apologize.";
         }
+        respond({
+          token: context.botToken,
+          response_type: "ephemeral",
+          text: msg
+        });
       });
     default:
       console.log("How did they even do this...?");
