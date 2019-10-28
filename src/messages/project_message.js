@@ -1,7 +1,7 @@
 import * as R from "ramda";
 import { ACTIONS, COMMANDS, ITEM_TYPES } from "./constants";
 
-export const buildProjectBlocks = (project, editable) => {
+const buildProjectBlocks = (project, editable) => {
   const descriptionBlock = {
     type: "section",
     text: {
@@ -28,7 +28,7 @@ export const buildProjectBlocks = (project, editable) => {
           text: {
             type: "plain_text",
             emoji: true,
-            text: "Add A New Section"
+            text: ":heavy_plus_sign: Add A New Section"
           },
           value: `newsection_${project.name}_${project.id}`
         },
@@ -37,7 +37,7 @@ export const buildProjectBlocks = (project, editable) => {
             type: "plain_text",
             emoji: true,
             text: hasSections
-              ? "Remove sections to remove project"
+              ? "Remove all sections to remove project"
               : ":no_entry_sign: Delete Project"
           },
           value: hasSections ? "noop" : `delete_${project.name}_${project.id}`
@@ -358,3 +358,5 @@ const buildItemBlocks = (items, projectName, editable) => {
     return itemBlock;
   })(items);
 };
+
+export default buildProjectBlocks;

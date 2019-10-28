@@ -3,8 +3,8 @@ import * as dotenv from "dotenv";
 
 import { App, MemoryStore } from "@slack/bolt";
 import { ACTIONS, MESSAGES, MODALS, COMMANDS } from "./constants";
-import { buildProjectBlocks } from "./messages";
 
+import projectMessage from "./messages/project_message";
 import availableProjects from "./messages/available_projects";
 import projectModal from "./messages/project_modal";
 import itemModal from "./messages/item_modal";
@@ -67,7 +67,7 @@ const lookupProject = (projectName, editable, respond, token) => {
         token,
         replace_original: true,
         response_type: "ephemeral",
-        blocks: buildProjectBlocks(project, editable)
+        blocks: projectMessage(project, editable)
       });
     }
   });
