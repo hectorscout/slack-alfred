@@ -289,17 +289,18 @@ export const moveItem = (itemId, command, next) => {
   }
 };
 
-const prepareRankForDelete = (id, table, next) => {
+const prepareRankForDelete = (id, table, parentIdField, next) => {
   pool.query(
-    `SELECT rank FROM ${table} WHERE ID = $1`,
+    `SELECT rank, ${parentIdField} AS parentid FROM ${table} WHERE ID = $1`,
     [id],
     (error, results) => {
       const targetRank = results.rows[0].rank;
+      const parentId = results.rows[0].parentid;
 
       // TODO: handle the errors and call next after all the calls are done...
       pool.query(
-        `SELECT ID, rank FROM ${table} WHERE rank > $1`,
-        [targetRank],
+        `SELECT ID, rank FROM ${table} WHERE rank > $1 AND ${parentIdField} = $2`,
+        [targetRank, parentId],
         (error, results) => {
           R.map(record => {
             const { id, rank } = record;
@@ -329,13 +330,13 @@ export const deleteProject = (projectId, next) => {
 };
 
 export const deleteSection = (sectionId, next) => {
-  prepareRankForDelete(sectionId, "sections", () => {
+  prepareRankForDelete(sectionId, "sections", "projectid", () => {
     deleteById(sectionId, "sections", next);
   });
 };
 
 export const deleteItem = (itemId, next) => {
-  prepareRankForDelete(itemId, "items", () => {
+  prepareRankForDelete(itemId, "items", "sectionid", () => {
     deleteById(itemId, "items", next);
   });
 };
