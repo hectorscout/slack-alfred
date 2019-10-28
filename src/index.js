@@ -6,6 +6,7 @@ import { ACTIONS, MESSAGES, MODALS } from "./constants";
 import { buildProjectBlocks } from "./messages";
 
 import availableProjects from './messages/available_projects';
+import projectModal from './messages/project_modal'
 
 import {
   addItem,
@@ -79,7 +80,7 @@ app.command("/alfred", ({ command, ack, respond, context }) => {
     case "NEW":
       app.client.views.open({
         token: context.botToken,
-        view: MODALS.newProject({}),
+        view: projectModal({}),
         trigger_id: command.trigger_id
       });
       break;
@@ -165,13 +166,14 @@ app.view(ACTIONS.saveProject, ({ ack, body, view, context }) => {
   ack();
 
   const projectName = view.state.values.project_name.project_name.value;
-  const projectDescription =
+  const description =
     view.state.values.project_description.project_description.value;
-  const projectId = view.private_metadata;
+  const aliases = view.state.values.project_aliases.project_aliases.value;
+  const id = view.private_metadata;
 
-  if (projectId) {
+  if (id) {
     const convo = convoStore.get(body.user.id);
-    updateProject(projectId, projectName, projectDescription, error => {
+    updateProject(id, projectName, description, aliases, error => {
       if (error) {
         // TODO
         console.log("handle this error in ACTIONS.saveProject");
@@ -181,7 +183,7 @@ app.view(ACTIONS.saveProject, ({ ack, body, view, context }) => {
       });
     });
   } else {
-    addProject(projectName, projectDescription, error => {
+    addProject(name, description, aliases, error => {
       let msg =
         "I had a bit of trouble making that new project for some reason.";
       if (!error) {
@@ -223,10 +225,9 @@ app.action(ACTIONS.modProject, ({ action, ack, context, body, respond }) => {
         projectName
       });
       getProjectById(projectId, (error, project) => {
-        const blocks = MODALS.newProject(project);
         app.client.views.open({
           token: context.botToken,
-          view: blocks,
+          view: projectModal(project),
           trigger_id: body.trigger_id
         });
       });

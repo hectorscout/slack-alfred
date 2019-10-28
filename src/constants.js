@@ -51,65 +51,6 @@ const MESSAGES = {
 };
 
 const MODALS = {
-  newProject: values => ({
-    type: "modal",
-    callback_id: ACTIONS.saveProject,
-    private_metadata: values.id ? `${values.id}` : "",
-    title: {
-      type: "plain_text",
-      text: "Alfred",
-      emoji: true
-    },
-    submit: {
-      type: "plain_text",
-      text: "Go Ahead",
-      emoji: true
-    },
-    close: {
-      type: "plain_text",
-      text: "Nevermind",
-      emoji: true
-    },
-    blocks: [
-      {
-        type: "input",
-        block_id: "project_name",
-        element: {
-          type: "plain_text_input",
-          action_id: "project_name",
-          placeholder: {
-            type: "plain_text",
-            text: "BatIQ"
-          },
-          initial_value: values.name || ""
-        },
-        label: {
-          type: "plain_text",
-          text: "What should the project be called then?"
-        }
-      },
-      {
-        type: "input",
-        block_id: "project_description",
-        label: {
-          type: "plain_text",
-          text: "And how would you describe the project, sir?",
-          emoji: true
-        },
-        element: {
-          type: "plain_text_input",
-          action_id: "project_description",
-          placeholder: {
-            type: "plain_text",
-            text:
-              "The best product ever created for understanding and managing your Batcave and the darkness within."
-          },
-          multiline: true,
-          initial_value: values.description || ""
-        }
-      }
-    ]
-  }),
   newSection: values => ({
     type: "modal",
     callback_id: ACTIONS.saveSection,

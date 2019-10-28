@@ -1,6 +1,21 @@
 import * as R from "ramda";
 import pool from "./config";
 
+const updateAliases = (aliases, projectId, projectName) => {
+  pool.query('DELETE FROM aliases WHERE projectId = $1', [projectId], error => {
+    if (error) { console.log('handle this error deleting aliases'); }
+  });
+  const aliasList = R.map(alias => alias.trim().toLowerCase())(aliases.split(','));
+  if (!aliasList.includes(projectName.toLowerCase())) {
+    aliasList.push(projectName);
+  }
+  R.forEach(alias => {
+    pool.query(`INSERT INTO aliases (alias, projectid) VALUES ($1, $2)`, [alias, projectId], error => {
+      if (error) { console.log('handle this error in inserting an alias'); }
+    })
+  })(aliasList);
+};
+
 export const addItem = (name, sectionId, url, description, next) => {
   pool.query(
     "SELECT MAX(rank) FROM items WHERE sectionId = $1",
@@ -49,7 +64,7 @@ export const addSection = (name, projectId, next) => {
   );
 };
 
-export const addProject = (name, description, next) => {
+export const addProject = (name, description, aliases, next) => {
   try {
     pool.query(
       "INSERT INTO projects (name, description) VALUES ($1, $2)",
@@ -69,6 +84,7 @@ export const addProject = (name, description, next) => {
             addSection("Design", projectId, () =>
               addSection("Environments", projectId, next)
             );
+            updateAliases(aliases, projectId, name);
           }
         );
       }
@@ -94,12 +110,13 @@ export const updateSection = (sectionId, name, next) => {
   );
 };
 
-export const updateProject = (projectId, name, description, next) => {
+export const updateProject = (projectId, name, description, aliases, next) => {
   pool.query(
     "UPDATE projects set name = $1, description = $2 WHERE ID = $3",
     [name, description, projectId],
     next
   );
+  updateAliases(aliases, projectId, name);
 };
 
 const getById = (table, id, next) => {
@@ -120,7 +137,14 @@ export const getSectionById = (sectionId, next) => {
 };
 
 export const getProjectById = (projectId, next) => {
-  getById("projects", projectId, next);
+  getById("projects", projectId, (error, project) => {
+    if (error) { next(error) }
+    pool.query(`SELECT alias FROM aliases WHERE projectid = $1`, [project.id], (error, results) => {
+      if (error) { next(error) }
+      project.aliases = R.pluck('alias', results.rows).join(', ');
+      next(error, project);
+    })
+  });
 };
 
 export const getFullProject = (projectName, next) => {
