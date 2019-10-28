@@ -10,18 +10,18 @@ const ACTIONS = {
 };
 
 const COMMANDS = {
-  edit: 'E',
-  new: 'N',
-  up: 'U',
-  down: 'D',
-  delete: 'X',
-  noop: '0'
+  edit: "E",
+  new: "N",
+  up: "U",
+  down: "D",
+  delete: "X",
+  noop: "0"
 };
 
 const ITEM_TYPES = {
-  url: 'URL',
-  user: 'USER',
-  channel: 'CHANNEL'
+  url: "URL",
+  user: "USER",
+  channel: "CHANNEL"
 };
 
 const MESSAGES = {
@@ -107,10 +107,4 @@ const MODALS = {
   })
 };
 
-export {
-  ACTIONS,
-  COMMANDS,
-  ITEM_TYPES,
-  MESSAGES,
-  MODALS
-};
+export { ACTIONS, COMMANDS, ITEM_TYPES, MESSAGES, MODALS };

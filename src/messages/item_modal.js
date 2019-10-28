@@ -70,7 +70,7 @@ const getUserBlocks = values => {
         placeholder: {
           type: "plain_text",
           text: "The Penguin"
-        },
+        }
         // initial_user: values.url || ""
       },
       label: {
@@ -108,8 +108,7 @@ const getUserBlocks = values => {
         action_id: "item_description",
         placeholder: {
           type: "plain_text",
-          text:
-            "Go to him for advise about hiding weapons in umbrellas."
+          text: "Go to him for advise about hiding weapons in umbrellas."
         },
         multiline: true,
         initial_value: values.description || ""
