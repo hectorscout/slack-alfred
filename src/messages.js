@@ -1,5 +1,5 @@
 import * as R from "ramda";
-import { ACTIONS } from "./constants";
+import { ACTIONS, COMMANDS } from "./constants";
 
 export const buildProjectBlocks = (project, editable) => {
   const descriptionBlock = {
@@ -51,7 +51,7 @@ export const buildProjectBlocks = (project, editable) => {
     };
   }
 
-  let projectBlocks = [
+  const projectBlocks = [
     {
       type: "section",
       text: {
@@ -73,44 +73,39 @@ export const buildProjectBlocks = (project, editable) => {
   ];
 
   if (editable) {
-    projectBlocks.push(
-      {
-        type: "actions",
-        elements: [
-          {
-            type: "button",
-            action_id: ACTIONS.viewProject,
-            text: {
-              type: "plain_text",
-              emoji: true,
-              text: "It's Done"
-            },
-            style: "primary",
-            value: `${project.name}`
-          }
-        ]
-      }
-    )
-  }
-  else {
-    projectBlocks.push(
-      {
-        type: "actions",
-        elements: [
-          {
-            type: "button",
-            action_id: ACTIONS.editProject,
-            text: {
-              type: "plain_text",
-              emoji: true,
-              text: "I need to edit this"
-            },
-            style: "primary",
-            value: `${project.name}`
-          }
-        ]
-      }
-    );
+    projectBlocks.push({
+      type: "actions",
+      elements: [
+        {
+          type: "button",
+          action_id: ACTIONS.viewProject,
+          text: {
+            type: "plain_text",
+            emoji: true,
+            text: "It's Done"
+          },
+          style: "primary",
+          value: `${project.name}`
+        }
+      ]
+    });
+  } else {
+    projectBlocks.push({
+      type: "actions",
+      elements: [
+        {
+          type: "button",
+          action_id: ACTIONS.editProject,
+          text: {
+            type: "plain_text",
+            emoji: true,
+            text: "I need to edit this"
+          },
+          style: "primary",
+          value: `${project.name}`
+        }
+      ]
+    });
   }
   return projectBlocks;
 };
@@ -118,6 +113,11 @@ export const buildProjectBlocks = (project, editable) => {
 const buildSectionBlocks = (sections, projectName, editable) => {
   const blocks = R.pipe(
     R.map(section => {
+      // value can only be 75 char, so we're gonna use stupid short keys
+      const baseValue = {
+        pn: projectName,
+        sId: section.id
+      };
       const hasItems = section.items.length > 0;
       const sectionBlock = {
         type: "section",
@@ -137,7 +137,10 @@ const buildSectionBlocks = (sections, projectName, editable) => {
                 emoji: true,
                 text: ":pencil: Edit Section Name"
               },
-              value: `edit_${projectName}_${section.id}`
+              value: JSON.stringify({
+                ...baseValue,
+                cmd: COMMANDS.edit
+              })
             }
           ],
           placeholder: {
@@ -154,7 +157,10 @@ const buildSectionBlocks = (sections, projectName, editable) => {
               emoji: true,
               text: ":arrow_up_small: Move Section Up"
             },
-            value: `up_${projectName}_${section.id}`
+            value: JSON.stringify({
+              ...baseValue,
+              cmd: COMMANDS.up
+            })
           });
         }
         if (section.rank !== sections.length - 1) {
@@ -164,16 +170,47 @@ const buildSectionBlocks = (sections, projectName, editable) => {
               emoji: true,
               text: ":arrow_down_small: Move Section Down"
             },
-            value: `down_${projectName}_${section.id}`
+            value: JSON.stringify({
+              ...baseValue,
+              cmd: COMMANDS.down
+            })
           });
         }
         sectionBlock.accessory.options.push({
           text: {
             type: "plain_text",
             emoji: true,
-            text: ":heavy_plus_sign: Add A New Item"
+            text: ":heavy_plus_sign: Add A New Link"
           },
-          value: `newitem_${projectName}_${section.id}`
+          value: JSON.stringify({
+            ...baseValue,
+            cmd: COMMANDS.new,
+            type: "URL"
+          })
+        });
+        sectionBlock.accessory.options.push({
+          text: {
+            type: "plain_text",
+            emoji: true,
+            text: ":heavy_plus_sign: Add A New Slack User"
+          },
+          value: JSON.stringify({
+            ...baseValue,
+            cmd: COMMANDS.new,
+            type: "USER"
+          })
+        });
+        sectionBlock.accessory.options.push({
+          text: {
+            type: "plain_text",
+            emoji: true,
+            text: ":heavy_plus_sign: Add A New Slack Channel"
+          },
+          value: JSON.stringify({
+            ...baseValue,
+            cmd: COMMANDS.new,
+            type: "CHANNEL"
+          })
         });
         sectionBlock.accessory.options.push({
           text: {
@@ -183,7 +220,10 @@ const buildSectionBlocks = (sections, projectName, editable) => {
               ? "Delete items to delete section"
               : ":no_entry_sign: Delete Section"
           },
-          value: hasItems ? "noop" : `delete_${projectName}_${section.id}`
+          value: JSON.stringify({
+            ...baseValue,
+            cmd: hasItems ? COMMANDS.noop : COMMANDS.delete
+          })
         });
       }
       return [

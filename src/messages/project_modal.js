@@ -71,8 +71,7 @@ const projectModal = values => {
           action_id: "project_aliases",
           placeholder: {
             type: "plain_text",
-            text:
-              "bat, cave, batcave, biq"
+            text: "bat, cave, batcave, biq"
           },
           multiline: true,
           initial_value: values.aliases || ""

@@ -2,21 +2,31 @@ import * as R from "ramda";
 import pool from "./config";
 
 const updateAliases = (aliases, projectId, projectName) => {
-  pool.query('DELETE FROM aliases WHERE projectId = $1', [projectId], error => {
-    if (error) { console.log('handle this error deleting aliases'); }
+  pool.query("DELETE FROM aliases WHERE projectId = $1", [projectId], error => {
+    if (error) {
+      console.log("handle this error deleting aliases");
+    }
   });
-  const aliasList = R.map(alias => alias.trim().toLowerCase())(aliases.split(','));
+  const aliasList = R.map(alias => alias.trim().toLowerCase())(
+    aliases.split(",")
+  );
   if (!aliasList.includes(projectName.toLowerCase())) {
     aliasList.push(projectName);
   }
   R.forEach(alias => {
-    pool.query(`INSERT INTO aliases (alias, projectid) VALUES ($1, $2)`, [alias, projectId], error => {
-      if (error) { console.log('handle this error in inserting an alias'); }
-    })
+    pool.query(
+      `INSERT INTO aliases (alias, projectid) VALUES ($1, $2)`,
+      [alias, projectId],
+      error => {
+        if (error) {
+          console.log("handle this error in inserting an alias");
+        }
+      }
+    );
   })(aliasList);
 };
 
-export const addItem = (name, sectionId, url, description, next) => {
+export const addItem = (name, sectionId, url, description, type, next) => {
   pool.query(
     "SELECT MAX(rank) FROM items WHERE sectionId = $1",
     [sectionId],
@@ -28,7 +38,7 @@ export const addItem = (name, sectionId, url, description, next) => {
       const rank = maxRank === null ? 0 : maxRank + 1;
       pool.query(
         "INSERT INTO items (name, url, description, type, sectionId, rank) VALUES ($1, $2, $3, $4, $5, $6)",
-        [name, url, description, "URL", sectionId, rank],
+        [name, url, description, type, sectionId, rank],
         error => {
           if (error) {
             throw error;
@@ -94,10 +104,10 @@ export const addProject = (name, description, aliases, next) => {
   }
 };
 
-export const updateItem = (itemId, name, url, description, next) => {
+export const updateItem = (itemId, name, url, description, type, next) => {
   pool.query(
-    "UPDATE items set name = $1, url = $2, description = $3 WHERE ID = $4",
-    [name, url, description, itemId],
+    "UPDATE items set name = $1, url = $2, description = $3, type = $4 WHERE ID = $4",
+    [name, url, description, itemId, type],
     next
   );
 };
@@ -138,12 +148,20 @@ export const getSectionById = (sectionId, next) => {
 
 export const getProjectById = (projectId, next) => {
   getById("projects", projectId, (error, project) => {
-    if (error) { next(error) }
-    pool.query(`SELECT alias FROM aliases WHERE projectid = $1`, [project.id], (error, results) => {
-      if (error) { next(error) }
-      project.aliases = R.pluck('alias', results.rows).join(', ');
-      next(error, project);
-    })
+    if (error) {
+      next(error);
+    }
+    pool.query(
+      `SELECT alias FROM aliases WHERE projectid = $1`,
+      [project.id],
+      (error, results) => {
+        if (error) {
+          next(error);
+        }
+        project.aliases = R.pluck("alias", results.rows).join(", ");
+        next(error, project);
+      }
+    );
   });
 };
 

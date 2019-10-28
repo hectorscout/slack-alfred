@@ -2,11 +2,12 @@ import * as R from "ramda";
 import * as dotenv from "dotenv";
 
 import { App, MemoryStore } from "@slack/bolt";
-import { ACTIONS, MESSAGES, MODALS } from "./constants";
+import { ACTIONS, MESSAGES, MODALS, COMMANDS } from "./constants";
 import { buildProjectBlocks } from "./messages";
 
-import availableProjects from './messages/available_projects';
-import projectModal from './messages/project_modal'
+import availableProjects from "./messages/available_projects";
+import projectModal from "./messages/project_modal";
+import itemModal from "./messages/item_modal";
 
 import {
   addItem,
@@ -101,16 +102,16 @@ app.command("/alfred", ({ command, ack, respond, context }) => {
 
 app.view(ACTIONS.saveItem, ({ ack, body, view }) => {
   ack();
-  const itemName = view.state.values.item_name.item_name.value;
-  const itemUrl = view.state.values.item_url.item_url.value;
-  const itemDescription =
-    view.state.values.item_description.item_description.value;
-  const { id, sectionId } = JSON.parse(view.private_metadata);
+  const values = view.state.values;
+  const itemName = R.path(['item_name', 'item_name', 'value'], values);
+  const itemUrl = R.pathOr(R.path(['item_user', 'item_user', 'selected_user'], values), ['item_url', 'item_url', 'value'], values);
+  const itemDescription = R.path(['item_description', 'item_description', 'value'], values);
+  const { id, sectionId, type } = JSON.parse(view.private_metadata);
   const itemId = id;
 
   const convo = convoStore.get(body.user.id);
   if (itemId) {
-    updateItem(itemId, itemName, itemUrl, itemDescription, error => {
+    updateItem(itemId, itemName, itemUrl, itemDescription, type, error => {
       if (error) {
         // TODO
         console.log("handle this error in ACTIONS.saveItem", error);
@@ -120,7 +121,7 @@ app.view(ACTIONS.saveItem, ({ ack, body, view }) => {
       });
     });
   } else {
-    addItem(itemName, sectionId, itemUrl, itemDescription, error => {
+    addItem(itemName, sectionId, itemUrl, itemDescription, type, error => {
       if (error) {
         // TODO
         console.log("handle this error in ACTIONS.saveItem", error);
@@ -265,12 +266,13 @@ app.action(ACTIONS.modProject, ({ action, ack, context, body, respond }) => {
 
 app.action("mod_section", ({ action, ack, context, body, respond }) => {
   ack();
-  const [command, projectName, sectionId] = action.selected_option.value.split(
-    "_"
-  );
+  const actionValue = JSON.parse(action.selected_option.value);
+  const command = actionValue.cmd;
+  const projectName = actionValue.pn;
+  const sectionId = actionValue.sId;
 
   switch (command) {
-    case "edit":
+    case COMMANDS.edit:
       convoStore.set(body.user.id, {
         respond,
         token: context.botToken,
@@ -285,22 +287,22 @@ app.action("mod_section", ({ action, ack, context, body, respond }) => {
         });
       });
       break;
-    case "newitem":
+    case COMMANDS.new:
       convoStore.set(body.user.id, {
         respond,
         token: context.botToken,
         projectName
       });
-      const blocks = MODALS.newItem({ sectionId });
       app.client.views.open({
         token: context.botToken,
-        view: blocks,
+        view: itemModal({ sectionId, type: actionValue.type }),
         trigger_id: body.trigger_id
       });
       break;
-    case "up":
-    case "down":
-      moveSection(sectionId, command, error => {
+    case COMMANDS.up:
+    case COMMANDS.down:
+      const direction = command === COMMANDS.up ? 'up' : 'down';
+      moveSection(sectionId, direction, error => {
         if (error) {
           respond({
             token: context.botToken,
@@ -313,7 +315,7 @@ app.action("mod_section", ({ action, ack, context, body, respond }) => {
         lookupProject(projectName, true, respond, context.botToken);
       });
       break;
-    case "delete":
+    case COMMANDS.delete:
       deleteSection(sectionId, error => {
         if (error) {
           respond({
@@ -327,6 +329,9 @@ app.action("mod_section", ({ action, ack, context, body, respond }) => {
         lookupProject(projectName, true, respond, context.botToken);
       });
       break;
+    case COMMANDS.noop:
+    default:
+      // don't do anything
   }
 });
 
@@ -344,7 +349,7 @@ app.action("mod_item", ({ action, ack, context, body, respond }) => {
         projectName
       });
       getItemById(itemId, (error, item) => {
-        const blocks = MODALS.newItem(item);
+        const blocks = itemModal(item);
         app.client.views.open({
           token: context.botToken,
           view: blocks,

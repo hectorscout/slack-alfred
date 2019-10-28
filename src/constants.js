@@ -1,12 +1,27 @@
 const ACTIONS = {
   editProject: "EDIT_PROJECT",
+  itemTypeSelection: "ITEM_TYPE_SELECTION",
   modProject: "MOD_PROJECT",
   openNewProjectDialog: "OPEN_NEW_PROJECT_DIALOG",
   saveProject: "SAVE_PROJECT",
   saveSection: "SAVE_SECTION",
   saveItem: "SAVE_ITEM",
-  viewProject: 'VIEW_PROJECT',
+  viewProject: "VIEW_PROJECT"
+};
 
+const COMMANDS = {
+  edit: 'E',
+  new: 'N',
+  up: 'U',
+  down: 'D',
+  delete: 'X',
+  noop: '0'
+};
+
+const ITEM_TYPES = {
+  url: 'URL',
+  user: 'USER',
+  channel: 'CHANNEL'
 };
 
 const MESSAGES = {
@@ -89,83 +104,13 @@ const MODALS = {
         }
       }
     ]
-  }),
-  newItem: values => ({
-    type: "modal",
-    callback_id: ACTIONS.saveItem,
-    private_metadata: JSON.stringify(values),
-    title: {
-      type: "plain_text",
-      text: "Alfred",
-      emoji: true
-    },
-    submit: {
-      type: "plain_text",
-      text: "That'll Do",
-      emoji: true
-    },
-    close: {
-      type: "plain_text",
-      text: "Forget It",
-      emoji: true
-    },
-    blocks: [
-      {
-        type: "input",
-        block_id: "item_name",
-        element: {
-          type: "plain_text_input",
-          action_id: "item_name",
-          placeholder: {
-            type: "plain_text",
-            text: "The Batmobile"
-          },
-          initial_value: values.name || ""
-        },
-        label: {
-          type: "plain_text",
-          text: "What is this item called?"
-        }
-      },
-      {
-        type: "input",
-        block_id: "item_url",
-        element: {
-          type: "plain_text_input",
-          action_id: "item_url",
-          placeholder: {
-            type: "plain_text",
-            text: "http://en.wikipedia.org/wiki/Batmobile"
-          },
-          initial_value: values.url || ""
-        },
-        label: {
-          type: "plain_text",
-          text: "Where would one find this item?"
-        }
-      },
-      {
-        type: "input",
-        block_id: "item_description",
-        label: {
-          type: "plain_text",
-          text: "And a bit more of a description?",
-          emoji: true
-        },
-        element: {
-          type: "plain_text_input",
-          action_id: "item_description",
-          placeholder: {
-            type: "plain_text",
-            text:
-              "A heavily armored armored tactical assault vehicle and a personalized custom-built pursuit and capture vehicle."
-          },
-          multiline: true,
-          initial_value: values.description || ""
-        }
-      }
-    ]
   })
 };
 
-export { ACTIONS, MESSAGES, MODALS };
+export {
+  ACTIONS,
+  COMMANDS,
+  ITEM_TYPES,
+  MESSAGES,
+  MODALS
+};
