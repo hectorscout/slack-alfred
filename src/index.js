@@ -246,7 +246,7 @@ app.action(ACTIONS.modProject, ({ action, ack, context, body, respond }) => {
       break;
     case "delete":
       deleteProject(projectId, error => {
-        let msg = `I've disposed of *${projectName}* discretely. It shan't be coming back to us, sir.`;
+        let msg = `I've disposed of *${projectName}* discretely. It shan't be traced back to us, sir.`;
         if (error) {
           msg =
             "I appear to have run into some problems trying to remove the project. I apologize.";

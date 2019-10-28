@@ -1,3 +1,9 @@
+CREATE TABLE aliases (
+  ID SERIAL PRIMARY KEY,
+  alias VARCHAR(255) NOT NULL,
+  projectId integer NOT NULL
+);
+
 CREATE TABLE projects (
   ID SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,

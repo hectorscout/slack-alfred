@@ -138,10 +138,11 @@ export const getFullProject = (projectName, next) => {
      items.url as item_url,
      items.description as item_description,
      items.rank as item_rank
-    FROM projects
+    FROM aliases
+    LEFT JOIN projects ON projects.ID = aliases.projectId
     LEFT JOIN sections ON projects.ID = sections.projectId
     LEFT JOIN items ON sections.ID = items.sectionId 
-    WHERE projects.name ilike $1
+    WHERE aliases.alias ilike $1
     ORDER BY sections.rank, items.rank
   `,
     [projectName],
