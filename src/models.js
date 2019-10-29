@@ -1,28 +1,26 @@
 import * as R from "ramda";
 import pool from "./config";
 
-const updateAliases = (aliases, projectId, projectName) => {
-  pool.query("DELETE FROM aliases WHERE projectId = $1", [projectId], error => {
-    if (error) {
-      console.log("handle this error deleting aliases");
-    }
-  });
+const updateAliases = async (aliases, projectId, projectName) => {
+  try {
+    await pool.query("DELETE FROM aliases WHERE projectId = $1", [projectId]);
+  } catch (err) {
+    console.log("handle this error deleting aliases");
+  }
+
+
   const aliasList = R.map(alias => alias.trim().toLowerCase())(
     aliases.split(",")
   );
   if (!aliasList.includes(projectName.toLowerCase())) {
     aliasList.push(projectName);
   }
-  R.forEach(alias => {
-    pool.query(
-      `INSERT INTO aliases (alias, projectid) VALUES ($1, $2)`,
-      [alias, projectId],
-      error => {
-        if (error) {
-          console.log("handle this error in inserting an alias");
-        }
-      }
-    );
+  R.forEach(async alias => {
+    try {
+      await pool.query(`INSERT INTO aliases (alias, projectid) VALUES ($1, $2)`, [alias, projectId])
+    } catch (err) {
+      console.log("handle this error in inserting an alias");
+    }
   })(aliasList);
 };
 
