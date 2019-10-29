@@ -1,5 +1,6 @@
 import * as R from "ramda";
 import pool from "./config";
+import {COMMANDS} from "./constants";
 
 const updateAliases = async (aliases, projectId, projectName) => {
   try {
@@ -183,71 +184,45 @@ export const getProjects = async () => {
   return projectResults.rows;
 };
 
-export const moveSection = async (sectionId, command) => {
-  const origRankResults = await pool.query(
-    "SELECT rank, projectID FROM sections WHERE ID = $1",
-    [sectionId]);
-  const projectId = origRankResults.rows[0].projectid;
-  const origRank = origRankResults.rows[0].rank;
-  const targetRank = origRank + (command === "up" ? -1 : 1);
-  const sectionRankResults = await pool.query(
-    "SELECT ID FROM sections WHERE projectId = $1 AND rank = $2",
-    [projectId, targetRank]);
-  const targetSectionId = sectionRankResults.rows[0].id;
+const moveRecord = async ({ table, parentField, id, command }) => {
+  const origResults = await pool.query(
+    `SELECT rank, ${parentField} as parentid FROM ${table} WHERE ID = $1`,
+    [id]);
+  const parentId = origResults.rows[0].parentid;
+  console.log(parentId, origResults.rows[0]);
+  const origRank = origResults.rows[0].rank;
+  const targetRank = origRank + (command === COMMANDS.up ? -1 : 1);
+  console.log(origRank, targetRank, parentField, table, parentId, command);
+  const targetResults = await pool.query(
+    `SELECT ID FROM ${table} WHERE ${parentField} = $1 AND rank = $2`,
+    [parentId, targetRank]);
+  console.log(targetResults);
+  const targetId = targetResults.rows[0].id;
   await pool.query(
-    "UPDATE sections SET rank = $1 WHERE id = $2",
-    [targetRank, sectionId]);
+    `UPDATE ${table} SET rank = $1 WHERE id = $2`,
+    [targetRank, id]);
   await pool.query(
-    "UPDATE sections SET rank = $1 WHERE id = $2",
-    [origRank, targetSectionId]);
+    `UPDATE ${table} SET rank = $1 WHERE id = $2`,
+    [origRank, targetId]);
 };
 
-export const moveItem = (itemId, command, next) => {
-  try {
-    pool.query(
-      "SELECT rank, sectionID FROM items WHERE ID = $1",
-      [itemId],
-      (error, results) => {
-        if (error) {
-          throw error;
-        }
-        const sectionId = results.rows[0].sectionid;
-        const origRank = results.rows[0].rank;
-        const targetRank = origRank + (command === "up" ? -1 : 1);
-        pool.query(
-          "SELECT ID FROM items WHERE sectionId = $1 AND rank = $2",
-          [sectionId, targetRank],
-          (error, results) => {
-            if (error) {
-              throw error;
-            }
-            const targetItemId = results.rows[0].id;
-            pool.query(
-              "UPDATE items SET rank = $1 WHERE id = $2",
-              [targetRank, itemId],
-              error => {
-                if (error) {
-                  throw error;
-                }
-                pool.query(
-                  "UPDATE items SET rank = $1 WHERE id = $2",
-                  [origRank, targetItemId],
-                  error => {
-                    if (error) {
-                      throw error;
-                    }
-                    next();
-                  }
-                );
-              }
-            );
-          }
-        );
-      }
-    );
-  } catch (error) {
-    next(error);
-  }
+export const moveSection = async (sectionId, command) => {
+  return moveRecord({
+    table: 'sections',
+    parentField: 'projectId',
+    id: sectionId,
+    command
+  });
+};
+
+
+export const moveItem = async (itemId, command) => {
+  return moveRecord({
+    table: 'items',
+    parentField: 'sectionId',
+    id: itemId,
+    command
+  });
 };
 
 const prepareRankForDelete = (id, table, parentIdField, next) => {

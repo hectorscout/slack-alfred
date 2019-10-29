@@ -362,9 +362,8 @@ app.action(
         break;
       case COMMANDS.up:
       case COMMANDS.down:
-        const direction = command === COMMANDS.up ? "up" : "down";
         try {
-          await moveSection(sectionId, direction);
+          await moveSection(sectionId, command);
           await lookupProject(projectName, true, respond, context.botToken);
         } catch (err) {
           console.log("error in ACTIONS.modSection (move)", err);
@@ -429,17 +428,17 @@ app.action(ACTIONS.modItem, async ({ action, ack, context, body, respond }) => {
       break;
     case COMMANDS.up:
     case COMMANDS.down:
-      moveItem(itemId, command, error => {
-        if (error) {
-          respond({
-            token: context.botToken,
-            response_type: "ephemeral",
-            text: MESSAGES.genericError("move that")
-          });
-          return;
-        }
-        lookupProject(projectName, true, respond, context.botToken);
-      });
+      try {
+        await moveItem(itemId, command);
+        await lookupProject(projectName, true, respond, context.botToken);
+      } catch (err) {
+        console.log("error in ACTIONS.modItem (move)", err);
+        respond({
+          token: context.botToken,
+          response_type: "ephemeral",
+          text: MESSAGES.genericError("move that")
+        });
+      }
       break;
     case COMMANDS.delete:
       deleteItem(itemId, error => {
