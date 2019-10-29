@@ -39,7 +39,7 @@ const sectionModal = values => {
         }
       }
     ]
-  }
+  };
 };
 
 export default sectionModal;

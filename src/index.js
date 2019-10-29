@@ -100,7 +100,7 @@ app.command("/alfred", ({ command, ack, respond, context }) => {
   }
 });
 
-app.view(ACTIONS.saveItem, ({ ack, body, view }) => {
+app.view(ACTIONS.saveItem, async ({ ack, body, view }) => {
   ack();
   const { values } = view.state;
   const itemName = R.path(["item_name", "item_name", "value"], values);
@@ -132,19 +132,23 @@ app.view(ACTIONS.saveItem, ({ ack, body, view }) => {
       });
     });
   } else {
-    addItem(itemName, sectionId, itemUrl, itemDescription, type, error => {
-      if (error) {
-        // TODO
-        console.log("handle this error in ACTIONS.saveItem", error);
-      }
+    try {
+      await addItem(itemName, sectionId, itemUrl, itemDescription, type);
       convo.then(({ respond, token, projectName }) => {
         lookupProject(projectName, true, respond, token);
       });
-    });
+    } catch (err) {
+      console.log("error in ACTIONS.saveItem", error);
+      app.client.chat.postMessage({
+        token: context.botToken,
+        channel: body.user.id,
+        text: MESSAGES.genericError("add that new item")
+      });
+    }
   }
 });
 
-app.view(ACTIONS.saveSection, ({ ack, body, view }) => {
+app.view(ACTIONS.saveSection, async ({ ack, body, view }) => {
   ack();
   const sectionName = view.state.values.section_name.section_name.value;
   const { id, projectId } = JSON.parse(view.private_metadata);
@@ -162,19 +166,23 @@ app.view(ACTIONS.saveSection, ({ ack, body, view }) => {
       });
     });
   } else {
-    addSection(sectionName, projectId, error => {
-      if (error) {
-        // TODO
-        console.log("handle this error in ACTIONS.saveSection", error);
-      }
+    try {
+      await addSection(sectionName, projectId);
       convo.then(({ respond, token, projectName }) => {
         lookupProject(projectName, true, respond, token);
       });
-    });
+    } catch (err) {
+      console.log("error in ACTIONS.saveSection", error);
+      app.client.chat.postMessage({
+        token: context.botToken,
+        channel: body.user.id,
+        text: MESSAGES.genericError("add that new section")
+      });
+    }
   }
 });
 
-app.view(ACTIONS.saveProject, ({ ack, body, view, context }) => {
+app.view(ACTIONS.saveProject, async ({ ack, body, view, context }) => {
   ack();
 
   const projectName = view.state.values.project_name.project_name.value;
@@ -195,17 +203,21 @@ app.view(ACTIONS.saveProject, ({ ack, body, view, context }) => {
       });
     });
   } else {
-    addProject(name, description, aliases, error => {
-      let msg = MESSAGES.genericError('make that new project');
-      if (!error) {
-        msg = MESSAGES.addProjectSuccess(projectName);
-      }
+    try {
+      await addProject(projectName, description, aliases);
       app.client.chat.postMessage({
         token: context.botToken,
         channel: body.user.id,
-        text: msg
+        text: MESSAGES.addProjectSuccess(projectName)
       });
-    });
+    } catch (err) {
+      console.log("error in ACTIONS.saveProject", err);
+      app.client.chat.postMessage({
+        token: context.botToken,
+        channel: body.user.id,
+        text: MESSAGES.genericError("make that new project")
+      });
+    }
   }
 });
 
@@ -224,7 +236,7 @@ app.action(ACTIONS.modProject, ({ action, ack, context, body, respond }) => {
   const actionValues = JSON.parse(action.selected_option.value);
   const command = actionValues.cmd;
   const projectName = actionValues.pn;
-  const projectId  = actionValues.pId;
+  const projectId = actionValues.pId;
 
   switch (command) {
     case COMMANDS.edit:
@@ -258,7 +270,7 @@ app.action(ACTIONS.modProject, ({ action, ack, context, body, respond }) => {
       deleteProject(projectId, error => {
         let msg = MESSAGES.removeProjectSuccess(projectName);
         if (error) {
-          msg = MESSAGES.genericError('remove that');
+          msg = MESSAGES.genericError("remove that");
         }
         respond({
           token: context.botToken,
@@ -329,7 +341,7 @@ app.action(ACTIONS.modSection, ({ action, ack, context, body, respond }) => {
           respond({
             token: context.botToken,
             response_type: "ephemeral",
-            text: MESSAGES.genericError('remove that')
+            text: MESSAGES.genericError("remove that")
           });
           return;
         }

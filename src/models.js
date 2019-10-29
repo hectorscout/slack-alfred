@@ -8,7 +8,6 @@ const updateAliases = async (aliases, projectId, projectName) => {
     console.log("handle this error deleting aliases");
   }
 
-
   const aliasList = R.map(alias => alias.trim().toLowerCase())(
     aliases.split(",")
   );
@@ -17,89 +16,55 @@ const updateAliases = async (aliases, projectId, projectName) => {
   }
   R.forEach(async alias => {
     try {
-      await pool.query(`INSERT INTO aliases (alias, projectid) VALUES ($1, $2)`, [alias, projectId])
+      await pool.query(
+        `INSERT INTO aliases (alias, projectid) VALUES ($1, $2)`,
+        [alias, projectId]
+      );
     } catch (err) {
       console.log("handle this error in inserting an alias");
     }
   })(aliasList);
 };
 
-export const addItem = (name, sectionId, url, description, type, next) => {
-  pool.query(
+export const addItem = async (name, sectionId, url, description, type) => {
+  const maxRankResults = await pool.query(
     "SELECT MAX(rank) FROM items WHERE sectionId = $1",
-    [sectionId],
-    (error, results) => {
-      if (error) {
-        throw error;
-      }
-      const maxRank = results.rows[0].max;
-      const rank = maxRank === null ? 0 : maxRank + 1;
-      pool.query(
-        "INSERT INTO items (name, url, description, type, sectionId, rank) VALUES ($1, $2, $3, $4, $5, $6)",
-        [name, url, description, type, sectionId, rank],
-        error => {
-          if (error) {
-            throw error;
-          }
-          next();
-        }
-      );
-    }
+    [sectionId]
+  );
+  const maxRank = maxRankResults.rows[0].max;
+  const rank = maxRank === null ? 0 : maxRank + 1;
+  await pool.query(
+    "INSERT INTO items (name, url, description, type, sectionId, rank) VALUES ($1, $2, $3, $4, $5, $6)",
+    [name, url, description, type, sectionId, rank]
   );
 };
 
-export const addSection = (name, projectId, next) => {
-  pool.query(
+export const addSection = async (name, projectId) => {
+  const maxRankResults = await pool.query(
     "SELECT MAX(rank) FROM sections WHERE projectId = $1",
-    [projectId],
-    (error, results) => {
-      if (error) {
-        throw error;
-      }
-      const maxRank = results.rows[0].max;
-      const rank = maxRank === null ? 0 : maxRank + 1;
-      pool.query(
-        "INSERT INTO sections (name, projectId, rank) VALUES ($1, $2, $3)",
-        [name, projectId, rank],
-        error => {
-          if (error) {
-            throw error;
-          }
-          next();
-        }
-      );
-    }
+    [projectId]
+  );
+  const maxRank = maxRankResults.rows[0].max;
+  const rank = maxRank === null ? 0 : maxRank + 1;
+  await pool.query(
+    "INSERT INTO sections (name, projectId, rank) VALUES ($1, $2, $3)",
+    [name, projectId, rank]
   );
 };
 
-export const addProject = (name, description, aliases, next) => {
-  try {
-    pool.query(
-      "INSERT INTO projects (name, description) VALUES ($1, $2)",
-      [name, description || ""],
-      error => {
-        if (error) {
-          throw error;
-        }
-        pool.query(
-          "SELECT ID from projects WHERE name = $1",
-          [name],
-          (error, results) => {
-            if (error) {
-              throw error;
-            }
-            const projectId = results.rows[0].id;
-            addSection("Design", projectId, () =>
-              addSection("Environments", projectId, next)
-            );
-            updateAliases(aliases, projectId, name);
-          }
-        );
-      }
-    );
-  } catch (error) {
-    next(error);
-  }
+export const addProject = async (name, description, aliases) => {
+  await pool.query("INSERT INTO projects (name, description) VALUES ($1, $2)", [
+    name,
+    description || ""
+  ]);
+  const idResults = await pool.query(
+    "SELECT ID from projects WHERE name = $1",
+    [name]
+  );
+  const projectId = idResults.rows[0].id;
+  await addSection("Design", projectId);
+  await addSection("Environments", projectId);
+  await updateAliases(aliases, projectId, name);
 };
 
 export const updateItem = (itemId, name, url, description, type, next) => {

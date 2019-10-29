@@ -34,10 +34,10 @@ const MESSAGES = {
     I'd recommend that you do that now and provide some more meaningful content.`;
   },
   removeProjectSuccess: projectName => {
-    return `I've disposed of *${projectName}* discretely. It shan't be traced back to us, sir.`
+    return `I've disposed of *${projectName}* discretely. It shan't be traced back to us, sir.`;
   },
   genericError: doThing => {
-    return `I appear to have run into some problems trying to ${doThing}. I apologize.`
+    return `I appear to have run into some problems trying to ${doThing}. I apologize.`;
   }
 };
 
