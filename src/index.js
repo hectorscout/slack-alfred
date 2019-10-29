@@ -100,7 +100,7 @@ app.command("/alfred", ({ command, ack, respond, context }) => {
   }
 });
 
-app.view(ACTIONS.saveItem, async ({ ack, body, view }) => {
+app.view(ACTIONS.saveItem, async ({ ack, body, view, context }) => {
   ack();
   const { values } = view.state;
   const itemName = R.path(["item_name", "item_name", "value"], values);
@@ -122,15 +122,19 @@ app.view(ACTIONS.saveItem, async ({ ack, body, view }) => {
 
   const convo = convoStore.get(body.user.id);
   if (itemId) {
-    updateItem(itemId, itemName, itemUrl, itemDescription, type, error => {
-      if (error) {
-        // TODO
-        console.log("handle this error in ACTIONS.saveItem", error);
-      }
-      convo.then(({ respond, token, projectName }) => {
+    try {
+      await updateItem(itemId, itemName, itemUrl, itemDescription, type);
+      convo.then(({respond, token, projectName}) => {
         lookupProject(projectName, true, respond, token);
       });
-    });
+    } catch (err) {
+      console.log("error in ACTIONS.saveItem (updateItem)", err);
+      app.client.chat.postMessage({
+        token: context.botToken,
+        channel: body.user.id,
+        text: MESSAGES.genericError("update that item")
+      });
+    }
   } else {
     try {
       await addItem(itemName, sectionId, itemUrl, itemDescription, type);
@@ -138,7 +142,7 @@ app.view(ACTIONS.saveItem, async ({ ack, body, view }) => {
         lookupProject(projectName, true, respond, token);
       });
     } catch (err) {
-      console.log("error in ACTIONS.saveItem", error);
+      console.log("error in ACTIONS.saveItem (addItem)", err);
       app.client.chat.postMessage({
         token: context.botToken,
         channel: body.user.id,

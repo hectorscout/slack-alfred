@@ -67,11 +67,10 @@ export const addProject = async (name, description, aliases) => {
   await updateAliases(aliases, projectId, name);
 };
 
-export const updateItem = (itemId, name, url, description, type, next) => {
-  pool.query(
-    "UPDATE items set name = $1, url = $2, description = $3, type = $4 WHERE ID = $4",
-    [name, url, description, itemId, type],
-    next
+export const updateItem = async (itemId, name, url, description, type) => {
+  return pool.query(
+    "UPDATE items set name = $1, url = $2, description = $3, type = $4 WHERE ID = $5",
+    [name, url, description, type, itemId],
   );
 };
 
