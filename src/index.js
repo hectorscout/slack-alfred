@@ -143,7 +143,7 @@ app.view(ACTIONS.saveItem, async ({ ack, body, view, context }) => {
   }
 });
 
-app.view(ACTIONS.saveSection, async ({ ack, body, view }) => {
+app.view(ACTIONS.saveSection, async ({ ack, body, view, context }) => {
   ack();
   const sectionName = view.state.values.section_name.section_name.value;
   const { id, projectId } = JSON.parse(view.private_metadata);
@@ -157,7 +157,7 @@ app.view(ACTIONS.saveSection, async ({ ack, body, view }) => {
         await lookupProject(projectName, true, respond, token);
       });
     } catch (err) {
-      console.log("error in ACTIONS.saveSection (updateSection)", error);
+      console.log("error in ACTIONS.saveSection (updateSection)", err);
       app.client.chat.postMessage({
         token: context.botToken,
         channel: body.user.id,
@@ -171,7 +171,7 @@ app.view(ACTIONS.saveSection, async ({ ack, body, view }) => {
         await lookupProject(projectName, true, respond, token);
       });
     } catch (err) {
-      console.log("error in ACTIONS.saveSection (addSection)", error);
+      console.log("error in ACTIONS.saveSection (addSection)", err);
       app.client.chat.postMessage({
         token: context.botToken,
         channel: body.user.id,
@@ -224,7 +224,7 @@ app.view(ACTIONS.saveProject, async ({ ack, body, view, context }) => {
   }
 });
 
-app.action(ACTIONS.openNewProjectDialog, ({ ack, body, context}) => {
+app.action(ACTIONS.openNewProjectDialog, ({ ack, body, context }) => {
   ack();
   app.client.views.open({
     token: context.botToken,

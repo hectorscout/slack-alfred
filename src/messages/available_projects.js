@@ -2,7 +2,9 @@ import * as R from "ramda";
 import { ACTIONS, MESSAGES } from "../constants";
 
 const availableProjects = (unfoundProjectName, projects) => {
-  let introText = unfoundProjectName ? MESSAGES.unfoundProject(unfoundProjectName) : MESSAGES.basicIntro();
+  const introText = unfoundProjectName
+    ? MESSAGES.unfoundProject(unfoundProjectName)
+    : MESSAGES.basicIntro();
 
   const blocks = [
     {
@@ -38,7 +40,7 @@ const availableProjects = (unfoundProjectName, projects) => {
   })(projects);
 
   if (unfoundProjectName) {
-    blocks.push({ type: "divider"});
+    blocks.push({ type: "divider" });
     blocks.push({
       type: "section",
       text: {
@@ -61,7 +63,7 @@ const availableProjects = (unfoundProjectName, projects) => {
           text: "New Project"
         }
       }
-    })
+    });
   }
 
   return blocks;

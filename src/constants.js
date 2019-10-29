@@ -46,8 +46,8 @@ const MESSAGES = {
   basicIntro: () => {
     return "Ah Master Bruce, which of the projects in the Bat Computer would you like to access?";
   },
-  addAliasPrompt: (unfoundProjectName) => {
-    return `If you feel that the should bat computer should have found one of the above files, you might consider adding *${unfoundProjectName}* to that project's list of aliases.`
+  addAliasPrompt: unfoundProjectName => {
+    return `If you feel that the should bat computer should have found one of the above files, you might consider adding *${unfoundProjectName}* to that project's list of aliases.`;
   },
   addNew: () => {
     return `Or maybe you would like to create a new file?`;
