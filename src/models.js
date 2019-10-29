@@ -180,55 +180,26 @@ export const getFullProject = async projectName => {
 
 export const getProjects = async () => {
   const projectResults = await pool.query("SELECT * from projects");
-  return projectResults.rows
+  return projectResults.rows;
 };
 
-export const moveSection = (sectionId, command, next) => {
-  try {
-    pool.query(
-      "SELECT rank, projectID FROM sections WHERE ID = $1",
-      [sectionId],
-      (error, results) => {
-        if (error) {
-          throw error;
-        }
-        const projectId = results.rows[0].projectid;
-        const origRank = results.rows[0].rank;
-        const targetRank = origRank + (command === "up" ? -1 : 1);
-        pool.query(
-          "SELECT ID FROM sections WHERE projectId = $1 AND rank = $2",
-          [projectId, targetRank],
-          (error, results) => {
-            if (error) {
-              throw error;
-            }
-            const targetSectionId = results.rows[0].id;
-            pool.query(
-              "UPDATE sections SET rank = $1 WHERE id = $2",
-              [targetRank, sectionId],
-              error => {
-                if (error) {
-                  throw error;
-                }
-                pool.query(
-                  "UPDATE sections SET rank = $1 WHERE id = $2",
-                  [origRank, targetSectionId],
-                  error => {
-                    if (error) {
-                      throw error;
-                    }
-                    next();
-                  }
-                );
-              }
-            );
-          }
-        );
-      }
-    );
-  } catch (error) {
-    next(error);
-  }
+export const moveSection = async (sectionId, command) => {
+  const origRankResults = await pool.query(
+    "SELECT rank, projectID FROM sections WHERE ID = $1",
+    [sectionId]);
+  const projectId = origRankResults.rows[0].projectid;
+  const origRank = origRankResults.rows[0].rank;
+  const targetRank = origRank + (command === "up" ? -1 : 1);
+  const sectionRankResults = await pool.query(
+    "SELECT ID FROM sections WHERE projectId = $1 AND rank = $2",
+    [projectId, targetRank]);
+  const targetSectionId = sectionRankResults.rows[0].id;
+  await pool.query(
+    "UPDATE sections SET rank = $1 WHERE id = $2",
+    [targetRank, sectionId]);
+  await pool.query(
+    "UPDATE sections SET rank = $1 WHERE id = $2",
+    [origRank, targetSectionId]);
 };
 
 export const moveItem = (itemId, command, next) => {

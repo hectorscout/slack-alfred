@@ -363,17 +363,17 @@ app.action(
       case COMMANDS.up:
       case COMMANDS.down:
         const direction = command === COMMANDS.up ? "up" : "down";
-        moveSection(sectionId, direction, error => {
-          if (error) {
-            respond({
-              token: context.botToken,
-              response_type: "ephemeral",
-              text: MESSAGES.genericError("move that")
-            });
-            return;
-          }
-          lookupProject(projectName, true, respond, context.botToken);
-        });
+        try {
+          await moveSection(sectionId, direction);
+          await lookupProject(projectName, true, respond, context.botToken);
+        } catch (err) {
+          console.log("error in ACTIONS.modSection (move)", err);
+          respond({
+            token: context.botToken,
+            response_type: "ephemeral",
+            text: MESSAGES.genericError("move that")
+          });
+        }
         break;
       case COMMANDS.delete:
         deleteSection(sectionId, error => {
