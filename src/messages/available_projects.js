@@ -1,5 +1,5 @@
 import * as R from "ramda";
-import { ACTIONS } from "../constants";
+import { ACTIONS, MESSAGES } from "../constants";
 
 const availableProjects = (unfoundProjectName, projects) => {
   let introText =
@@ -21,7 +21,7 @@ const availableProjects = (unfoundProjectName, projects) => {
     }
   ];
 
-  R.map(project => {
+  R.forEach(project => {
     blocks.push({
       type: "section",
       text: {
@@ -39,14 +39,6 @@ const availableProjects = (unfoundProjectName, projects) => {
         value: project.name
       }
     });
-    // blocks.push({
-    //   type: "context",
-    //   elements: [{
-    //     type: "plain_text",
-    //     emoji: true,
-    //     text: project.description
-    //   }]
-    // })
   })(projects);
 
   return blocks;

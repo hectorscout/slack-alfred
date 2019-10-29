@@ -209,6 +209,8 @@ const itemModal = values => {
     case ITEM_TYPES.channel:
       modal.blocks = getChannelBlocks(values);
       break;
+    default:
+    // idk
   }
 
   return modal;

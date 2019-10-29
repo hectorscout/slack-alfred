@@ -228,10 +228,10 @@ export const moveItem = async (itemId, command) => {
   });
 };
 
-const prepareRankForDelete = async (id, table, parentIdField) => {
+const prepareRankForDelete = async (targetId, table, parentIdField) => {
   const targetResults = await pool.query(
     `SELECT rank, ${parentIdField} AS parentid FROM ${table} WHERE ID = $1`,
-    [id]
+    [targetId]
   );
   const targetRank = targetResults.rows[0].rank;
   const parentId = targetResults.rows[0].parentid;

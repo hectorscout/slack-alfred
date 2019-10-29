@@ -1,126 +1,142 @@
 import * as R from "ramda";
 import { ACTIONS, COMMANDS, ITEM_TYPES } from "../constants";
 
-const buildProjectBlocks = (project, editable) => {
-  const descriptionBlock = {
+const buildLinkItemBlocks = item => {
+  return {
     type: "section",
     text: {
       type: "mrkdwn",
-      text: `*${project.name}*\n${project.description}`
+      text: `*<${item.url}|${item.name} - ${
+        item.url
+      }>*\n>${item.description.replace("\n", "\n>")}`
     }
   };
+};
 
-  if (editable) {
-    const baseValue = {
-      pn: project.name,
-      pId: project.id
-    };
-    const hasSections = project.sections.length > 0;
-    descriptionBlock.accessory = {
-      type: "static_select",
-      action_id: ACTIONS.modProject,
-      options: [
-        {
-          text: {
-            type: "plain_text",
-            emoji: true,
-            text: "Edit Project Name/Description"
-          },
-          value: JSON.stringify({
-            ...baseValue,
-            cmd: COMMANDS.edit
-          })
-        },
-        {
-          text: {
-            type: "plain_text",
-            emoji: true,
-            text: ":heavy_plus_sign: Add A New Section"
-          },
-          value: JSON.stringify({
-            ...baseValue,
-            cmd: COMMANDS.new
-          })
-        },
-        {
-          text: {
-            type: "plain_text",
-            emoji: true,
-            text: hasSections
-              ? "Remove all sections to remove project"
-              : ":no_entry_sign: Delete Project"
-          },
-          value: JSON.stringify({
-            ...baseValue,
-            cmd: hasSections ? COMMANDS.noop : COMMANDS.delete
-          })
-        }
-      ],
-      placeholder: {
-        type: "plain_text",
-        emoji: true,
-        text: "Modify Project"
-      }
-    };
-  }
-
-  const projectBlocks = [
-    {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        text: `Here's what we know about *${project.name}*, Master Bruce.`
-      }
-    },
-    {
-      type: "divider"
-    },
-    descriptionBlock,
-    {
-      type: "divider"
-    },
-    ...buildSectionBlocks(project.sections, project.name, editable),
-    {
-      type: "divider"
+const buildUserItemBlocks = item => {
+  return {
+    type: "section",
+    text: {
+      type: "mrkdwn",
+      text: `*${item.name}:* <@${item.url}>\n>${item.description.replace(
+        "\n",
+        "\n>"
+      )}`
     }
-  ];
+  };
+};
 
-  if (editable) {
-    projectBlocks.push({
-      type: "actions",
-      elements: [
-        {
-          type: "button",
-          action_id: ACTIONS.viewProject,
-          text: {
-            type: "plain_text",
-            emoji: true,
-            text: "It's Done"
-          },
-          style: "primary",
-          value: `${project.name}`
+const buildChannelItemBlocks = item => {
+  return {
+    type: "section",
+    text: {
+      type: "mrkdwn",
+      text: `*${item.name}:* <#${item.url}>\n>${item.description.replace(
+        "\n",
+        "\n>"
+      )}`
+    }
+  };
+};
+
+const buildItemBlocks = (items, projectName, editable) => {
+  if (!items.length) {
+    return [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text:
+            "I didn't find anything for this section. Perhaps you would like to edit the project?"
         }
-      ]
-    });
-  } else {
-    projectBlocks.push({
-      type: "actions",
-      elements: [
-        {
-          type: "button",
-          action_id: ACTIONS.editProject,
-          text: {
-            type: "plain_text",
-            emoji: true,
-            text: "I need to edit this"
-          },
-          style: "primary",
-          value: `${project.name}`
-        }
-      ]
-    });
+      }
+    ];
   }
-  return projectBlocks;
+
+  return R.map(item => {
+    let itemBlock = {};
+    switch (item.type) {
+      case ITEM_TYPES.url:
+        itemBlock = buildLinkItemBlocks(item);
+        break;
+      case ITEM_TYPES.user:
+        itemBlock = buildUserItemBlocks(item);
+        break;
+      case ITEM_TYPES.channel:
+        itemBlock = buildChannelItemBlocks(item);
+        break;
+      default:
+      // idk
+    }
+
+    if (editable) {
+      const baseValue = {
+        pn: projectName,
+        iId: item.id
+      };
+      itemBlock.accessory = {
+        type: "static_select",
+        action_id: ACTIONS.modItem,
+        options: [
+          {
+            text: {
+              type: "plain_text",
+              emoji: true,
+              text: "Edit"
+            },
+            value: JSON.stringify({
+              ...baseValue,
+              cmd: COMMANDS.edit
+            })
+          }
+        ],
+        placeholder: {
+          type: "plain_text",
+          emoji: true,
+          text: "Modify Item"
+        }
+      };
+      if (item.rank !== 0) {
+        itemBlock.accessory.options.push({
+          text: {
+            type: "plain_text",
+            emoji: true,
+            text: "Move Item Up"
+          },
+          value: JSON.stringify({
+            ...baseValue,
+            cmd: COMMANDS.up
+          })
+        });
+      }
+      if (item.rank !== items.length - 1) {
+        itemBlock.accessory.options.push({
+          text: {
+            type: "plain_text",
+            emoji: true,
+            text: "Move Item Down"
+          },
+          value: JSON.stringify({
+            ...baseValue,
+            cmd: COMMANDS.down
+          })
+        });
+      }
+      itemBlock.accessory.options.push({
+        text: {
+          type: "plain_text",
+          emoji: true,
+          text: "Delete"
+        },
+        value: JSON.stringify({
+          ...baseValue,
+          cmd: COMMANDS.delete
+        })
+      });
+    }
+
+    return itemBlock;
+  })(items);
 };
 
 const buildSectionBlocks = (sections, projectName, editable) => {
@@ -252,140 +268,126 @@ const buildSectionBlocks = (sections, projectName, editable) => {
   return blocks;
 };
 
-const buildLinkItemBlocks = item => {
-  return {
+const buildProjectBlocks = (project, editable) => {
+  const descriptionBlock = {
     type: "section",
     text: {
       type: "mrkdwn",
-      text: `*<${item.url}|${item.name} - ${
-        item.url
-      }>*\n>${item.description.replace("\n", "\n>")}`
+      text: `*${project.name}*\n${project.description}`
     }
   };
-};
 
-const buildUserItemBlocks = item => {
-  return {
-    type: "section",
-    text: {
-      type: "mrkdwn",
-      text: `*${item.name}:* <@${item.url}>\n>${item.description.replace(
-        "\n",
-        "\n>"
-      )}`
-    }
-  };
-};
-
-const buildChannelItemBlocks = item => {
-  return {
-    type: "section",
-    text: {
-      type: "mrkdwn",
-      text: `*${item.name}:* <#${item.url}>\n>${item.description.replace(
-        "\n",
-        "\n>"
-      )}`
-    }
-  };
-};
-
-const buildItemBlocks = (items, projectName, editable) => {
-  if (!items.length) {
-    return [
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text:
-            "I didn't find anything for this section. Perhaps you would like to edit the project?"
+  if (editable) {
+    const baseValue = {
+      pn: project.name,
+      pId: project.id
+    };
+    const hasSections = project.sections.length > 0;
+    descriptionBlock.accessory = {
+      type: "static_select",
+      action_id: ACTIONS.modProject,
+      options: [
+        {
+          text: {
+            type: "plain_text",
+            emoji: true,
+            text: "Edit Project Name/Description"
+          },
+          value: JSON.stringify({
+            ...baseValue,
+            cmd: COMMANDS.edit
+          })
+        },
+        {
+          text: {
+            type: "plain_text",
+            emoji: true,
+            text: ":heavy_plus_sign: Add A New Section"
+          },
+          value: JSON.stringify({
+            ...baseValue,
+            cmd: COMMANDS.new
+          })
+        },
+        {
+          text: {
+            type: "plain_text",
+            emoji: true,
+            text: hasSections
+              ? "Remove all sections to remove project"
+              : ":no_entry_sign: Delete Project"
+          },
+          value: JSON.stringify({
+            ...baseValue,
+            cmd: hasSections ? COMMANDS.noop : COMMANDS.delete
+          })
         }
+      ],
+      placeholder: {
+        type: "plain_text",
+        emoji: true,
+        text: "Modify Project"
       }
-    ];
+    };
   }
 
-  return R.map(item => {
-    let itemBlock = {};
-    switch (item.type) {
-      case ITEM_TYPES.url:
-        itemBlock = buildLinkItemBlocks(item);
-        break;
-      case ITEM_TYPES.user:
-        itemBlock = buildUserItemBlocks(item);
-        break;
-      case ITEM_TYPES.channel:
-        itemBlock = buildChannelItemBlocks(item);
-        break;
+  const projectBlocks = [
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `Here's what we know about *${project.name}*, Master Bruce.`
+      }
+    },
+    {
+      type: "divider"
+    },
+    descriptionBlock,
+    {
+      type: "divider"
+    },
+    ...buildSectionBlocks(project.sections, project.name, editable),
+    {
+      type: "divider"
     }
+  ];
 
-    if (editable) {
-      const baseValue = {
-        pn: projectName,
-        iId: item.id
-      };
-      itemBlock.accessory = {
-        type: "static_select",
-        action_id: ACTIONS.modItem,
-        options: [
-          {
-            text: {
-              type: "plain_text",
-              emoji: true,
-              text: "Edit"
-            },
-            value: JSON.stringify({
-              ...baseValue,
-              cmd: COMMANDS.edit
-            })
-          }
-        ],
-        placeholder: {
-          type: "plain_text",
-          emoji: true,
-          text: "Modify Item"
+  if (editable) {
+    projectBlocks.push({
+      type: "actions",
+      elements: [
+        {
+          type: "button",
+          action_id: ACTIONS.viewProject,
+          text: {
+            type: "plain_text",
+            emoji: true,
+            text: "It's Done"
+          },
+          style: "primary",
+          value: `${project.name}`
         }
-      };
-      if (item.rank !== 0) {
-        itemBlock.accessory.options.push({
+      ]
+    });
+  } else {
+    projectBlocks.push({
+      type: "actions",
+      elements: [
+        {
+          type: "button",
+          action_id: ACTIONS.editProject,
           text: {
             type: "plain_text",
             emoji: true,
-            text: "Move Item Up"
+            text: "I need to edit this"
           },
-          value: JSON.stringify({
-            ...baseValue,
-            cmd: COMMANDS.up
-          })
-        });
-      }
-      if (item.rank !== items.length - 1) {
-        itemBlock.accessory.options.push({
-          text: {
-            type: "plain_text",
-            emoji: true,
-            text: "Move Item Down"
-          },
-          value: JSON.stringify({
-            ...baseValue,
-            cmd: COMMANDS.down
-          })
-        });
-      }
-      itemBlock.accessory.options.push({
-        text: {
-          type: "plain_text",
-          emoji: true,
-          text: "Delete"
-        },
-        value: JSON.stringify({
-          ...baseValue,
-          cmd: COMMANDS.delete
-        })
-      });
-    }
-
-    return itemBlock;
-  })(items);
+          style: "primary",
+          value: `${project.name}`
+        }
+      ]
+    });
+  }
+  return projectBlocks;
 };
 
 export default buildProjectBlocks;
