@@ -11,6 +11,10 @@ const buildProjectBlocks = (project, editable) => {
   };
 
   if (editable) {
+    const baseValue = {
+      pn: project.name,
+      pId: project.id
+    };
     const hasSections = project.sections.length > 0;
     descriptionBlock.accessory = {
       type: "static_select",
@@ -22,7 +26,10 @@ const buildProjectBlocks = (project, editable) => {
             emoji: true,
             text: "Edit Project Name/Description"
           },
-          value: `edit_${project.name}_${project.id}`
+          value: JSON.stringify({
+            ...baseValue,
+            cmd: COMMANDS.edit
+          })
         },
         {
           text: {
@@ -30,7 +37,10 @@ const buildProjectBlocks = (project, editable) => {
             emoji: true,
             text: ":heavy_plus_sign: Add A New Section"
           },
-          value: `newsection_${project.name}_${project.id}`
+          value: JSON.stringify({
+            ...baseValue,
+            cmd: COMMANDS.new
+          })
         },
         {
           text: {
@@ -40,7 +50,10 @@ const buildProjectBlocks = (project, editable) => {
               ? "Remove all sections to remove project"
               : ":no_entry_sign: Delete Project"
           },
-          value: hasSections ? "noop" : `delete_${project.name}_${project.id}`
+          value: JSON.stringify({
+            ...baseValue,
+            cmd: hasSections ? COMMANDS.noop : COMMANDS.delete
+          })
         }
       ],
       placeholder: {
@@ -306,6 +319,10 @@ const buildItemBlocks = (items, projectName, editable) => {
     }
 
     if (editable) {
+      const baseValue = {
+        pn: projectName,
+        iId: item.id
+      };
       itemBlock.accessory = {
         type: "static_select",
         action_id: ACTIONS.modItem,
@@ -316,7 +333,10 @@ const buildItemBlocks = (items, projectName, editable) => {
               emoji: true,
               text: "Edit"
             },
-            value: `edit_${projectName}_${item.id}`
+            value: JSON.stringify({
+              ...baseValue,
+              cmd: COMMANDS.edit
+            })
           }
         ],
         placeholder: {
@@ -332,7 +352,10 @@ const buildItemBlocks = (items, projectName, editable) => {
             emoji: true,
             text: "Move Item Up"
           },
-          value: `up_${projectName}_${item.id}`
+          value: JSON.stringify({
+            ...baseValue,
+            cmd: COMMANDS.up
+          })
         });
       }
       if (item.rank !== items.length - 1) {
@@ -342,7 +365,10 @@ const buildItemBlocks = (items, projectName, editable) => {
             emoji: true,
             text: "Move Item Down"
           },
-          value: `down_${projectName}_${item.id}`
+          value: JSON.stringify({
+            ...baseValue,
+            cmd: COMMANDS.down
+          })
         });
       }
       itemBlock.accessory.options.push({
@@ -351,7 +377,10 @@ const buildItemBlocks = (items, projectName, editable) => {
           emoji: true,
           text: "Delete"
         },
-        value: `delete_${projectName}_${item.id}`
+        value: JSON.stringify({
+          ...baseValue,
+          cmd: COMMANDS.delete
+        })
       });
     }
 

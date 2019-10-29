@@ -2,7 +2,7 @@ import * as R from "ramda";
 import * as dotenv from "dotenv";
 
 import { App, MemoryStore } from "@slack/bolt";
-import { ACTIONS, COMMANDS } from "./constants";
+import { ACTIONS, COMMANDS, MESSAGES } from "./constants";
 
 import projectMessage from "./messages/project_message";
 import availableProjects from "./messages/available_projects";
@@ -51,8 +51,7 @@ const lookupProject = (projectName, editable, respond, token) => {
       respond({
         token,
         response_type: "ephemeral",
-        text:
-          "I had some difficulty getting that project... Maybe I'll take a nap."
+        text: MESSAGES.genericError(`retrieve *${projectName}*`)
       });
       throw error;
     } else if (!project) {
@@ -197,13 +196,9 @@ app.view(ACTIONS.saveProject, ({ ack, body, view, context }) => {
     });
   } else {
     addProject(name, description, aliases, error => {
-      let msg =
-        "I had a bit of trouble making that new project for some reason.";
+      let msg = MESSAGES.genericError('make that new project');
       if (!error) {
-        msg = `I've create *${projectName}* as you requested.
-        It currently consist of a few empty default sections.
-        You can view it at anytime by typing \`/alfred ${projectName}\`.
-        I'd recommend that you do that now and provide some more meaningful content.`;
+        msg = MESSAGES.addProjectSuccess(projectName);
       }
       app.client.chat.postMessage({
         token: context.botToken,
@@ -226,12 +221,13 @@ app.action(ACTIONS.viewProject, ({ action, ack, respond, context }) => {
 
 app.action(ACTIONS.modProject, ({ action, ack, context, body, respond }) => {
   ack();
-  const [command, projectName, projectId] = action.selected_option.value.split(
-    "_"
-  );
+  const actionValues = JSON.parse(action.selected_option.value);
+  const command = actionValues.cmd;
+  const projectName = actionValues.pn;
+  const projectId  = actionValues.pId;
 
   switch (command) {
-    case "edit":
+    case COMMANDS.edit:
       convoStore.set(body.user.id, {
         respond,
         token: context.botToken,
@@ -245,7 +241,7 @@ app.action(ACTIONS.modProject, ({ action, ack, context, body, respond }) => {
         });
       });
       break;
-    case "newsection":
+    case COMMANDS.new:
       convoStore.set(body.user.id, {
         respond,
         token: context.botToken,
@@ -258,12 +254,11 @@ app.action(ACTIONS.modProject, ({ action, ack, context, body, respond }) => {
         trigger_id: body.trigger_id
       });
       break;
-    case "delete":
+    case COMMANDS.delete:
       deleteProject(projectId, error => {
-        let msg = `I've disposed of *${projectName}* discretely. It shan't be traced back to us, sir.`;
+        let msg = MESSAGES.removeProjectSuccess(projectName);
         if (error) {
-          msg =
-            "I appear to have run into some problems trying to remove the project. I apologize.";
+          msg = MESSAGES.genericError('remove that');
         }
         respond({
           token: context.botToken,
@@ -271,6 +266,8 @@ app.action(ACTIONS.modProject, ({ action, ack, context, body, respond }) => {
           text: msg
         });
       });
+    case COMMANDS.noop:
+      break;
     default:
       console.log("How did they even do this...?");
   }
@@ -319,8 +316,7 @@ app.action(ACTIONS.modSection, ({ action, ack, context, body, respond }) => {
           respond({
             token: context.botToken,
             response_type: "ephemeral",
-            text:
-              "I appear to have run into some problems trying to move that. I apologize."
+            text: MESSAGES.genericError("move that")
           });
           return;
         }
@@ -333,8 +329,7 @@ app.action(ACTIONS.modSection, ({ action, ack, context, body, respond }) => {
           respond({
             token: context.botToken,
             response_type: "ephemeral",
-            text:
-              "I appear to have run into some problems trying to remove that. I apologize."
+            text: MESSAGES.genericError('remove that')
           });
           return;
         }
@@ -342,19 +337,21 @@ app.action(ACTIONS.modSection, ({ action, ack, context, body, respond }) => {
       });
       break;
     case COMMANDS.noop:
+      break;
     default:
-    // don't do anything
+      console.log("Shouldn't be able to do this...");
   }
 });
 
 app.action(ACTIONS.modItem, ({ action, ack, context, body, respond }) => {
   ack();
-  const [command, projectName, itemId] = action.selected_option.value.split(
-    "_"
-  );
+  const actionValue = JSON.parse(action.selected_option.value);
+  const command = actionValue.cmd;
+  const projectName = actionValue.pn;
+  const itemId = actionValue.iId;
 
   switch (command) {
-    case "edit":
+    case COMMANDS.edit:
       convoStore.set(body.user.id, {
         respond,
         token: context.botToken,
@@ -369,33 +366,34 @@ app.action(ACTIONS.modItem, ({ action, ack, context, body, respond }) => {
         });
       });
       break;
-    case "up":
-    case "down":
+    case COMMANDS.up:
+    case COMMANDS.down:
       moveItem(itemId, command, error => {
         if (error) {
           respond({
             token: context.botToken,
             response_type: "ephemeral",
-            text:
-              "I appear to have run into some problems trying to move that. I apologize."
+            text: MESSAGES.genericError("move that")
           });
           return;
         }
         lookupProject(projectName, true, respond, context.botToken);
       });
       break;
-    case "delete":
+    case COMMANDS.delete:
       deleteItem(itemId, error => {
         if (error) {
           respond({
             token: context.botToken,
             response_type: "ephemeral",
-            text:
-              "I appear to have run into some problems trying to remove that. I apologize."
+            text: MESSAGES.genericError("remove that")
           });
           return;
         }
         lookupProject(projectName, true, respond, context.botToken);
       });
+      break;
+    default:
+      console.log("Shouldn't be able to do this...");
   }
 });

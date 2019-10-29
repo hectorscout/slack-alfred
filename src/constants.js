@@ -26,4 +26,19 @@ const ITEM_TYPES = {
   channel: "CHANNEL"
 };
 
-export { ACTIONS, COMMANDS, ITEM_TYPES };
+const MESSAGES = {
+  addProjectSuccess: projectName => {
+    return `I've create *${projectName}* as you requested.
+    It currently consist of a few empty default sections.
+    You can view it at anytime by typing \`/alfred ${projectName}\`.
+    I'd recommend that you do that now and provide some more meaningful content.`;
+  },
+  removeProjectSuccess: projectName => {
+    return `I've disposed of *${projectName}* discretely. It shan't be traced back to us, sir.`
+  },
+  genericError: doThing => {
+    return `I appear to have run into some problems trying to ${doThing}. I apologize.`
+  }
+};
+
+export { ACTIONS, COMMANDS, ITEM_TYPES, MESSAGES };
