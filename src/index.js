@@ -183,7 +183,6 @@ app.view(ACTIONS.saveSection, async ({ ack, body, view, context }) => {
 
 app.view(ACTIONS.saveProject, async ({ ack, body, view, context }) => {
   ack();
-
   const projectName = view.state.values.project_name.project_name.value;
   const description =
     view.state.values.project_description.project_description.value;

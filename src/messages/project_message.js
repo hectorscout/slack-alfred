@@ -82,7 +82,7 @@ const buildItemBlocks = (items, projectName, editable) => {
             text: {
               type: "plain_text",
               emoji: true,
-              text: "Edit"
+              text: ":pencil2: Edit"
             },
             value: JSON.stringify({
               ...baseValue,
@@ -101,7 +101,7 @@ const buildItemBlocks = (items, projectName, editable) => {
           text: {
             type: "plain_text",
             emoji: true,
-            text: "Move Item Up"
+            text: ":arrow_up_small: Move Item Up"
           },
           value: JSON.stringify({
             ...baseValue,
@@ -114,7 +114,7 @@ const buildItemBlocks = (items, projectName, editable) => {
           text: {
             type: "plain_text",
             emoji: true,
-            text: "Move Item Down"
+            text: ":arrow_down_small: Move Item Down"
           },
           value: JSON.stringify({
             ...baseValue,
@@ -126,7 +126,7 @@ const buildItemBlocks = (items, projectName, editable) => {
         text: {
           type: "plain_text",
           emoji: true,
-          text: "Delete"
+          text: ":no_entry_sign: Delete"
         },
         value: JSON.stringify({
           ...baseValue,
@@ -164,7 +164,7 @@ const buildSectionBlocks = (sections, projectName, editable) => {
               text: {
                 type: "plain_text",
                 emoji: true,
-                text: ":pencil: Edit Section Name"
+                text: ":pencil2: Edit Section Name"
               },
               value: JSON.stringify({
                 ...baseValue,
@@ -291,7 +291,7 @@ const buildProjectBlocks = (project, editable) => {
           text: {
             type: "plain_text",
             emoji: true,
-            text: "Edit Project Name/Description"
+            text: ":pencil2: Edit Project Name/Description"
           },
           value: JSON.stringify({
             ...baseValue,
