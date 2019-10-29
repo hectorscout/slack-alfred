@@ -74,12 +74,8 @@ export const updateItem = async (itemId, name, url, description, type) => {
   );
 };
 
-export const updateSection = (sectionId, name, next) => {
-  pool.query(
-    "UPDATE sections set name = $1 WHERE ID = $2",
-    [name, sectionId],
-    next
-  );
+export const updateSection = async (sectionId, name) => {
+  return pool.query("UPDATE sections set name = $1 WHERE ID = $2", [name, sectionId]);
 };
 
 export const updateProject = (projectId, name, description, aliases, next) => {

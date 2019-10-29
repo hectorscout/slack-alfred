@@ -160,15 +160,19 @@ app.view(ACTIONS.saveSection, async ({ ack, body, view }) => {
 
   const convo = convoStore.get(body.user.id);
   if (sectionId) {
-    updateSection(sectionId, sectionName, error => {
-      if (error) {
-        // TODO
-        console.log("handle this error in ACTIONS.saveSection", error);
-      }
-      convo.then(({ respond, token, projectName }) => {
+    try {
+      await updateSection(sectionId, sectionName);
+      convo.then(({respond, token, projectName}) => {
         lookupProject(projectName, true, respond, token);
       });
-    });
+    } catch (err) {
+      console.log("error in ACTIONS.saveSection (updateSection)", error);
+      app.client.chat.postMessage({
+        token: context.botToken,
+        channel: body.user.id,
+        text: MESSAGES.genericError("update that section")
+      });
+    }
   } else {
     try {
       await addSection(sectionName, projectId);
@@ -176,7 +180,7 @@ app.view(ACTIONS.saveSection, async ({ ack, body, view }) => {
         lookupProject(projectName, true, respond, token);
       });
     } catch (err) {
-      console.log("error in ACTIONS.saveSection", error);
+      console.log("error in ACTIONS.saveSection (addSection)", error);
       app.client.chat.postMessage({
         token: context.botToken,
         channel: body.user.id,
