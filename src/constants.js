@@ -38,6 +38,12 @@ const MESSAGES = {
   },
   genericError: doThing => {
     return `I appear to have run into some problems trying to ${doThing}. I apologize.`;
+  },
+  unfoundProject: unfoundProjectName => {
+    return `I'm sorry Master Bruce, but the Bat-Computer doesn't currently have a file on *${unfoundProjectName}*.\nPerhaps you'd be interested in one of these projects?`;
+  },
+  basicIntro: () => {
+    return "Ah Master Bruce, which of the projects in the Bat Computer would you like to access?";
   }
 };
 

@@ -2,11 +2,7 @@ import * as R from "ramda";
 import { ACTIONS, MESSAGES } from "../constants";
 
 const availableProjects = (unfoundProjectName, projects) => {
-  let introText =
-    "Ah Master Bruce, which of the projects in the Bat Computer would you like to access?";
-  if (unfoundProjectName) {
-    introText = `I'm sorry Master Bruce, but the Bat-Computer doesn't currently have a file on *${unfoundProjectName}*.\nPerhaps you'd be interested in one of these projects?`;
-  }
+  let introText = unfoundProjectName ? MESSAGES.unfoundProject(unfoundProjectName) : MESSAGES.basicIntro();
 
   const blocks = [
     {
