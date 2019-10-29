@@ -375,17 +375,18 @@ app.action(
         }
         break;
       case COMMANDS.delete:
-        deleteSection(sectionId, error => {
-          if (error) {
-            respond({
-              token: context.botToken,
-              response_type: "ephemeral",
-              text: MESSAGES.genericError("remove that")
-            });
-            return;
-          }
-          lookupProject(projectName, true, respond, context.botToken);
-        });
+        try {
+          await deleteSection(sectionId);
+          await lookupProject(projectName, true, respond, context.botToken);
+        } catch (err)
+        {
+          console.log("error in ACTIONS.modSection (delete)", err);
+          respond({
+            token: context.botToken,
+            response_type: "ephemeral",
+            text: MESSAGES.genericError("remove that")
+          });
+        }
         break;
       case COMMANDS.noop:
         break;
@@ -441,17 +442,17 @@ app.action(ACTIONS.modItem, async ({ action, ack, context, body, respond }) => {
       }
       break;
     case COMMANDS.delete:
-      deleteItem(itemId, error => {
-        if (error) {
-          respond({
-            token: context.botToken,
-            response_type: "ephemeral",
-            text: MESSAGES.genericError("remove that")
-          });
-          return;
-        }
-        lookupProject(projectName, true, respond, context.botToken);
-      });
+      try {
+        await deleteItem(itemId);
+        await lookupProject(projectName, true, respond, context.botToken);
+      } catch (err) {
+        console.log("error in ACTIONS.modItem (delete)", err);
+        respond({
+          token: context.botToken,
+          response_type: "ephemeral",
+          text: MESSAGES.genericError("delete that")
+        });
+      }
       break;
     default:
       console.log("Shouldn't be able to do this...");

@@ -225,36 +225,23 @@ export const moveItem = async (itemId, command) => {
   });
 };
 
-const prepareRankForDelete = (id, table, parentIdField, next) => {
-  pool.query(
+const prepareRankForDelete = async (id, table, parentIdField) => {
+  const targetResults = await pool.query(
     `SELECT rank, ${parentIdField} AS parentid FROM ${table} WHERE ID = $1`,
-    [id],
-    (error, results) => {
-      const targetRank = results.rows[0].rank;
-      const parentId = results.rows[0].parentid;
+    [id]);
+  const targetRank = targetResults.rows[0].rank;
+  const parentId = targetResults.rows[0].parentid;
 
-      // TODO: handle the errors and call next after all the calls are done...
-      pool.query(
-        `SELECT ID, rank FROM ${table} WHERE rank > $1 AND ${parentIdField} = $2`,
-        [targetRank, parentId],
-        (error, results) => {
-          R.map(record => {
-            const { id, rank } = record;
-            pool.query(
-              `UPDATE ${table} SET rank = $1 WHERE id = $2`,
-              [rank - 1, id],
-              error => {
-                if (error) {
-                  throw error;
-                }
-              }
-            );
-          })(results.rows);
-          next();
-        }
-      );
-    }
-  );
+  const toModResults = await pool.query(
+    `SELECT ID, rank FROM ${table} WHERE rank > $1 AND ${parentIdField} = $2`,
+    [targetRank, parentId]);
+  const records = toModResults.rows;
+  for (let index = 0; index < records.length; index++) {
+    const {id, rank} = records[index];
+    await pool.query(
+      `UPDATE ${table} SET rank = $1 WHERE id = $2`,
+      [rank - 1, id])
+  }
 };
 
 const deleteById = (id, table, next) => {
@@ -265,14 +252,12 @@ export const deleteProject = (projectId, next) => {
   deleteById(projectId, "projects", next);
 };
 
-export const deleteSection = (sectionId, next) => {
-  prepareRankForDelete(sectionId, "sections", "projectid", () => {
-    deleteById(sectionId, "sections", next);
-  });
+export const deleteSection = async (sectionId) => {
+  await prepareRankForDelete(sectionId, "sections", "projectid");
+  return deleteById(sectionId, "sections");
 };
 
-export const deleteItem = (itemId, next) => {
-  prepareRankForDelete(itemId, "items", "sectionid", () => {
-    deleteById(itemId, "items", next);
-  });
+export const deleteItem = async (itemId) => {
+  await prepareRankForDelete(itemId, "items", "sectionid");
+  return deleteById(itemId, "items");
 };
