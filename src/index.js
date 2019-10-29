@@ -64,7 +64,7 @@ const lookupProject = async (projectName, editable, respond, token) => {
   }
 };
 
-app.command("/alfred", ({ command, ack, respond, context }) => {
+app.command("/alfred", async ({ command, ack, respond, context }) => {
   ack();
   const method = command.text.split(" ")[0].toUpperCase();
 
@@ -87,7 +87,7 @@ app.command("/alfred", ({ command, ack, respond, context }) => {
     //   });
     //   break;
     default:
-      lookupProject(command.text, false, respond, context.botToken);
+      await lookupProject(command.text, false, respond, context.botToken);
   }
 });
 
@@ -115,8 +115,8 @@ app.view(ACTIONS.saveItem, async ({ ack, body, view, context }) => {
   if (itemId) {
     try {
       await updateItem(itemId, itemName, itemUrl, itemDescription, type);
-      convo.then(({ respond, token, projectName }) => {
-        lookupProject(projectName, true, respond, token);
+      convo.then(async ({ respond, token, projectName }) => {
+        await lookupProject(projectName, true, respond, token);
       });
     } catch (err) {
       console.log("error in ACTIONS.saveItem (updateItem)", err);
@@ -129,8 +129,8 @@ app.view(ACTIONS.saveItem, async ({ ack, body, view, context }) => {
   } else {
     try {
       await addItem(itemName, sectionId, itemUrl, itemDescription, type);
-      convo.then(({ respond, token, projectName }) => {
-        lookupProject(projectName, true, respond, token);
+      convo.then(async ({ respond, token, projectName }) => {
+        await lookupProject(projectName, true, respond, token);
       });
     } catch (err) {
       console.log("error in ACTIONS.saveItem (addItem)", err);
@@ -153,8 +153,8 @@ app.view(ACTIONS.saveSection, async ({ ack, body, view }) => {
   if (sectionId) {
     try {
       await updateSection(sectionId, sectionName);
-      convo.then(({ respond, token, projectName }) => {
-        lookupProject(projectName, true, respond, token);
+      convo.then(async ({ respond, token, projectName }) => {
+        await lookupProject(projectName, true, respond, token);
       });
     } catch (err) {
       console.log("error in ACTIONS.saveSection (updateSection)", error);
@@ -167,8 +167,8 @@ app.view(ACTIONS.saveSection, async ({ ack, body, view }) => {
   } else {
     try {
       await addSection(sectionName, projectId);
-      convo.then(({ respond, token, projectName }) => {
-        lookupProject(projectName, true, respond, token);
+      convo.then(async ({ respond, token, projectName }) => {
+        await lookupProject(projectName, true, respond, token);
       });
     } catch (err) {
       console.log("error in ACTIONS.saveSection (addSection)", error);
@@ -194,8 +194,8 @@ app.view(ACTIONS.saveProject, async ({ ack, body, view, context }) => {
     const convo = convoStore.get(body.user.id);
     try {
       await updateProject(id, projectName, description, aliases);
-      convo.then(({ respond, token }) => {
-        lookupProject(projectName, true, respond, token);
+      convo.then(async ({ respond, token }) => {
+        await lookupProject(projectName, true, respond, token);
       });
     } catch (err) {
       console.log("error in ACTIONS.saveProject (updateProject)", err);
@@ -307,6 +307,7 @@ app.action(
             text: msg
           });
         });
+        break;
       case COMMANDS.noop:
         break;
       default:
