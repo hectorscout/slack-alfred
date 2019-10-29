@@ -378,8 +378,7 @@ app.action(
         try {
           await deleteSection(sectionId);
           await lookupProject(projectName, true, respond, context.botToken);
-        } catch (err)
-        {
+        } catch (err) {
           console.log("error in ACTIONS.modSection (delete)", err);
           respond({
             token: context.botToken,

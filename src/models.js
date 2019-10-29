@@ -1,6 +1,6 @@
 import * as R from "ramda";
 import pool from "./config";
-import {COMMANDS} from "./constants";
+import { COMMANDS } from "./constants";
 
 const updateAliases = async (aliases, projectId, projectName) => {
   try {
@@ -187,7 +187,8 @@ export const getProjects = async () => {
 const moveRecord = async ({ table, parentField, id, command }) => {
   const origResults = await pool.query(
     `SELECT rank, ${parentField} as parentid FROM ${table} WHERE ID = $1`,
-    [id]);
+    [id]
+  );
   const parentId = origResults.rows[0].parentid;
   console.log(parentId, origResults.rows[0]);
   const origRank = origResults.rows[0].rank;
@@ -195,31 +196,33 @@ const moveRecord = async ({ table, parentField, id, command }) => {
   console.log(origRank, targetRank, parentField, table, parentId, command);
   const targetResults = await pool.query(
     `SELECT ID FROM ${table} WHERE ${parentField} = $1 AND rank = $2`,
-    [parentId, targetRank]);
+    [parentId, targetRank]
+  );
   console.log(targetResults);
   const targetId = targetResults.rows[0].id;
-  await pool.query(
-    `UPDATE ${table} SET rank = $1 WHERE id = $2`,
-    [targetRank, id]);
-  await pool.query(
-    `UPDATE ${table} SET rank = $1 WHERE id = $2`,
-    [origRank, targetId]);
+  await pool.query(`UPDATE ${table} SET rank = $1 WHERE id = $2`, [
+    targetRank,
+    id
+  ]);
+  await pool.query(`UPDATE ${table} SET rank = $1 WHERE id = $2`, [
+    origRank,
+    targetId
+  ]);
 };
 
 export const moveSection = async (sectionId, command) => {
   return moveRecord({
-    table: 'sections',
-    parentField: 'projectId',
+    table: "sections",
+    parentField: "projectId",
     id: sectionId,
     command
   });
 };
 
-
 export const moveItem = async (itemId, command) => {
   return moveRecord({
-    table: 'items',
-    parentField: 'sectionId',
+    table: "items",
+    parentField: "sectionId",
     id: itemId,
     command
   });
@@ -228,19 +231,22 @@ export const moveItem = async (itemId, command) => {
 const prepareRankForDelete = async (id, table, parentIdField) => {
   const targetResults = await pool.query(
     `SELECT rank, ${parentIdField} AS parentid FROM ${table} WHERE ID = $1`,
-    [id]);
+    [id]
+  );
   const targetRank = targetResults.rows[0].rank;
   const parentId = targetResults.rows[0].parentid;
 
   const toModResults = await pool.query(
     `SELECT ID, rank FROM ${table} WHERE rank > $1 AND ${parentIdField} = $2`,
-    [targetRank, parentId]);
+    [targetRank, parentId]
+  );
   const records = toModResults.rows;
   for (let index = 0; index < records.length; index++) {
-    const {id, rank} = records[index];
-    await pool.query(
-      `UPDATE ${table} SET rank = $1 WHERE id = $2`,
-      [rank - 1, id])
+    const { id, rank } = records[index];
+    await pool.query(`UPDATE ${table} SET rank = $1 WHERE id = $2`, [
+      rank - 1,
+      id
+    ]);
   }
 };
 
@@ -252,12 +258,12 @@ export const deleteProject = (projectId, next) => {
   deleteById(projectId, "projects", next);
 };
 
-export const deleteSection = async (sectionId) => {
+export const deleteSection = async sectionId => {
   await prepareRankForDelete(sectionId, "sections", "projectid");
   return deleteById(sectionId, "sections");
 };
 
-export const deleteItem = async (itemId) => {
+export const deleteItem = async itemId => {
   await prepareRankForDelete(itemId, "items", "sectionid");
   return deleteById(itemId, "items");
 };
