@@ -201,15 +201,20 @@ app.view(ACTIONS.saveProject, async ({ ack, body, view, context }) => {
 
   if (id) {
     const convo = convoStore.get(body.user.id);
-    updateProject(id, projectName, description, aliases, error => {
-      if (error) {
-        // TODO
-        console.log("handle this error in ACTIONS.saveProject");
-      }
-      convo.then(({ respond, token }) => {
+    try {
+      await updateProject(id, projectName, description, aliases);
+      convo.then(({respond, token}) => {
         lookupProject(projectName, true, respond, token);
       });
-    });
+    } catch (err) {
+      console.log("error in ACTIONS.saveProject (updateProject)", err);
+      app.client.chat.postMessage({
+        token: context.botToken,
+        channel: body.user.id,
+        text: MESSAGES.genericError("make that new project")
+      });
+
+    }
   } else {
     try {
       await addProject(projectName, description, aliases);
@@ -219,7 +224,7 @@ app.view(ACTIONS.saveProject, async ({ ack, body, view, context }) => {
         text: MESSAGES.addProjectSuccess(projectName)
       });
     } catch (err) {
-      console.log("error in ACTIONS.saveProject", err);
+      console.log("error in ACTIONS.saveProject (addProject)", err);
       app.client.chat.postMessage({
         token: context.botToken,
         channel: body.user.id,

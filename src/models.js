@@ -78,13 +78,11 @@ export const updateSection = async (sectionId, name) => {
   return pool.query("UPDATE sections set name = $1 WHERE ID = $2", [name, sectionId]);
 };
 
-export const updateProject = (projectId, name, description, aliases, next) => {
-  pool.query(
+export const updateProject = async (projectId, name, description, aliases) => {
+  await pool.query(
     "UPDATE projects set name = $1, description = $2 WHERE ID = $3",
-    [name, description, projectId],
-    next
-  );
-  updateAliases(aliases, projectId, name);
+    [name, description, projectId]);
+  return updateAliases(aliases, projectId, name);
 };
 
 const getById = (table, id, next) => {
