@@ -48,12 +48,11 @@ const convoStore = new MemoryStore();
 const lookupProject = async (projectName, editable, respond, token) => {
   const project = await getFullProject(projectName);
   if (!project) {
-    getProjects(projects => {
-      respond({
-        token,
-        response_type: "ephemeral",
-        blocks: availableProjects(projectName, projects)
-      });
+    const projects = await getProjects();
+    respond({
+      token,
+      response_type: "ephemeral",
+      blocks: availableProjects(projectName, projects)
     });
   } else {
     respond({

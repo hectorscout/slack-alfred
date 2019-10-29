@@ -139,10 +139,10 @@ export const getFullProject = async projectName => {
   `,
     [projectName]
   );
-  // if (error || results.rows.length === 0) {
-  //   return next(error, false);
-  // }
-  const project = R.reduce(
+  if (projectResults.rows.length === 0) {
+    return false;
+  }
+  return R.reduce(
     (project, row) => {
       if (!project.id) {
         project.id = row.project_id;
@@ -176,13 +176,11 @@ export const getFullProject = async projectName => {
     { sections: [] },
     projectResults.rows
   );
-  return project;
 };
 
-export const getProjects = next => {
-  pool.query("SELECT * from projects", (error, results) => {
-    next(results.rows);
-  });
+export const getProjects = async () => {
+  const projectResults = await pool.query("SELECT * from projects");
+  return projectResults.rows
 };
 
 export const moveSection = (sectionId, command, next) => {
