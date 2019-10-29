@@ -40,10 +40,17 @@ const MESSAGES = {
     return `I appear to have run into some problems trying to ${doThing}. I apologize.`;
   },
   unfoundProject: unfoundProjectName => {
-    return `I'm sorry Master Bruce, but the Bat-Computer doesn't currently have a file on *${unfoundProjectName}*.\nPerhaps you'd be interested in one of these projects?`;
+    return `I'm sorry Master Bruce, but the Bat-Computer doesn't currently have a file on *${unfoundProjectName}*.
+    Perhaps you'd be interested in one of these projects?`;
   },
   basicIntro: () => {
     return "Ah Master Bruce, which of the projects in the Bat Computer would you like to access?";
+  },
+  addAliasPrompt: (unfoundProjectName) => {
+    return `If you feel that the should bat computer should have found one of the above files, you might consider adding *${unfoundProjectName}* to that project's list of aliases.`
+  },
+  addNew: () => {
+    return `Or maybe you would like to create a new file?`;
   }
 };
 

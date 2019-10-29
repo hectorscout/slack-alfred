@@ -224,6 +224,15 @@ app.view(ACTIONS.saveProject, async ({ ack, body, view, context }) => {
   }
 });
 
+app.action(ACTIONS.openNewProjectDialog, ({ ack, body, context}) => {
+  ack();
+  app.client.views.open({
+    token: context.botToken,
+    view: projectModal({}),
+    trigger_id: body.trigger_id
+  });
+});
+
 app.action(ACTIONS.editProject, async ({ action, ack, respond, context }) => {
   ack();
   try {
