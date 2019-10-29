@@ -45,32 +45,24 @@ const convoStore = new MemoryStore();
   console.log(`Bolt app is running on port ${port}`);
 })();
 
-const lookupProject = (projectName, editable, respond, token) => {
-  getFullProject(projectName, (error, project) => {
-    if (error) {
+const lookupProject = async (projectName, editable, respond, token) => {
+  const project = await getFullProject(projectName);
+  if (!project) {
+    getProjects(projects => {
       respond({
         token,
         response_type: "ephemeral",
-        text: MESSAGES.genericError(`retrieve *${projectName}*`)
+        blocks: availableProjects(projectName, projects)
       });
-      throw error;
-    } else if (!project) {
-      getProjects(projects => {
-        respond({
-          token,
-          response_type: "ephemeral",
-          blocks: availableProjects(projectName, projects)
-        });
-      });
-    } else {
-      respond({
-        token,
-        replace_original: true,
-        response_type: "ephemeral",
-        blocks: projectMessage(project, editable)
-      });
-    }
-  });
+    });
+  } else {
+    respond({
+      token,
+      replace_original: true,
+      response_type: "ephemeral",
+      blocks: projectMessage(project, editable)
+    });
+  }
 };
 
 app.command("/alfred", ({ command, ack, respond, context }) => {
@@ -124,7 +116,7 @@ app.view(ACTIONS.saveItem, async ({ ack, body, view, context }) => {
   if (itemId) {
     try {
       await updateItem(itemId, itemName, itemUrl, itemDescription, type);
-      convo.then(({respond, token, projectName}) => {
+      convo.then(({ respond, token, projectName }) => {
         lookupProject(projectName, true, respond, token);
       });
     } catch (err) {
@@ -162,7 +154,7 @@ app.view(ACTIONS.saveSection, async ({ ack, body, view }) => {
   if (sectionId) {
     try {
       await updateSection(sectionId, sectionName);
-      convo.then(({respond, token, projectName}) => {
+      convo.then(({ respond, token, projectName }) => {
         lookupProject(projectName, true, respond, token);
       });
     } catch (err) {
@@ -203,7 +195,7 @@ app.view(ACTIONS.saveProject, async ({ ack, body, view, context }) => {
     const convo = convoStore.get(body.user.id);
     try {
       await updateProject(id, projectName, description, aliases);
-      convo.then(({respond, token}) => {
+      convo.then(({ respond, token }) => {
         lookupProject(projectName, true, respond, token);
       });
     } catch (err) {
@@ -213,7 +205,6 @@ app.view(ACTIONS.saveProject, async ({ ack, body, view, context }) => {
         channel: body.user.id,
         text: MESSAGES.genericError("make that new project")
       });
-
     }
   } else {
     try {
@@ -234,155 +225,177 @@ app.view(ACTIONS.saveProject, async ({ ack, body, view, context }) => {
   }
 });
 
-app.action(ACTIONS.editProject, ({ action, ack, respond, context }) => {
+app.action(ACTIONS.editProject, async ({ action, ack, respond, context }) => {
   ack();
-  lookupProject(action.value, true, respond, context.botToken);
-});
-
-app.action(ACTIONS.viewProject, ({ action, ack, respond, context }) => {
-  ack();
-  lookupProject(action.value, false, respond, context.botToken);
-});
-
-app.action(ACTIONS.modProject, async ({ action, ack, context, body, respond }) => {
-  ack();
-  const actionValues = JSON.parse(action.selected_option.value);
-  const command = actionValues.cmd;
-  const projectName = actionValues.pn;
-  const projectId = actionValues.pId;
-
-  switch (command) {
-    case COMMANDS.edit:
-      convoStore.set(body.user.id, {
-        respond,
-        token: context.botToken,
-        projectName
-      });
-      try {
-        const project = await getProjectById(projectId);
-        app.client.views.open({
-          token: context.botToken,
-          view: projectModal(project),
-          trigger_id: body.trigger_id
-        });
-      } catch (err) {
-        console.log("error in ACTIONS.modProject (edit)", err);
-        app.client.chat.postMessage({
-          token: context.botToken,
-          channel: body.user.id,
-          text: MESSAGES.genericError("edit that project")
-        });
-      }
-      break;
-    case COMMANDS.new:
-      convoStore.set(body.user.id, {
-        respond,
-        token: context.botToken,
-        projectName
-      });
-      const blocks = sectionModal({ projectId });
-      app.client.views.open({
-        token: context.botToken,
-        view: blocks,
-        trigger_id: body.trigger_id
-      });
-      break;
-    case COMMANDS.delete:
-      deleteProject(projectId, error => {
-        let msg = MESSAGES.removeProjectSuccess(projectName);
-        if (error) {
-          msg = MESSAGES.genericError("remove that");
-        }
-        respond({
-          token: context.botToken,
-          response_type: "ephemeral",
-          text: msg
-        });
-      });
-    case COMMANDS.noop:
-      break;
-    default:
-      console.log("How did they even do this...?");
+  try {
+    await lookupProject(action.value, true, respond, context.botToken);
+  } catch (err) {
+    respond({
+      token: context.botToken,
+      response_type: "ephemeral",
+      text: MESSAGES.genericError(`edit *${action.value}*`)
+    });
   }
 });
 
-app.action(ACTIONS.modSection, async ({ action, ack, context, body, respond }) => {
+app.action(ACTIONS.viewProject, async ({ action, ack, respond, context }) => {
   ack();
-  const actionValue = JSON.parse(action.selected_option.value);
-  const command = actionValue.cmd;
-  const projectName = actionValue.pn;
-  const sectionId = actionValue.sId;
+  try {
+    await lookupProject(action.value, false, respond, context.botToken);
+  } catch (err) {
+    respond({
+      token: context.botToken,
+      response_type: "ephemeral",
+      text: MESSAGES.genericError(`edit *${action.value}*`)
+    });
+  }
+});
 
-  switch (command) {
-    case COMMANDS.edit:
-      convoStore.set(body.user.id, {
-        respond,
-        token: context.botToken,
-        projectName
-      });
-      try {
-        const section = await getSectionById(sectionId);
-        const blocks = sectionModal(section);
+app.action(
+  ACTIONS.modProject,
+  async ({ action, ack, context, body, respond }) => {
+    ack();
+    const actionValues = JSON.parse(action.selected_option.value);
+    const command = actionValues.cmd;
+    const projectName = actionValues.pn;
+    const projectId = actionValues.pId;
+
+    switch (command) {
+      case COMMANDS.edit:
+        convoStore.set(body.user.id, {
+          respond,
+          token: context.botToken,
+          projectName
+        });
+        try {
+          const project = await getProjectById(projectId);
+          app.client.views.open({
+            token: context.botToken,
+            view: projectModal(project),
+            trigger_id: body.trigger_id
+          });
+        } catch (err) {
+          console.log("error in ACTIONS.modProject (edit)", err);
+          app.client.chat.postMessage({
+            token: context.botToken,
+            channel: body.user.id,
+            text: MESSAGES.genericError("edit that project")
+          });
+        }
+        break;
+      case COMMANDS.new:
+        convoStore.set(body.user.id, {
+          respond,
+          token: context.botToken,
+          projectName
+        });
+        const blocks = sectionModal({ projectId });
         app.client.views.open({
           token: context.botToken,
           view: blocks,
           trigger_id: body.trigger_id
         });
-      } catch (err) {
-        console.log("error in ACTIONS.modSection (edit)", err);
-        app.client.chat.postMessage({
-          token: context.botToken,
-          channel: body.user.id,
-          text: MESSAGES.genericError("edit that section")
+        break;
+      case COMMANDS.delete:
+        deleteProject(projectId, error => {
+          let msg = MESSAGES.removeProjectSuccess(projectName);
+          if (error) {
+            msg = MESSAGES.genericError("remove that");
+          }
+          respond({
+            token: context.botToken,
+            response_type: "ephemeral",
+            text: msg
+          });
         });
-      }
-      break;
-    case COMMANDS.new:
-      convoStore.set(body.user.id, {
-        respond,
-        token: context.botToken,
-        projectName
-      });
-      app.client.views.open({
-        token: context.botToken,
-        view: itemModal({ sectionId, type: actionValue.type }),
-        trigger_id: body.trigger_id
-      });
-      break;
-    case COMMANDS.up:
-    case COMMANDS.down:
-      const direction = command === COMMANDS.up ? "up" : "down";
-      moveSection(sectionId, direction, error => {
-        if (error) {
-          respond({
-            token: context.botToken,
-            response_type: "ephemeral",
-            text: MESSAGES.genericError("move that")
-          });
-          return;
-        }
-        lookupProject(projectName, true, respond, context.botToken);
-      });
-      break;
-    case COMMANDS.delete:
-      deleteSection(sectionId, error => {
-        if (error) {
-          respond({
-            token: context.botToken,
-            response_type: "ephemeral",
-            text: MESSAGES.genericError("remove that")
-          });
-          return;
-        }
-        lookupProject(projectName, true, respond, context.botToken);
-      });
-      break;
-    case COMMANDS.noop:
-      break;
-    default:
-      console.log("Shouldn't be able to do this...");
+      case COMMANDS.noop:
+        break;
+      default:
+        console.log("How did they even do this...?");
+    }
   }
-});
+);
+
+app.action(
+  ACTIONS.modSection,
+  async ({ action, ack, context, body, respond }) => {
+    ack();
+    const actionValue = JSON.parse(action.selected_option.value);
+    const command = actionValue.cmd;
+    const projectName = actionValue.pn;
+    const sectionId = actionValue.sId;
+
+    switch (command) {
+      case COMMANDS.edit:
+        convoStore.set(body.user.id, {
+          respond,
+          token: context.botToken,
+          projectName
+        });
+        try {
+          const section = await getSectionById(sectionId);
+          const blocks = sectionModal(section);
+          app.client.views.open({
+            token: context.botToken,
+            view: blocks,
+            trigger_id: body.trigger_id
+          });
+        } catch (err) {
+          console.log("error in ACTIONS.modSection (edit)", err);
+          app.client.chat.postMessage({
+            token: context.botToken,
+            channel: body.user.id,
+            text: MESSAGES.genericError("edit that section")
+          });
+        }
+        break;
+      case COMMANDS.new:
+        convoStore.set(body.user.id, {
+          respond,
+          token: context.botToken,
+          projectName
+        });
+        app.client.views.open({
+          token: context.botToken,
+          view: itemModal({ sectionId, type: actionValue.type }),
+          trigger_id: body.trigger_id
+        });
+        break;
+      case COMMANDS.up:
+      case COMMANDS.down:
+        const direction = command === COMMANDS.up ? "up" : "down";
+        moveSection(sectionId, direction, error => {
+          if (error) {
+            respond({
+              token: context.botToken,
+              response_type: "ephemeral",
+              text: MESSAGES.genericError("move that")
+            });
+            return;
+          }
+          lookupProject(projectName, true, respond, context.botToken);
+        });
+        break;
+      case COMMANDS.delete:
+        deleteSection(sectionId, error => {
+          if (error) {
+            respond({
+              token: context.botToken,
+              response_type: "ephemeral",
+              text: MESSAGES.genericError("remove that")
+            });
+            return;
+          }
+          lookupProject(projectName, true, respond, context.botToken);
+        });
+        break;
+      case COMMANDS.noop:
+        break;
+      default:
+        console.log("Shouldn't be able to do this...");
+    }
+  }
+);
 
 app.action(ACTIONS.modItem, async ({ action, ack, context, body, respond }) => {
   ack();

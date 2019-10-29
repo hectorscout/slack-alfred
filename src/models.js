@@ -70,45 +70,52 @@ export const addProject = async (name, description, aliases) => {
 export const updateItem = async (itemId, name, url, description, type) => {
   return pool.query(
     "UPDATE items set name = $1, url = $2, description = $3, type = $4 WHERE ID = $5",
-    [name, url, description, type, itemId],
+    [name, url, description, type, itemId]
   );
 };
 
 export const updateSection = async (sectionId, name) => {
-  return pool.query("UPDATE sections set name = $1 WHERE ID = $2", [name, sectionId]);
+  return pool.query("UPDATE sections set name = $1 WHERE ID = $2", [
+    name,
+    sectionId
+  ]);
 };
 
 export const updateProject = async (projectId, name, description, aliases) => {
   await pool.query(
     "UPDATE projects set name = $1, description = $2 WHERE ID = $3",
-    [name, description, projectId]);
+    [name, description, projectId]
+  );
   return updateAliases(aliases, projectId, name);
 };
 
 const getById = async (table, id) => {
-  const tableResult = await pool.query(`SELECT * FROM ${table} WHERE ID = $1`, [id]);
+  const tableResult = await pool.query(`SELECT * FROM ${table} WHERE ID = $1`, [
+    id
+  ]);
   return tableResult.rows[0];
 };
 
-export const getItemById = async (itemId) => {
+export const getItemById = async itemId => {
   return getById("items", itemId);
 };
 
-export const getSectionById = async (sectionId) => {
+export const getSectionById = async sectionId => {
   return getById("sections", sectionId);
 };
 
-export const getProjectById = async (projectId) => {
+export const getProjectById = async projectId => {
   const project = await getById("projects", projectId);
   const aliasesResults = await pool.query(
     `SELECT alias FROM aliases WHERE projectid = $1`,
-    [project.id]);
+    [project.id]
+  );
   project.aliases = R.pluck("alias", aliasesResults.rows).join(", ");
   return project;
 };
 
-export const getFullProject = (projectName, next) => {
-  pool.query(
+export const getFullProject = async projectName => {
+  const projectResults = await pool.query(
     `
     SELECT
      projects.ID as project_id,
@@ -130,48 +137,46 @@ export const getFullProject = (projectName, next) => {
     WHERE aliases.alias ilike $1
     ORDER BY sections.rank, items.rank
   `,
-    [projectName],
-    (error, results) => {
-      if (error || results.rows.length === 0) {
-        return next(error, false);
-      }
-      const project = R.reduce(
-        (project, row) => {
-          if (!project.id) {
-            project.id = row.project_id;
-          }
-          if (!project.name) {
-            project.name = row.project_name;
-          }
-          if (!project.description) {
-            project.description = row.project_description;
-          }
-          if (!project.sections[row.section_rank]) {
-            project.sections[row.section_rank] = {
-              id: row.section_id,
-              name: row.section_name,
-              rank: row.section_rank,
-              items: []
-            };
-          }
-          if (row.item_id) {
-            project.sections[row.section_rank].items.push({
-              id: row.item_id,
-              name: row.item_name,
-              description: row.item_description,
-              url: row.item_url,
-              rank: row.item_rank,
-              type: row.item_type
-            });
-          }
-          return project;
-        },
-        { sections: [] },
-        results.rows
-      );
-      next(error, project);
-    }
+    [projectName]
   );
+  // if (error || results.rows.length === 0) {
+  //   return next(error, false);
+  // }
+  const project = R.reduce(
+    (project, row) => {
+      if (!project.id) {
+        project.id = row.project_id;
+      }
+      if (!project.name) {
+        project.name = row.project_name;
+      }
+      if (!project.description) {
+        project.description = row.project_description;
+      }
+      if (!project.sections[row.section_rank]) {
+        project.sections[row.section_rank] = {
+          id: row.section_id,
+          name: row.section_name,
+          rank: row.section_rank,
+          items: []
+        };
+      }
+      if (row.item_id) {
+        project.sections[row.section_rank].items.push({
+          id: row.item_id,
+          name: row.item_name,
+          description: row.item_description,
+          url: row.item_url,
+          rank: row.item_rank,
+          type: row.item_type
+        });
+      }
+      return project;
+    },
+    { sections: [] },
+    projectResults.rows
+  );
+  return project;
 };
 
 export const getProjects = next => {
