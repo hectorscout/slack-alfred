@@ -244,7 +244,7 @@ app.action(ACTIONS.viewProject, ({ action, ack, respond, context }) => {
   lookupProject(action.value, false, respond, context.botToken);
 });
 
-app.action(ACTIONS.modProject, ({ action, ack, context, body, respond }) => {
+app.action(ACTIONS.modProject, async ({ action, ack, context, body, respond }) => {
   ack();
   const actionValues = JSON.parse(action.selected_option.value);
   const command = actionValues.cmd;
@@ -258,13 +258,21 @@ app.action(ACTIONS.modProject, ({ action, ack, context, body, respond }) => {
         token: context.botToken,
         projectName
       });
-      getProjectById(projectId, (error, project) => {
+      try {
+        const project = await getProjectById(projectId);
         app.client.views.open({
           token: context.botToken,
           view: projectModal(project),
           trigger_id: body.trigger_id
         });
-      });
+      } catch (err) {
+        console.log("error in ACTIONS.modProject (edit)", err);
+        app.client.chat.postMessage({
+          token: context.botToken,
+          channel: body.user.id,
+          text: MESSAGES.genericError("edit that project")
+        });
+      }
       break;
     case COMMANDS.new:
       convoStore.set(body.user.id, {
@@ -298,7 +306,7 @@ app.action(ACTIONS.modProject, ({ action, ack, context, body, respond }) => {
   }
 });
 
-app.action(ACTIONS.modSection, ({ action, ack, context, body, respond }) => {
+app.action(ACTIONS.modSection, async ({ action, ack, context, body, respond }) => {
   ack();
   const actionValue = JSON.parse(action.selected_option.value);
   const command = actionValue.cmd;
@@ -312,14 +320,22 @@ app.action(ACTIONS.modSection, ({ action, ack, context, body, respond }) => {
         token: context.botToken,
         projectName
       });
-      getSectionById(sectionId, (error, section) => {
+      try {
+        const section = await getSectionById(sectionId);
         const blocks = sectionModal(section);
         app.client.views.open({
           token: context.botToken,
           view: blocks,
           trigger_id: body.trigger_id
         });
-      });
+      } catch (err) {
+        console.log("error in ACTIONS.modSection (edit)", err);
+        app.client.chat.postMessage({
+          token: context.botToken,
+          channel: body.user.id,
+          text: MESSAGES.genericError("edit that section")
+        });
+      }
       break;
     case COMMANDS.new:
       convoStore.set(body.user.id, {
@@ -368,7 +384,7 @@ app.action(ACTIONS.modSection, ({ action, ack, context, body, respond }) => {
   }
 });
 
-app.action(ACTIONS.modItem, ({ action, ack, context, body, respond }) => {
+app.action(ACTIONS.modItem, async ({ action, ack, context, body, respond }) => {
   ack();
   const actionValue = JSON.parse(action.selected_option.value);
   const command = actionValue.cmd;
@@ -382,14 +398,22 @@ app.action(ACTIONS.modItem, ({ action, ack, context, body, respond }) => {
         token: context.botToken,
         projectName
       });
-      getItemById(itemId, (error, item) => {
+      try {
+        const item = await getItemById(itemId);
         const blocks = itemModal(item);
         app.client.views.open({
           token: context.botToken,
           view: blocks,
           trigger_id: body.trigger_id
         });
-      });
+      } catch (err) {
+        console.log("error in ACTIONS.modItem (edit)", err);
+        app.client.chat.postMessage({
+          token: context.botToken,
+          channel: body.user.id,
+          text: MESSAGES.genericError("edit that item")
+        });
+      }
       break;
     case COMMANDS.up:
     case COMMANDS.down:

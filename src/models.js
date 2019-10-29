@@ -85,40 +85,26 @@ export const updateProject = async (projectId, name, description, aliases) => {
   return updateAliases(aliases, projectId, name);
 };
 
-const getById = (table, id, next) => {
-  pool.query(`SELECT * FROM ${table} WHERE ID = $1`, [id], (error, results) => {
-    if (error) {
-      return next(error);
-    }
-    return next(null, results.rows[0]);
-  });
+const getById = async (table, id) => {
+  const tableResult = await pool.query(`SELECT * FROM ${table} WHERE ID = $1`, [id]);
+  return tableResult.rows[0];
 };
 
-export const getItemById = (itemId, next) => {
-  getById("items", itemId, next);
+export const getItemById = async (itemId) => {
+  return getById("items", itemId);
 };
 
-export const getSectionById = (sectionId, next) => {
-  getById("sections", sectionId, next);
+export const getSectionById = async (sectionId) => {
+  return getById("sections", sectionId);
 };
 
-export const getProjectById = (projectId, next) => {
-  getById("projects", projectId, (error, project) => {
-    if (error) {
-      next(error);
-    }
-    pool.query(
-      `SELECT alias FROM aliases WHERE projectid = $1`,
-      [project.id],
-      (error, results) => {
-        if (error) {
-          next(error);
-        }
-        project.aliases = R.pluck("alias", results.rows).join(", ");
-        next(error, project);
-      }
-    );
-  });
+export const getProjectById = async (projectId) => {
+  const project = await getById("projects", projectId);
+  const aliasesResults = await pool.query(
+    `SELECT alias FROM aliases WHERE projectid = $1`,
+    [project.id]);
+  project.aliases = R.pluck("alias", aliasesResults.rows).join(", ");
+  return project;
 };
 
 export const getFullProject = (projectName, next) => {
