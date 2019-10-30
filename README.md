@@ -50,8 +50,8 @@ setup ngrok
 `./ngrok http 8080` from wherever ngrok is...
 
 If ngrok url is `https://24392a0c.ngrok.io`:
-* Put `https://24392a0c.ngrok.io/slack/commands` into the slash command's `Request URL` (you'll have to edit the command).
-* Put `https://24392a0c.ngrok.io/slack/actions` into the `Request URL` under `Interactive Components`.
+* Put `https://24392a0c.ngrok.io/slack/events` into the slash command's `Request URL` (you'll have to edit the command).
+* Put `https://24392a0c.ngrok.io/slack/events` into the `Request URL` under `Interactive Components`.
 
 ## Slack App
 Creating a Slack app (probably want to do this in a testing workspace)
@@ -59,12 +59,14 @@ Creating a Slack app (probably want to do this in a testing workspace)
 * Slash Commands
   * Create a slash command
   * Command: is whatever you want the command to be... (`/alfred`)
-  * Request URL: `https://24392a0c.ngrok.io/slack/commands` when doing dev work (See ngrok stuff above).
+  * Request URL: `https://24392a0c.ngrok.io/slack/events` when doing dev work (See ngrok stuff above).
   * Short Description: `Ask Alfred about a project` or something
   * Usage Hint: `[project name]` I guess...
 * Interactive Components
   * Turn them on
-  * Request URL: `https://24392a0c.ngrok.io/slack/actions` (similar ngrok thing)
+  * Request URL: `https://24392a0c.ngrok.io/slack/events` (similar ngrok thing)
+* Slack Bot
+  * Create a slack bot. This is mostly used for its bot token.
 * Install the app to your workspace in the Basic Information section
 
 
