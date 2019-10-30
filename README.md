@@ -65,7 +65,7 @@ Creating a Slack app (probably want to do this in a testing workspace)
 * Install the app to your workspace in the Basic Information section
 
 
-# Heroku
+# Heroku (for production)
 
 ## Setup
 
