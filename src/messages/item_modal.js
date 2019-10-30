@@ -16,7 +16,7 @@ const getUrlBlocks = values => {
       },
       label: {
         type: "plain_text",
-        text: "What is this item called?"
+        text: "What would you call this link?"
       }
     },
     {
@@ -33,7 +33,7 @@ const getUrlBlocks = values => {
       },
       label: {
         type: "plain_text",
-        text: "Where would one find this item?"
+        text: "What is the Uniform Resource Locator, or URL, for this link?"
       }
     },
     {
@@ -60,19 +60,24 @@ const getUrlBlocks = values => {
 };
 
 const getUserBlocks = values => {
+  const userInputElement = {
+    type: "users_select",
+    action_id: "item_user",
+    placeholder: {
+      type: "plain_text",
+      text: "The Penguin"
+    }
+  };
+
+  if (values.url) {
+    userInputElement.initial_user = values.url;
+  }
+
   return [
     {
       type: "input",
       block_id: "item_user",
-      element: {
-        type: "users_select",
-        action_id: "item_user",
-        placeholder: {
-          type: "plain_text",
-          text: "The Penguin"
-        }
-        // initial_user: values.url || ""
-      },
+      element: userInputElement,
       label: {
         type: "plain_text",
         text: "Who are we calling out?"
