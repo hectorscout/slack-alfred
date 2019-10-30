@@ -21,11 +21,14 @@ Create a `slack_cache` database and connect to it
 * `\c slack_alfred`
 
 Create a `projects` table
+```postgres
 CREATE TABLE projects (
   ID SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   description VARCHAR(255) NOT NULL
 );
+```
+and the other tables in https://github.com/hectorscout/slack-alfred...
 
 ## Environment Variables
 Create a `.env` file with the following:
