@@ -94,7 +94,7 @@ app.command("/alfred", async ({ command, ack, respond, context }) => {
 app.view(ACTIONS.saveItem, async ({ ack, body, view, context }) => {
   ack();
   const { values } = view.state;
-  const itemName = R.path(["item_name", "item_name", "value"], values);
+  const itemName = R.pathOr("", ["item_name", "item_name", "value"], values);
   const itemUrl =
     R.path(["item_url", "item_url", "value"], values) ||
     R.path(["item_user", "item_user", "selected_user"], values) ||

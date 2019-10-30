@@ -27,11 +27,12 @@ const buildUserItemBlocks = item => {
 };
 
 const buildChannelItemBlocks = item => {
+  const name = item.name ? `*${item.name}:* ` : ''
   return {
     type: "section",
     text: {
       type: "mrkdwn",
-      text: `*${item.name}:* <#${item.url}>\n>${item.description.replace(
+      text: `${name}<#${item.url}>\n>${item.description.replace(
         "\n",
         "\n>"
       )}`

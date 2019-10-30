@@ -131,19 +131,24 @@ const getUserBlocks = values => {
 };
 
 const getChannelBlocks = values => {
+  const channelElement = {
+    type: "channels_select",
+    action_id: "item_channel",
+    placeholder: {
+      type: "plain_text",
+      text: "same_bat_channel"
+    }
+  };
+
+  if (values.url) {
+    channelElement.initial_channel = values.url;
+  }
+
   return [
     {
       type: "input",
       block_id: "item_channel",
-      element: {
-        type: "channels_select",
-        action_id: "item_channel",
-        placeholder: {
-          type: "plain_text",
-          text: "same_bat_channel"
-        }
-        // initial_channel: values.url || ""
-      },
+      element: channelElement,
       label: {
         type: "plain_text",
         text: "Which channel?"
@@ -152,6 +157,7 @@ const getChannelBlocks = values => {
     {
       type: "input",
       block_id: "item_name",
+      optional: true,
       element: {
         type: "plain_text_input",
         action_id: "item_name",
