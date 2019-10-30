@@ -99,7 +99,8 @@ app.view(ACTIONS.saveItem, async ({ ack, body, view, context }) => {
     R.path(["item_url", "item_url", "value"], values) ||
     R.path(["item_user", "item_user", "selected_user"], values) ||
     R.path(["item_channel", "item_channel", "selected_channel"], values);
-  const itemDescription = R.path(
+  const itemDescription = R.pathOr(
+    "",
     ["item_description", "item_description", "value"],
     values
   );

@@ -45,6 +45,7 @@ const getUrlBlocks = values => {
     {
       type: "input",
       block_id: "item_description",
+      optional: true,
       label: {
         type: "plain_text",
         text: "And a bit more of a description?",
@@ -109,6 +110,7 @@ const getUserBlocks = values => {
     {
       type: "input",
       block_id: "item_description",
+      optional: true,
       label: {
         type: "plain_text",
         text: "And anything else, like what you might search them out for?",
@@ -167,6 +169,7 @@ const getChannelBlocks = values => {
     {
       type: "input",
       block_id: "item_description",
+      optional: true,
       label: {
         type: "plain_text",
         text: "What would one find in this channel?",
