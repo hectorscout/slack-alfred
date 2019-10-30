@@ -1,5 +1,11 @@
 import { ACTIONS, ITEM_TYPES } from "../constants";
 
+const TITLES = {
+  [ITEM_TYPES.url]: "Link",
+  [ITEM_TYPES.user]: "USER",
+  [ITEM_TYPES.channel]: "Channel"
+};
+
 const getUrlBlocks = values => {
   return [
     {
@@ -182,13 +188,14 @@ const getChannelBlocks = values => {
 };
 
 const itemModal = values => {
+
   const modal = {
     type: "modal",
     callback_id: ACTIONS.saveItem,
     private_metadata: JSON.stringify(values),
     title: {
       type: "plain_text",
-      text: "Alfred",
+      text: TITLES[values.type],
       emoji: true
     },
     submit: {

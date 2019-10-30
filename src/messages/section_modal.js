@@ -37,6 +37,15 @@ const sectionModal = values => {
           type: "plain_text",
           text: "What section is this?"
         }
+      },
+      {
+        type: "context",
+        elements: [
+          {
+            type: "mrkdwn",
+            text: "Including an `:emoji:` at the beginning of the section name can help visually separate the sections."
+          }
+        ]
       }
     ]
   };

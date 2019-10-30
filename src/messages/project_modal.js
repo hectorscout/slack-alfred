@@ -7,7 +7,7 @@ const projectModal = values => {
     private_metadata: values.id ? `${values.id}` : "",
     title: {
       type: "plain_text",
-      text: "Alfred",
+      text: "Project",
       emoji: true
     },
     submit: {
@@ -37,6 +37,15 @@ const projectModal = values => {
           type: "plain_text",
           text: "What should the project be called then?"
         }
+      },
+      {
+        type: "context",
+        elements: [
+          {
+            type: "mrkdwn",
+            text: "If the project has an `:emoji:` feel freed to include it here."
+          }
+        ]
       },
       {
         type: "input",
