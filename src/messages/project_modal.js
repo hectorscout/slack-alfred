@@ -17,7 +17,7 @@ const projectModal = values => {
     },
     close: {
       type: "plain_text",
-      text: "Nevermind",
+      text: "Cancel That",
       emoji: true
     },
     blocks: [

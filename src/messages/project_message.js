@@ -27,15 +27,12 @@ const buildUserItemBlocks = item => {
 };
 
 const buildChannelItemBlocks = item => {
-  const name = item.name ? `*${item.name}:* ` : ''
+  const name = item.name ? `*${item.name}:* ` : "";
   return {
     type: "section",
     text: {
       type: "mrkdwn",
-      text: `${name}<#${item.url}>\n>${item.description.replace(
-        "\n",
-        "\n>"
-      )}`
+      text: `${name}<#${item.url}>\n>${item.description.replace("\n", "\n>")}`
     }
   };
 };
@@ -247,7 +244,7 @@ const buildSectionBlocks = (sections, projectName, editable) => {
             type: "plain_text",
             emoji: true,
             text: hasItems
-              ? "Delete items to delete section"
+              ? "Delete all items to delete section"
               : ":no_entry_sign: Delete Section"
           },
           value: JSON.stringify({
@@ -380,9 +377,8 @@ const buildProjectBlocks = (project, editable) => {
           text: {
             type: "plain_text",
             emoji: true,
-            text: "I need to edit this"
+            text: ":batsymbol: Update This"
           },
-          style: "primary",
           value: `${project.name}`
         }
       ]

@@ -17,7 +17,7 @@ const sectionModal = values => {
     },
     close: {
       type: "plain_text",
-      text: "I Was Just Kidding",
+      text: "Not Today",
       emoji: true
     },
     blocks: [
