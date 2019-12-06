@@ -51,7 +51,31 @@ const MESSAGES = {
   },
   addNew: () => {
     return `Or maybe you would like to create a new file?`;
+  },
+  auditChannel: {
+    notDM: () => {
+      return `You should probably set an audit _channel_ instead of a DM with you, sir.
+      Might I suggest a new private channel named something to the tune of \`alfred-audit\`, perhaps?`;
+    },
+    dropFirst: () => {
+      return `If you'd like to change the audit channel you'll first need to run \`\\alfred releaseaudit\` in the current audit channel.`;
+    },
+    set: channelName => {
+      return `The audit channel has been set to #${channelName}, as you requested.`;
+    },
+    dropWrongChannel: () => {
+      return `I'm sorry Master Bruce, but this isn't the audit channel. You'll need to run \`\\alfred releaseaudit\` in the current audit channel.
+      If the current audit channel no longer exists, or you don't remember which it was, I'm afraid you may need to update the DB manually.
+      It's for security, sir.`;
+    },
+    dropped: () => {
+      return `I've released the audit channel. You're now free to designate another channel as the audit channel. Choose wisely.`;
+    }
   }
 };
 
-export { ACTIONS, COMMANDS, ITEM_TYPES, MESSAGES };
+const SETTING_NAMES = {
+  auditChannelId: "AUDIT_CHANNEL_ID"
+};
+
+export { ACTIONS, COMMANDS, ITEM_TYPES, MESSAGES, SETTING_NAMES };

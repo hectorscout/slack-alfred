@@ -2,7 +2,7 @@ import * as R from "ramda";
 import * as dotenv from "dotenv";
 
 import { App, MemoryStore } from "@slack/bolt";
-import { ACTIONS, COMMANDS, MESSAGES } from "./constants";
+import { ACTIONS, COMMANDS, MESSAGES, SETTING_NAMES } from "./constants";
 
 import projectMessage from "./messages/project_message";
 import availableProjects from "./messages/available_projects";
@@ -17,6 +17,7 @@ import {
   deleteItem,
   deleteProject,
   deleteSection,
+  deleteSetting,
   getFullProject,
   getItemById,
   getProjectById,
@@ -27,7 +28,9 @@ import {
   moveSection,
   updateItem,
   updateProject,
-  updateSection
+  updateSection,
+  getSetting,
+  setSetting
 } from "./models";
 
 dotenv.config();
@@ -77,7 +80,49 @@ const dumpProjects = async (respond, token) => {
   }, projects);
 };
 
-app.command("/alfred", async ({ command, ack, respond, context }) => {
+const setAuditChannel = async (respond, token, channelId, channelName) => {
+  if (channelName === "directmessage") {
+    return respond({
+      token,
+      response_type: "ephemeral",
+      text: MESSAGES.auditChannel.notDM()
+    });
+  }
+  const currentChannelId = await getSetting(SETTING_NAMES.auditChannelId);
+  if (currentChannelId && currentChannelId !== channelId) {
+    return respond({
+      token,
+      response_type: "ephemeral",
+      text: MESSAGES.auditChannel.dropFirst()
+    });
+  }
+
+  await setSetting(SETTING_NAMES.auditChannelId, channelId);
+  return respond({
+    token,
+    response_type: "in-channel",
+    text: MESSAGES.auditChannel.set(channelName)
+  });
+};
+
+const removeAuditChannel = async (respond, token, channelId) => {
+  const currentChannelSetting = await getSetting(SETTING_NAMES.auditChannelId);
+  if (currentChannelSetting && currentChannelSetting.value !== channelId) {
+    return respond({
+      token,
+      response_type: "ephemeral",
+      text: MESSAGES.auditChannel.dropWrongChannel()
+    });
+  }
+  await deleteSetting(SETTING_NAMES.auditChannelId);
+  return respond({
+    token,
+    response_type: "in-channel",
+    text: MESSAGES.auditChannel.dropped()
+  });
+};
+
+app.command("/alfred", async ({ command, ack, respond, context, body }) => {
   ack();
   const method = command.text.split(" ")[0].toUpperCase();
 
@@ -101,6 +146,22 @@ app.command("/alfred", async ({ command, ack, respond, context }) => {
     //   break;
     case "DUMP":
       await dumpProjects(respond, context.botToken);
+      break;
+    case "AUDITCHANNEL":
+      await setAuditChannel(
+        respond,
+        context.botToken,
+        body.channel_id,
+        body.channel_name
+      );
+      break;
+    case "RELEASEAUDIT":
+      await removeAuditChannel(
+        respond,
+        context.botToken,
+        body.channel_id,
+        body.channel_name
+      );
       break;
     default:
       await lookupProject(command.text, false, respond, context.botToken);
