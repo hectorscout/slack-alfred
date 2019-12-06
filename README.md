@@ -126,3 +126,19 @@ You can find this at the end of the build log (there's probably someplace better
 
 Set this URL in your slack app.
 
+# Setting an Audit Channel
+
+You can set a slack channel where Alfred will log all changes made to all projects.
+
+You'll probably want this to be a small private channel. The point is to make sure nobody puts anything in the Bat Computer they shouldn't (username and passwords, AWS keys, that sort of thing).
+
+To do this create/go to the channel you'd like to use as the audi channel and type:
+
+- `/alfred auditchannel`
+
+If you want to change the audit channel, you'll first need to release the current audit channel by running
+
+- `/alfred releaseaudit`
+  in the current audit channel. This is to ensure that no one can change the audit channel besides the few invited to the audit channel.
+
+_*WARNING:* If you delete the audit channel without first releasing it, you won't be able to set a new audit channel unless you go into the DB and clear out the setting. Probably just release it first._
