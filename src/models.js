@@ -323,3 +323,31 @@ export const deleteItem = async itemId => {
   await prepareRankForDelete(itemId, "items", "sectionid");
   return deleteById(itemId, "items");
 };
+
+export const getSetting = async name => {
+  const setting = await pool.query(`SELECT * FROM settings WHERE name = $1`, [
+    name
+  ]);
+  return setting.rows[0];
+};
+
+export const setSetting = async (name, value) => {
+  const setting = await pool.query(`SELECT * FROM settings WHERE name = $1`, [
+    name
+  ]);
+  if (setting.rows.length) {
+    await pool.query(`UPDATE settings SET value = $1 WHERE id  = $2`, [
+      value,
+      setting.rows[0].id
+    ]);
+  } else {
+    await pool.query(`INSERT INTO settings (name, value) VALUES ($1, $2)`, [
+      name,
+      value
+    ]);
+  }
+};
+
+export const deleteSetting = async name => {
+  await pool.query(`DELETE FROM settings WHERE name = $1`, [name]);
+};
