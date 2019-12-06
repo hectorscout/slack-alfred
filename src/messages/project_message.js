@@ -266,7 +266,7 @@ const buildSectionBlocks = (sections, projectName, editable) => {
   return blocks;
 };
 
-const buildProjectBlocks = (project, editable) => {
+const buildProjectBlocks = (project, editable, isDump = false) => {
   const descriptionBlock = {
     type: "section",
     text: {
@@ -350,35 +350,41 @@ const buildProjectBlocks = (project, editable) => {
     }
   ];
 
-  if (editable) {
+  if (isDump) {
     projectBlocks.push({
-      type: "actions",
-      elements: [
-        {
-          type: "button",
-          action_id: ACTIONS.viewProject,
-          text: {
-            type: "plain_text",
-            emoji: true,
-            text: "It's Done"
-          },
-          style: "primary",
-          value: `${project.name}`
-        }
-      ]
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `*Aliases*: ${project.aliases.join(", ")}`
+      }
+    });
+    projectBlocks.push({
+      type: "divider"
+    });
+    projectBlocks.push({
+      type: "divider"
     });
   } else {
+    let actionId = ACTIONS.editProject;
+    let text = ":batsymbol: Update This";
+    let style = "default";
+    if (editable) {
+      actionId = ACTIONS.viewProject;
+      text = "It's Done";
+      style = "primary";
+    }
     projectBlocks.push({
       type: "actions",
       elements: [
         {
           type: "button",
-          action_id: ACTIONS.editProject,
+          action_id: actionId,
           text: {
             type: "plain_text",
             emoji: true,
-            text: ":batsymbol: Update This"
+            text
           },
+          style,
           value: `${project.name}`
         }
       ]

@@ -21,6 +21,7 @@ import {
   getItemById,
   getProjectById,
   getProjects,
+  getProjectsDump,
   getSectionById,
   moveItem,
   moveSection,
@@ -64,6 +65,18 @@ const lookupProject = async (projectName, editable, respond, token) => {
   }
 };
 
+const dumpProjects = async (respond, token) => {
+  const projects = await getProjectsDump();
+  R.map(project => {
+    return respond({
+      token,
+      replace_original: false,
+      response_type: "in_channel",
+      blocks: projectMessage(project, false, true)
+    });
+  }, projects);
+};
+
 app.command("/alfred", async ({ command, ack, respond, context }) => {
   ack();
   const method = command.text.split(" ")[0].toUpperCase();
@@ -86,6 +99,9 @@ app.command("/alfred", async ({ command, ack, respond, context }) => {
     //     });
     //   });
     //   break;
+    case "DUMP":
+      await dumpProjects(respond, context.botToken);
+      break;
     default:
       await lookupProject(command.text, false, respond, context.botToken);
   }

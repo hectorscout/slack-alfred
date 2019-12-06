@@ -1,6 +1,7 @@
 import * as R from "ramda";
 import pool from "./config";
 import { COMMANDS } from "./constants";
+import { promises } from "dns";
 
 const updateAliases = async (aliases, projectId, projectName) => {
   try {
@@ -115,6 +116,38 @@ export const getProjectById = async projectId => {
   return project;
 };
 
+const projectRowReducer = (origProject, row) => {
+  const project = { ...origProject };
+  if (!project.id) {
+    project.id = row.project_id;
+  }
+  if (!project.name) {
+    project.name = row.project_name;
+  }
+  if (!project.description) {
+    project.description = row.project_description;
+  }
+  if (!project.sections[row.section_rank]) {
+    project.sections[row.section_rank] = {
+      id: row.section_id,
+      name: row.section_name,
+      rank: row.section_rank,
+      items: []
+    };
+  }
+  if (row.item_id) {
+    project.sections[row.section_rank].items.push({
+      id: row.item_id,
+      name: row.item_name,
+      description: row.item_description,
+      url: row.item_url,
+      rank: row.item_rank,
+      type: row.item_type
+    });
+  }
+  return project;
+};
+
 export const getFullProject = async projectName => {
   const projectResults = await pool.query(
     `
@@ -143,45 +176,71 @@ export const getFullProject = async projectName => {
   if (projectResults.rows.length === 0) {
     return false;
   }
-  return R.reduce(
-    (project, row) => {
-      if (!project.id) {
-        project.id = row.project_id;
-      }
-      if (!project.name) {
-        project.name = row.project_name;
-      }
-      if (!project.description) {
-        project.description = row.project_description;
-      }
-      if (!project.sections[row.section_rank]) {
-        project.sections[row.section_rank] = {
-          id: row.section_id,
-          name: row.section_name,
-          rank: row.section_rank,
-          items: []
-        };
-      }
-      if (row.item_id) {
-        project.sections[row.section_rank].items.push({
-          id: row.item_id,
-          name: row.item_name,
-          description: row.item_description,
-          url: row.item_url,
-          rank: row.item_rank,
-          type: row.item_type
-        });
-      }
-      return project;
-    },
-    { sections: [] },
-    projectResults.rows
-  );
+  return R.reduce(projectRowReducer, { sections: [] }, projectResults.rows);
 };
 
 export const getProjects = async () => {
   const projectResults = await pool.query("SELECT * from projects");
   return projectResults.rows;
+};
+
+const getProjectAliases = async projectId => {
+  const aliasResults = await pool.query(
+    `
+    SELECT
+      aliases.alias
+    FROM aliases
+    WHERE projectId = $1
+    `,
+    [projectId]
+  );
+  return R.map(record => record.alias, aliasResults.rows);
+};
+
+export const getProjectsDump = async () => {
+  const projectsResults = await pool.query(
+    `
+    SELECT
+     projects.ID as project_id,
+     projects.name as project_name,
+     projects.description as project_description,
+     sections.ID as section_id,
+     sections.name as section_name,
+     sections.rank as section_rank,
+     items.ID as item_id,
+     items.name as item_name,
+     items.url as item_url,
+     items.description as item_description,
+     items.rank as item_rank,
+     items.type as item_type
+    FROM  projects
+    LEFT JOIN sections ON projects.ID = sections.projectId
+    LEFT JOIN items ON sections.ID = items.sectionId
+    ORDER BY projects.ID, sections.rank, items.rank
+    `
+  );
+  const projects = R.reduce(
+    (projectRows, row) => {
+      if (!projectRows[row.project_id]) {
+        // eslint-disable-next-line no-param-reassign
+        projectRows[row.project_id] = [];
+      }
+      projectRows[row.project_id].push(row);
+      return projectRows;
+    },
+    {},
+    projectsResults.rows
+  );
+  const projectRetVal = await Promise.all(
+    R.map(async rows => {
+      return R.reduce(
+        projectRowReducer,
+        { sections: [], aliases: await getProjectAliases(rows[0].project_id) },
+        rows
+      );
+    }, Object.values(projects))
+  );
+  return projectRetVal;
 };
 
 const moveRecord = async ({ table, parentField, id, command }) => {
@@ -190,15 +249,12 @@ const moveRecord = async ({ table, parentField, id, command }) => {
     [id]
   );
   const parentId = origResults.rows[0].parentid;
-  console.log(parentId, origResults.rows[0]);
   const origRank = origResults.rows[0].rank;
   const targetRank = origRank + (command === COMMANDS.up ? -1 : 1);
-  console.log(origRank, targetRank, parentField, table, parentId, command);
   const targetResults = await pool.query(
     `SELECT ID FROM ${table} WHERE ${parentField} = $1 AND rank = $2`,
     [parentId, targetRank]
   );
-  console.log(targetResults);
   const targetId = targetResults.rows[0].id;
   await pool.query(`UPDATE ${table} SET rank = $1 WHERE id = $2`, [
     targetRank,
