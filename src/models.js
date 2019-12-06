@@ -194,7 +194,7 @@ const getProjectAliases = async projectId => {
     `,
     [projectId]
   );
-  return R.map(record => record.alias, aliasResults.rows);
+  return R.pluck("alias", aliasResults.rows);
 };
 
 export const getProjectsDump = async () => {
