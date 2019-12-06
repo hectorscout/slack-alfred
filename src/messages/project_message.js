@@ -367,7 +367,7 @@ const buildProjectBlocks = (project, editable, isDump = false) => {
   } else {
     let actionId = ACTIONS.editProject;
     let text = ":batsymbol: Update This";
-    let style = "default";
+    let style;
     if (editable) {
       actionId = ACTIONS.viewProject;
       text = "It's Done";
