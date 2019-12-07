@@ -49,6 +49,17 @@ const convoStore = new MemoryStore();
   console.log(`Bolt app is running on port ${port}`);
 })();
 
+const postAuditMessage = async (projectName, changeText, token) => {
+  const auditChannelSetting = await getSetting(SETTING_NAMES.auditChannelId);
+  if (auditChannelSetting) {
+    app.client.chat.postMessage({
+      token,
+      channel: auditChannelSetting.value,
+      text: `*${projectName}:*\n*New Values:* ${changeText}`
+    });
+  }
+};
+
 const lookupProject = async (projectName, editable, respond, token) => {
   const project = await getFullProject(projectName);
   if (!project) {
@@ -181,6 +192,7 @@ app.view(ACTIONS.saveItem, async ({ ack, body, view, context }) => {
     ["item_description", "item_description", "value"],
     values
   );
+
   const { id, sectionId, type } = JSON.parse(view.private_metadata);
   const itemId = id;
 
@@ -189,6 +201,11 @@ app.view(ACTIONS.saveItem, async ({ ack, body, view, context }) => {
     try {
       await updateItem(itemId, itemName, itemUrl, itemDescription, type);
       convo.then(async ({ respond, token, projectName }) => {
+        postAuditMessage(
+          projectName,
+          `${itemName}: ${itemUrl}, ${itemDescription}`,
+          context.botToken
+        );
         await lookupProject(projectName, true, respond, token);
       });
     } catch (err) {
@@ -227,6 +244,7 @@ app.view(ACTIONS.saveSection, async ({ ack, body, view, context }) => {
     try {
       await updateSection(sectionId, sectionName);
       convo.then(async ({ respond, token, projectName }) => {
+        postAuditMessage(projectName, sectionName, context.botToken);
         await lookupProject(projectName, true, respond, token);
       });
     } catch (err) {
@@ -267,6 +285,11 @@ app.view(ACTIONS.saveProject, async ({ ack, body, view, context }) => {
     try {
       await updateProject(id, projectName, description, aliases);
       convo.then(async ({ respond, token }) => {
+        postAuditMessage(
+          projectName,
+          `${aliases}\n${description}`,
+          context.botToken
+        );
         await lookupProject(projectName, true, respond, token);
       });
     } catch (err) {

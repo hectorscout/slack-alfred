@@ -156,6 +156,10 @@ To do this create/go to the channel you'd like to use as the audi channel and ty
 
 - `/alfred auditchannel`
 
+You'll also need to add the Alfred bot to the private channel so he has permission to post there.
+
+- `/invite @alfred`
+
 If you want to change the audit channel, you'll first need to release the current audit channel by running
 
 - `/alfred releaseaudit`
