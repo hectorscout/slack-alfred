@@ -144,7 +144,7 @@ app.command("/alfred", async ({ command, ack, respond, context, body }) => {
     //     });
     //   });
     //   break;
-    case "DUMP":
+    case "AUDITDUMP":
       await dumpProjects(respond, context.botToken);
       break;
     case "AUDITCHANNEL":
