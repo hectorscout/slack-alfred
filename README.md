@@ -115,7 +115,7 @@ You can login to this instance with
 
 To initialize the tables from the project root
 
-- `cat init.ql | heroku pg:psql postgresql-something-00000 --app slack-alfred-something-unique`
+- `cat init.sql | heroku pg:psql postgresql-something-00000 --app slack-alfred-something-unique`
 
 Theoretically you can test it locally with
 `heroku local web`
