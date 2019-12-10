@@ -220,6 +220,11 @@ app.view(ACTIONS.saveItem, async ({ ack, body, view, context }) => {
     try {
       await addItem(itemName, sectionId, itemUrl, itemDescription, type);
       convo.then(async ({ respond, token, projectName }) => {
+        postAuditMessage(
+          projectName,
+          `${itemName}: ${itemUrl}, ${itemDescription}`,
+          context.botToken
+        );
         await lookupProject(projectName, true, respond, token);
       });
     } catch (err) {
@@ -259,6 +264,7 @@ app.view(ACTIONS.saveSection, async ({ ack, body, view, context }) => {
     try {
       await addSection(sectionName, projectId);
       convo.then(async ({ respond, token, projectName }) => {
+        postAuditMessage(projectName, sectionName, context.botToken);
         await lookupProject(projectName, true, respond, token);
       });
     } catch (err) {
@@ -308,6 +314,11 @@ app.view(ACTIONS.saveProject, async ({ ack, body, view, context }) => {
         channel: body.user.id,
         text: MESSAGES.addProjectSuccess(projectName)
       });
+      postAuditMessage(
+        projectName,
+        `${aliases}\n${description}`,
+        context.botToken
+      );
     } catch (err) {
       console.log("error in ACTIONS.saveProject (addProject)", err);
       app.client.chat.postMessage({
