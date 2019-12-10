@@ -6,9 +6,10 @@ const buildLinkItemBlocks = item => {
     type: "section",
     text: {
       type: "mrkdwn",
-      text: `*<${item.url}|${item.name} - ${
-        item.url
-      }>*\n>${item.description.replace("\n", "\n>")}`
+      text: `*<${item.url}|${item.name}>*\n>${item.description.replace(
+        "\n",
+        "\n>"
+      )}`
     }
   };
 };
