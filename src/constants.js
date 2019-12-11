@@ -20,6 +20,18 @@ const COMMANDS = {
   noop: "0"
 };
 
+const ICONS = {
+  addNewLink: ":alfred_add_new",
+  addNewUser: ":alfred_add_new:",
+  addNewChannel: ":alfred_add_new:",
+  addNewSection: ":alfred_add_new:",
+  edit: ":alfred_edit:",
+  moveUp: ":alfred_move_up:",
+  moveDown: ":alfred_move_down:",
+  delete: ":alfred_delete:",
+  updateButton: ":alfred_batsymbol:"
+};
+
 const ITEM_TYPES = {
   url: "URL",
   user: "USER",
@@ -78,4 +90,4 @@ const SETTING_NAMES = {
   auditChannelId: "AUDIT_CHANNEL_ID"
 };
 
-export { ACTIONS, COMMANDS, ITEM_TYPES, MESSAGES, SETTING_NAMES };
+export { ACTIONS, COMMANDS, ICONS, ITEM_TYPES, MESSAGES, SETTING_NAMES };

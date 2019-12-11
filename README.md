@@ -83,6 +83,21 @@ Creating a Slack app (probably want to do this in a testing workspace)
   - Create a slack bot. This is mostly used for its bot token.
 - Install the app to your workspace in the Basic Information section
 
+## Custom Emojis
+
+You'll want to set up some custom emojis in your workspace to make Alfred look his best
+
+Add Custom Emojis or Add Aliases for the following:
+
+- `alfred_add_new`
+- `alfred_batsymbol`
+- `alfred_delete`
+- `alfred_edit`
+- `alfred_move_down`
+- `alfred_move_up`
+
+Note: these are the defaults. You can change these in the `constants.js` file if you like.
+
 # Heroku (for production)
 
 ## Setup

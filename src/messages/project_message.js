@@ -1,5 +1,5 @@
 import * as R from "ramda";
-import { ACTIONS, COMMANDS, ITEM_TYPES } from "../constants";
+import { ACTIONS, COMMANDS, ICONS, ITEM_TYPES } from "../constants";
 
 const buildLinkItemBlocks = item => {
   return {
@@ -81,7 +81,7 @@ const buildItemBlocks = (items, projectName, editable) => {
             text: {
               type: "plain_text",
               emoji: true,
-              text: ":pencil2: Edit"
+              text: `${ICONS.edit} Edit`
             },
             value: JSON.stringify({
               ...baseValue,
@@ -100,7 +100,7 @@ const buildItemBlocks = (items, projectName, editable) => {
           text: {
             type: "plain_text",
             emoji: true,
-            text: ":arrow_up_small: Move Item Up"
+            text: `${ICONS.moveUp} Move Item Up`
           },
           value: JSON.stringify({
             ...baseValue,
@@ -113,7 +113,7 @@ const buildItemBlocks = (items, projectName, editable) => {
           text: {
             type: "plain_text",
             emoji: true,
-            text: ":arrow_down_small: Move Item Down"
+            text: `${ICONS.moveDown} Move Item Down`
           },
           value: JSON.stringify({
             ...baseValue,
@@ -125,7 +125,7 @@ const buildItemBlocks = (items, projectName, editable) => {
         text: {
           type: "plain_text",
           emoji: true,
-          text: ":no_entry_sign: Delete"
+          text: `${ICONS.delete} Delete`
         },
         value: JSON.stringify({
           ...baseValue,
@@ -163,7 +163,7 @@ const buildSectionBlocks = (sections, projectName, editable) => {
               text: {
                 type: "plain_text",
                 emoji: true,
-                text: ":pencil2: Edit Section Name"
+                text: `${ICONS.edit} Edit Section Name`
               },
               value: JSON.stringify({
                 ...baseValue,
@@ -183,7 +183,7 @@ const buildSectionBlocks = (sections, projectName, editable) => {
             text: {
               type: "plain_text",
               emoji: true,
-              text: ":arrow_up_small: Move Section Up"
+              text: `${ICONS.moveUp} Move Section Up`
             },
             value: JSON.stringify({
               ...baseValue,
@@ -196,7 +196,7 @@ const buildSectionBlocks = (sections, projectName, editable) => {
             text: {
               type: "plain_text",
               emoji: true,
-              text: ":arrow_down_small: Move Section Down"
+              text: `${ICONS.moveDown} Move Section Down`
             },
             value: JSON.stringify({
               ...baseValue,
@@ -208,7 +208,7 @@ const buildSectionBlocks = (sections, projectName, editable) => {
           text: {
             type: "plain_text",
             emoji: true,
-            text: ":heavy_plus_sign: Add A New Link"
+            text: `${ICONS.addNewLink} Add A New Link`
           },
           value: JSON.stringify({
             ...baseValue,
@@ -220,7 +220,7 @@ const buildSectionBlocks = (sections, projectName, editable) => {
           text: {
             type: "plain_text",
             emoji: true,
-            text: ":heavy_plus_sign: Add A New Slack User"
+            text: `${ICONS.addNewUser} Add A New Slack User`
           },
           value: JSON.stringify({
             ...baseValue,
@@ -232,7 +232,7 @@ const buildSectionBlocks = (sections, projectName, editable) => {
           text: {
             type: "plain_text",
             emoji: true,
-            text: ":heavy_plus_sign: Add A New Slack Channel"
+            text: `${ICONS.addNewChannel} Add A New Slack Channel`
           },
           value: JSON.stringify({
             ...baseValue,
@@ -246,7 +246,7 @@ const buildSectionBlocks = (sections, projectName, editable) => {
             emoji: true,
             text: hasItems
               ? "Delete all items to delete section"
-              : ":no_entry_sign: Delete Section"
+              : `${ICONS.delete} Delete Section`
           },
           value: JSON.stringify({
             ...baseValue,
@@ -290,7 +290,7 @@ const buildProjectBlocks = (project, editable, isDump = false) => {
           text: {
             type: "plain_text",
             emoji: true,
-            text: ":pencil2: Edit Project Name/Description"
+            text: `${ICONS.edit} Edit Project Name/Description`
           },
           value: JSON.stringify({
             ...baseValue,
@@ -301,7 +301,7 @@ const buildProjectBlocks = (project, editable, isDump = false) => {
           text: {
             type: "plain_text",
             emoji: true,
-            text: ":heavy_plus_sign: Add A New Section"
+            text: `${ICONS.addNewSection} Add A New Section`
           },
           value: JSON.stringify({
             ...baseValue,
@@ -314,7 +314,7 @@ const buildProjectBlocks = (project, editable, isDump = false) => {
             emoji: true,
             text: hasSections
               ? "Remove all sections to remove project"
-              : ":no_entry_sign: Delete Project"
+              : `${ICONS.delete} Delete Project`
           },
           value: JSON.stringify({
             ...baseValue,
@@ -367,7 +367,7 @@ const buildProjectBlocks = (project, editable, isDump = false) => {
     });
   } else {
     let actionId = ACTIONS.editProject;
-    let text = ":batsymbol: Update This";
+    let text = `${ICONS.updateButton} Update This`;
     let style;
     if (editable) {
       actionId = ACTIONS.viewProject;
