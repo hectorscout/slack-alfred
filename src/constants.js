@@ -21,7 +21,7 @@ const COMMANDS = {
 };
 
 const ICONS = {
-  addNewLink: ":alfred_add_new",
+  addNewLink: ":alfred_add_new:",
   addNewUser: ":alfred_add_new:",
   addNewChannel: ":alfred_add_new:",
   addNewSection: ":alfred_add_new:",
