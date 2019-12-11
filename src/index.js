@@ -9,6 +9,7 @@ import availableProjects from "./messages/available_projects";
 import projectModal from "./messages/project_modal";
 import itemModal from "./messages/item_modal";
 import sectionModal from "./messages/section_modal";
+import auditPost from "./messages/audit_post";
 
 import {
   addItem,
@@ -49,13 +50,13 @@ const convoStore = new MemoryStore();
   console.log(`Bolt app is running on port ${port}`);
 })();
 
-const postAuditMessage = async (projectName, changeText, token) => {
+const postAuditMessage = async (userId, projectName, changeText, token) => {
   const auditChannelSetting = await getSetting(SETTING_NAMES.auditChannelId);
   if (auditChannelSetting) {
     app.client.chat.postMessage({
       token,
       channel: auditChannelSetting.value,
-      text: `*${projectName}:*\n*New Values:* ${changeText}`
+      blocks: auditPost(userId, projectName, changeText)
     });
   }
 };
@@ -202,6 +203,7 @@ app.view(ACTIONS.saveItem, async ({ ack, body, view, context }) => {
       await updateItem(itemId, itemName, itemUrl, itemDescription, type);
       convo.then(async ({ respond, token, projectName }) => {
         postAuditMessage(
+          body.user.id,
           projectName,
           `${itemName}: ${itemUrl}, ${itemDescription}`,
           context.botToken
@@ -221,6 +223,7 @@ app.view(ACTIONS.saveItem, async ({ ack, body, view, context }) => {
       await addItem(itemName, sectionId, itemUrl, itemDescription, type);
       convo.then(async ({ respond, token, projectName }) => {
         postAuditMessage(
+          body.user.id,
           projectName,
           `${itemName}: ${itemUrl}, ${itemDescription}`,
           context.botToken
@@ -249,7 +252,12 @@ app.view(ACTIONS.saveSection, async ({ ack, body, view, context }) => {
     try {
       await updateSection(sectionId, sectionName);
       convo.then(async ({ respond, token, projectName }) => {
-        postAuditMessage(projectName, sectionName, context.botToken);
+        postAuditMessage(
+          body.user.id,
+          projectName,
+          sectionName,
+          context.botToken
+        );
         await lookupProject(projectName, true, respond, token);
       });
     } catch (err) {
@@ -264,7 +272,12 @@ app.view(ACTIONS.saveSection, async ({ ack, body, view, context }) => {
     try {
       await addSection(sectionName, projectId);
       convo.then(async ({ respond, token, projectName }) => {
-        postAuditMessage(projectName, sectionName, context.botToken);
+        postAuditMessage(
+          body.user.id,
+          projectName,
+          sectionName,
+          context.botToken
+        );
         await lookupProject(projectName, true, respond, token);
       });
     } catch (err) {
@@ -292,6 +305,7 @@ app.view(ACTIONS.saveProject, async ({ ack, body, view, context }) => {
       await updateProject(id, projectName, description, aliases);
       convo.then(async ({ respond, token }) => {
         postAuditMessage(
+          body.user.id,
           projectName,
           `${aliases}\n${description}`,
           context.botToken
@@ -315,6 +329,7 @@ app.view(ACTIONS.saveProject, async ({ ack, body, view, context }) => {
         text: MESSAGES.addProjectSuccess(projectName)
       });
       postAuditMessage(
+        body.user.id,
         projectName,
         `${aliases}\n${description}`,
         context.botToken
