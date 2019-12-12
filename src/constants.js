@@ -90,4 +90,54 @@ const SETTING_NAMES = {
   auditChannelId: "AUDIT_CHANNEL_ID"
 };
 
-export { ACTIONS, COMMANDS, ICONS, ITEM_TYPES, MESSAGES, SETTING_NAMES };
+const BLOCKS = {
+  text: text => ({
+    type: "section",
+    text: {
+      type: "mrkdwn",
+      text
+    }
+  }),
+  option: (text, value) => ({
+    text: {
+      type: "plain_text",
+      emoji: true,
+      text
+    },
+    value: JSON.stringify(value)
+  }),
+  divider: () => ({
+    type: "divider"
+  }),
+  button: (actionId, text, style, value) => ({
+    type: "button",
+    action_id: actionId,
+    text: {
+      type: "plain_text",
+      emoji: true,
+      text
+    },
+    style,
+    value: `${value}`
+  }),
+  dropdown: (actionId, options, placeholder) => ({
+    type: "static_select",
+    action_id: actionId,
+    options,
+    placeholder: {
+      type: "plain_text",
+      emoji: true,
+      text: `${placeholder}`
+    }
+  })
+};
+
+export {
+  ACTIONS,
+  BLOCKS,
+  COMMANDS,
+  ICONS,
+  ITEM_TYPES,
+  MESSAGES,
+  SETTING_NAMES
+};
