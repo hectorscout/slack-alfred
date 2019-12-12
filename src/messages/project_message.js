@@ -3,20 +3,20 @@ import { ACTIONS, COMMANDS, ICONS, ITEM_TYPES, BLOCKS } from "../constants";
 
 const buildLinkItemBlocks = item => {
   return BLOCKS.text(
-    `*<${item.url}|${item.name}>*\n>${item.description.replace("\n", "\n>")}`
+    `>*<${item.url}|${item.name}>*\n>${item.description.replace("\n", "\n>")}`
   );
 };
 
 const buildUserItemBlocks = item => {
   return BLOCKS.text(
-    `*${item.name}:* <@${item.url}>\n>${item.description.replace("\n", "\n>")}`
+    `>*${item.name}:* <@${item.url}>\n>${item.description.replace("\n", "\n>")}`
   );
 };
 
 const buildChannelItemBlocks = item => {
   const name = item.name ? `*${item.name}:* ` : "";
   return BLOCKS.text(
-    `${name}<#${item.url}>\n>${item.description.replace("\n", "\n>")}`
+    `>${name}<#${item.url}>\n>${item.description.replace("\n", "\n>")}`
   );
 };
 
@@ -59,7 +59,7 @@ const buildItemBlocks = (items, projectName, editable) => {
   if (!items.length) {
     return [
       BLOCKS.text(
-        "I didn't find anything for this section. Perhaps you would like to edit the project?"
+        ">I didn't find anything for this section. Perhaps you would like to edit the project?"
       )
     ];
   }
