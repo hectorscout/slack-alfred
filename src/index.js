@@ -418,10 +418,9 @@ app.action(
           token: context.botToken,
           projectName
         });
-        const blocks = sectionModal({ projectId });
         app.client.views.open({
           token: context.botToken,
-          view: blocks,
+          view: sectionModal({ projectId }),
           trigger_id: body.trigger_id
         });
         break;

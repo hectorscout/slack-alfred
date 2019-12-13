@@ -246,19 +246,22 @@ const buildProjectDescriptionBlock = (
 };
 
 const buildProjectBlocks = (project, editable, isDump = false) => {
-  const projectBlocks = [
+  let projectBlocks = [
     BLOCKS.text(`Here's what we know about *${project.name}*, Master Bruce.`),
     BLOCKS.divider(),
     buildProjectDescriptionBlock(project, editable),
     BLOCKS.divider(),
-    ...buildSectionBlocks(project.sections, project.name, editable),
-    BLOCKS.divider()
+    ...buildSectionBlocks(project.sections, project.name, editable)
   ];
 
   if (isDump) {
-    projectBlocks.push(BLOCKS.text(`*Aliases*: ${project.aliases.join(", ")}`));
-    projectBlocks.push(BLOCKS.divider());
-    projectBlocks.push(BLOCKS.divider());
+    projectBlocks = [
+      ...projectBlocks,
+      BLOCKS.divider(),
+      BLOCKS.text(`*Aliases*: ${project.aliases.join(", ")}`),
+      BLOCKS.divider(),
+      BLOCKS.divider()
+    ];
   } else {
     projectBlocks.push(buildProjectButton(project.name, editable));
   }
