@@ -31,7 +31,8 @@ const projectModal = values => {
             type: "plain_text",
             text: "BatIQ"
           },
-          initial_value: values.name || ""
+          initial_value: values.name || "",
+          max_length: 256
         },
         label: {
           type: "plain_text",
@@ -43,7 +44,8 @@ const projectModal = values => {
         elements: [
           {
             type: "mrkdwn",
-            text: "If the project has an `:emoji:` feel freed to include it here."
+            text:
+              "If the project has an `:emoji:` feel freed to include it here."
           }
         ]
       },
@@ -64,7 +66,8 @@ const projectModal = values => {
               "The best product ever created for understanding and managing your Batcave and the darkness within."
           },
           multiline: true,
-          initial_value: values.description || ""
+          initial_value: values.description || "",
+          max_length: 256
         }
       },
       {
@@ -83,7 +86,8 @@ const projectModal = values => {
             text: "bat, cave, batcave, biq"
           },
           multiline: true,
-          initial_value: values.aliases || ""
+          initial_value: values.aliases || "",
+          max_length: 256
         }
       }
     ]

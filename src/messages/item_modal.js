@@ -18,7 +18,8 @@ const getUrlBlocks = values => {
           type: "plain_text",
           text: "The Batmobile"
         },
-        initial_value: values.name || ""
+        initial_value: values.name || "",
+        max_length: 256
       },
       label: {
         type: "plain_text",
@@ -35,7 +36,8 @@ const getUrlBlocks = values => {
           type: "plain_text",
           text: "http://en.wikipedia.org/wiki/Batmobile"
         },
-        initial_value: values.url || ""
+        initial_value: values.url || "",
+        max_length: 256
       },
       label: {
         type: "plain_text",
@@ -60,7 +62,8 @@ const getUrlBlocks = values => {
             "A heavily armored armored tactical assault vehicle and a personalized custom-built pursuit and capture vehicle."
         },
         multiline: true,
-        initial_value: values.description || ""
+        initial_value: values.description || "",
+        max_length: 256
       }
     }
   ];
@@ -100,7 +103,8 @@ const getUserBlocks = values => {
           type: "plain_text",
           text: "The Gentleman of Crime"
         },
-        initial_value: values.name || ""
+        initial_value: values.name || "",
+        max_length: 256
       },
       label: {
         type: "plain_text",
@@ -124,7 +128,8 @@ const getUserBlocks = values => {
           text: "Go to him for advise about hiding weapons in umbrellas."
         },
         multiline: true,
-        initial_value: values.description || ""
+        initial_value: values.description || "",
+        max_length: 256
       }
     }
   ];
@@ -165,7 +170,8 @@ const getChannelBlocks = values => {
           type: "plain_text",
           text: "What's Next!?"
         },
-        initial_value: values.name || ""
+        initial_value: values.name || "",
+        max_length: 256
       },
       label: {
         type: "plain_text",
@@ -190,14 +196,14 @@ const getChannelBlocks = values => {
             "It appears the Caped Crusader's \"goose is cooked\". Will Robin's wings be clipped?\nNext week, the exciting conclusion.\nSame bat time, same bat channel!"
         },
         multiline: true,
-        initial_value: values.description || ""
+        initial_value: values.description || "",
+        max_length: 256
       }
     }
   ];
 };
 
 const itemModal = values => {
-
   const modal = {
     type: "modal",
     callback_id: ACTIONS.saveItem,

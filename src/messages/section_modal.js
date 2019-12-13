@@ -31,7 +31,8 @@ const sectionModal = values => {
             type: "plain_text",
             text: "Bat Vehicles"
           },
-          initial_value: values.name || ""
+          initial_value: values.name || "",
+          max_length: 256
         },
         label: {
           type: "plain_text",
@@ -43,7 +44,8 @@ const sectionModal = values => {
         elements: [
           {
             type: "mrkdwn",
-            text: "Including an `:emoji:` at the beginning of the section name can help visually separate the sections."
+            text:
+              "Including an `:emoji:` at the beginning of the section name can help visually separate the sections."
           }
         ]
       }
