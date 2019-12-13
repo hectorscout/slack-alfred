@@ -312,6 +312,7 @@ const deleteById = (id, table, next) => {
 
 export const deleteProject = (projectId, next) => {
   deleteById(projectId, "projects", next);
+  pool.query(`DELETE FROM aliases WHERE projectId = $1`, [projectId], next);
 };
 
 export const deleteSection = async sectionId => {
