@@ -1,4 +1,4 @@
-import { ACTIONS, ITEM_TYPES } from "../constants";
+import { ACTIONS, ITEM_TYPES, MAX_TEXT_INPUT_LENGTH } from "../constants";
 
 const TITLES = {
   [ITEM_TYPES.url]: "Link",
@@ -19,7 +19,7 @@ const getUrlBlocks = values => {
           text: "The Batmobile"
         },
         initial_value: values.name || "",
-        max_length: 256
+        max_length: MAX_TEXT_INPUT_LENGTH
       },
       label: {
         type: "plain_text",
@@ -37,7 +37,7 @@ const getUrlBlocks = values => {
           text: "http://en.wikipedia.org/wiki/Batmobile"
         },
         initial_value: values.url || "",
-        max_length: 256
+        max_length: MAX_TEXT_INPUT_LENGTH
       },
       label: {
         type: "plain_text",
@@ -63,7 +63,7 @@ const getUrlBlocks = values => {
         },
         multiline: true,
         initial_value: values.description || "",
-        max_length: 256
+        max_length: MAX_TEXT_INPUT_LENGTH
       }
     }
   ];
@@ -104,7 +104,7 @@ const getUserBlocks = values => {
           text: "The Gentleman of Crime"
         },
         initial_value: values.name || "",
-        max_length: 256
+        max_length: MAX_TEXT_INPUT_LENGTH
       },
       label: {
         type: "plain_text",
@@ -129,7 +129,7 @@ const getUserBlocks = values => {
         },
         multiline: true,
         initial_value: values.description || "",
-        max_length: 256
+        max_length: MAX_TEXT_INPUT_LENGTH
       }
     }
   ];
@@ -171,7 +171,7 @@ const getChannelBlocks = values => {
           text: "What's Next!?"
         },
         initial_value: values.name || "",
-        max_length: 256
+        max_length: MAX_TEXT_INPUT_LENGTH
       },
       label: {
         type: "plain_text",
@@ -197,7 +197,7 @@ const getChannelBlocks = values => {
         },
         multiline: true,
         initial_value: values.description || "",
-        max_length: 256
+        max_length: MAX_TEXT_INPUT_LENGTH
       }
     }
   ];

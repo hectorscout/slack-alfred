@@ -1,4 +1,4 @@
-import { ACTIONS } from "../constants";
+import { ACTIONS, MAX_TEXT_INPUT_LENGTH } from "../constants";
 
 const projectModal = values => {
   return {
@@ -32,7 +32,7 @@ const projectModal = values => {
             text: "BatIQ"
           },
           initial_value: values.name || "",
-          max_length: 256
+          max_length: MAX_TEXT_INPUT_LENGTH
         },
         label: {
           type: "plain_text",
@@ -67,7 +67,7 @@ const projectModal = values => {
           },
           multiline: true,
           initial_value: values.description || "",
-          max_length: 256
+          max_length: MAX_TEXT_INPUT_LENGTH
         }
       },
       {
@@ -87,7 +87,7 @@ const projectModal = values => {
           },
           multiline: true,
           initial_value: values.aliases || "",
-          max_length: 256
+          max_length: MAX_TEXT_INPUT_LENGTH
         }
       }
     ]

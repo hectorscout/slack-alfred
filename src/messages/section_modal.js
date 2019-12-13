@@ -1,4 +1,4 @@
-import { ACTIONS } from "../constants";
+import { ACTIONS, MAX_TEXT_INPUT_LENGTH } from "../constants";
 
 const sectionModal = values => {
   return {
@@ -32,7 +32,7 @@ const sectionModal = values => {
             text: "Bat Vehicles"
           },
           initial_value: values.name || "",
-          max_length: 256
+          max_length: MAX_TEXT_INPUT_LENGTH
         },
         label: {
           type: "plain_text",

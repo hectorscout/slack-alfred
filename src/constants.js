@@ -1,3 +1,5 @@
+const MAX_TEXT_INPUT_LENGTH = 255;
+
 const ACTIONS = {
   editProject: "EDIT_PROJECT",
   itemTypeSelection: "ITEM_TYPE_SELECTION",
@@ -138,6 +140,7 @@ export {
   COMMANDS,
   ICONS,
   ITEM_TYPES,
+  MAX_TEXT_INPUT_LENGTH,
   MESSAGES,
   SETTING_NAMES
 };
