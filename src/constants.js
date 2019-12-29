@@ -1,3 +1,5 @@
+const SLASH_COMMAND = "/alfred";
+
 const MAX_TEXT_INPUT_LENGTH = 255;
 
 const ACTIONS = {
@@ -147,5 +149,6 @@ export {
   ITEM_TYPES,
   MAX_TEXT_INPUT_LENGTH,
   MESSAGES,
-  SETTING_NAMES
+  SETTING_NAMES,
+  SLASH_COMMAND
 };
