@@ -595,5 +595,17 @@ app.action(ACTIONS.modItem, async ({ action, ack, context, body, respond }) => {
 });
 
 app.event(EVENTS.appHomeOpened, async payload => {
+  const { event, context } = payload;
+  const projects = await getProjects();
+  const projectsBlocks = availableProjects("", projects);
+
+  app.client.views.publish({
+    token: context.botToken,
+    user_id: event.user,
+    view: {
+      type: "home",
+      blocks: projectsBlocks
+    }
+  });
   console.log(payload);
 });
