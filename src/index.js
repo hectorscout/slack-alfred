@@ -4,7 +4,6 @@ import * as dotenv from "dotenv";
 import { App, MemoryStore } from "@slack/bolt";
 import { ACTIONS, COMMANDS, MESSAGES } from "./constants";
 
-import availableProjects from "./messages/available_projects";
 import itemModal from "./messages/item_modal";
 import sectionModal from "./messages/section_modal";
 import {
@@ -30,7 +29,6 @@ import {
   deleteItem,
   deleteSection,
   getItemById,
-  getProjects,
   getSectionById,
   moveItem,
   moveSection,
