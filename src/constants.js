@@ -13,6 +13,10 @@ const ACTIONS = {
   viewProject: "VIEW_PROJECT"
 };
 
+const EVENTS = {
+  appHomeOpened: "app_home_opened"
+};
+
 const COMMANDS = {
   edit: "E",
   new: "N",
@@ -138,6 +142,7 @@ export {
   ACTIONS,
   BLOCKS,
   COMMANDS,
+  EVENTS,
   ICONS,
   ITEM_TYPES,
   MAX_TEXT_INPUT_LENGTH,

@@ -2,7 +2,13 @@ import * as R from "ramda";
 import * as dotenv from "dotenv";
 
 import { App, MemoryStore } from "@slack/bolt";
-import { ACTIONS, COMMANDS, MESSAGES, SETTING_NAMES } from "./constants";
+import {
+  ACTIONS,
+  COMMANDS,
+  EVENTS,
+  MESSAGES,
+  SETTING_NAMES
+} from "./constants";
 
 import projectMessage from "./messages/project_message";
 import availableProjects from "./messages/available_projects";
@@ -586,4 +592,8 @@ app.action(ACTIONS.modItem, async ({ action, ack, context, body, respond }) => {
     default:
       console.log("Shouldn't be able to do this...");
   }
+});
+
+app.event(EVENTS.appHomeOpened, async payload => {
+  console.log(payload);
 });
