@@ -51,23 +51,23 @@ const availableProjects = (unfoundProjectName, projects) => {
         text: MESSAGES.addAliasPrompt(unfoundProjectName)
       }
     });
-    blocks.push({
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        text: MESSAGES.addNew()
-      },
-      accessory: {
-        type: "button",
-        action_id: ACTIONS.openNewProjectDialog,
-        text: {
-          type: "plain_text",
-          emoji: true,
-          text: "New Project"
-        }
-      }
-    });
   }
+  blocks.push({
+    type: "section",
+    text: {
+      type: "mrkdwn",
+      text: MESSAGES.addNew()
+    },
+    accessory: {
+      type: "button",
+      action_id: ACTIONS.openNewProjectDialog,
+      text: {
+        type: "plain_text",
+        emoji: true,
+        text: "New Project"
+      }
+    }
+  });
 
   return blocks;
 };
