@@ -1,5 +1,6 @@
 import { dumpProjects, removeAuditChannel, setAuditChannel } from "./auditing";
-import { lookupProject, newProjectView } from "./projects";
+import { getProjectBlocks, newProjectView } from "./projects";
+import postBlocks from "./utils";
 
 const handleSlashCommand = app => async ({
   command,
@@ -45,7 +46,14 @@ const handleSlashCommand = app => async ({
       );
       break;
     default:
-      await lookupProject(command.text, false, respond, context.botToken);
+      console.log(body);
+      postBlocks({
+        app,
+        blocks: await getProjectBlocks(command.text, false),
+        respond,
+        token: context.botToken,
+        userId: body.user_id
+      });
   }
 };
 

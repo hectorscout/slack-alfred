@@ -6,7 +6,8 @@ import {
   updateSection
 } from "./models";
 import { postAuditMessageMaker } from "./auditing";
-import { lookupProject } from "./projects";
+import { getProjectBlocks } from "./projects";
+import postBlocks from "./utils";
 import { COMMANDS, MESSAGES } from "./constants";
 import itemModal from "./messages/item_modal";
 import sectionModal from "./messages/section_modal";
@@ -64,7 +65,13 @@ const handleSectionMod = (app, convoStore) => async ({
     case COMMANDS.down:
       try {
         await moveSection(sectionId, command);
-        await lookupProject(projectName, true, respond, context.botToken);
+        postBlocks({
+          app,
+          blocks: await getProjectBlocks(projectName),
+          respond,
+          token: context.botToken,
+          userId: body.user.id
+        });
       } catch (err) {
         console.log("error in ACTIONS.modSection (move)", err);
         respond({
@@ -77,7 +84,13 @@ const handleSectionMod = (app, convoStore) => async ({
     case COMMANDS.delete:
       try {
         await deleteSection(sectionId);
-        await lookupProject(projectName, true, respond, context.botToken);
+        postBlocks({
+          app,
+          blocks: await getProjectBlocks(projectName),
+          respond,
+          token: context.botToken,
+          userId: body.user.id
+        });
       } catch (err) {
         console.log("error in ACTIONS.modSection (delete)", err);
         respond({
@@ -117,7 +130,13 @@ const saveSection = (app, convoStore) => async ({
           sectionName,
           context.botToken
         );
-        await lookupProject(projectName, true, respond, token);
+        postBlocks({
+          app,
+          blocks: await getProjectBlocks(projectName),
+          respond,
+          token,
+          userId: body.user.id
+        });
       });
     } catch (err) {
       console.log("error in ACTIONS.saveSection (updateSection)", err);
@@ -137,7 +156,13 @@ const saveSection = (app, convoStore) => async ({
           sectionName,
           context.botToken
         );
-        await lookupProject(projectName, true, respond, token);
+        postBlocks({
+          app,
+          blocks: await getProjectBlocks(projectName),
+          respond,
+          token,
+          userId: body.user.id
+        });
       });
     } catch (err) {
       console.log("error in ACTIONS.saveSection (addSection)", err);

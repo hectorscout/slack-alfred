@@ -37,6 +37,9 @@ const availableProjects = (unfoundProjectName, projects) => {
         value: project.name
       }
     });
+    blocks.push({
+      type: "divider"
+    });
   })(projects);
 
   if (unfoundProjectName) {

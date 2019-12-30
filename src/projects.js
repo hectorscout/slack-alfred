@@ -13,23 +13,18 @@ import projectMessage from "./messages/project_message";
 import projectModal from "./messages/project_modal";
 import sectionModal from "./messages/section_modal";
 
-const lookupProject = async (projectName, editable, respond, token) => {
+import postBlocks from "./utils";
+
+const getProjectBlocks = async (projectName, editable = true) => {
+  let blocks;
   const project = await getFullProject(projectName);
   if (!project) {
     const projects = await getProjects();
-    respond({
-      token,
-      response_type: "ephemeral",
-      blocks: availableProjects(projectName, projects)
-    });
+    blocks = availableProjects(projectName, projects);
   } else {
-    respond({
-      token,
-      replace_original: true,
-      response_type: "ephemeral",
-      blocks: projectMessage(project, editable)
-    });
+    blocks = projectMessage(project, editable);
   }
+  return blocks;
 };
 
 const saveProject = (app, convoStore) => async ({
@@ -57,7 +52,13 @@ const saveProject = (app, convoStore) => async ({
           `${aliases}\n${description}`,
           context.botToken
         );
-        await lookupProject(projectName, true, respond, token);
+        postBlocks({
+          app,
+          respond,
+          token,
+          userId: body.user.id,
+          blocks: await getProjectBlocks(projectName, true)
+        });
       });
     } catch (err) {
       console.log("error in ACTIONS.saveProject (updateProject)", err);
@@ -105,10 +106,16 @@ const newProjectViewForAction = app => ({ ack, body, context }) => {
   newProjectView(app, context.botToken, body.trigger_id);
 };
 
-const editProject = async ({ action, ack, respond, context }) => {
+const editProject = app => async ({ action, ack, respond, context, body }) => {
   ack();
   try {
-    await lookupProject(action.value, true, respond, context.botToken);
+    postBlocks({
+      app,
+      respond,
+      token: context.botToken,
+      userId: body.user.id,
+      blocks: await getProjectBlocks(action.value, true)
+    });
   } catch (err) {
     respond({
       token: context.botToken,
@@ -118,10 +125,16 @@ const editProject = async ({ action, ack, respond, context }) => {
   }
 };
 
-const viewProject = async ({ action, ack, respond, context }) => {
+const viewProject = app => async ({ action, ack, respond, context, body }) => {
   ack();
   try {
-    await lookupProject(action.value, false, respond, context.botToken);
+    postBlocks({
+      app,
+      respond,
+      token: context.botToken,
+      userId: body.user.id,
+      blocks: await getProjectBlocks(action.value, false)
+    });
   } catch (err) {
     respond({
       token: context.botToken,
@@ -201,8 +214,8 @@ const handleProjectMod = (app, convoStore) => async ({
 
 export {
   editProject,
+  getProjectBlocks,
   handleProjectMod,
-  lookupProject,
   newProjectView,
   newProjectViewForAction,
   saveProject,
