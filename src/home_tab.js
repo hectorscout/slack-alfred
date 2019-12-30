@@ -14,9 +14,6 @@ const openHomeTab = app => async payload => {
       blocks: projectsBlocks
     }
   });
-  console.log("here");
-  console.log(payload);
-  // payload.say("wtf");
 };
 
 export default openHomeTab;
