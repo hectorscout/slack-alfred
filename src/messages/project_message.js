@@ -264,6 +264,19 @@ const buildProjectBlocks = (project, editable, isDump = false) => {
     ];
   } else {
     projectBlocks.push(buildProjectButton(project.name, editable));
+    if (!editable) {
+      projectBlocks.push({
+        type: "actions",
+        elements: [
+          BLOCKS.button(
+            ACTIONS.listProjects,
+            "List Projects",
+            "primary",
+            "bogus project name"
+          )
+        ]
+      });
+    }
   }
 
   return projectBlocks;

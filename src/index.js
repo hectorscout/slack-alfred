@@ -8,6 +8,7 @@ import handleSlashCommand from "./slash_command";
 import {
   editProject,
   handleProjectMod,
+  listProjects,
   newProjectViewForAction,
   saveProject,
   viewProject
@@ -44,5 +45,6 @@ app.action(ACTIONS.viewProject, viewProject(app));
 app.action(ACTIONS.modProject, handleProjectMod(app, convoStore));
 app.action(ACTIONS.modSection, handleSectionMod(app, convoStore));
 app.action(ACTIONS.modItem, handleItemMod(app, convoStore));
+app.action(ACTIONS.listProjects, listProjects(app));
 
 app.event(EVENTS.appHomeOpened, openHomeTab(app));

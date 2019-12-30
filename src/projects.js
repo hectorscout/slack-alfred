@@ -125,6 +125,25 @@ const editProject = app => async ({ action, ack, respond, context, body }) => {
   }
 };
 
+const listProjects = app => async ({ ack, respond, context, body }) => {
+  ack();
+  try {
+    postBlocks({
+      app,
+      respond,
+      token: context.botToken,
+      userId: body.user.id,
+      blocks: await getProjectBlocks("", false)
+    });
+  } catch (err) {
+    respond({
+      token: context.botToken,
+      response_type: "ephemeral",
+      text: MESSAGES.genericError(`list projects`)
+    });
+  }
+};
+
 const viewProject = app => async ({ action, ack, respond, context, body }) => {
   ack();
   try {
@@ -216,6 +235,7 @@ export {
   editProject,
   getProjectBlocks,
   handleProjectMod,
+  listProjects,
   newProjectView,
   newProjectViewForAction,
   saveProject,

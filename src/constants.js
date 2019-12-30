@@ -5,6 +5,7 @@ const MAX_TEXT_INPUT_LENGTH = 255;
 const ACTIONS = {
   editProject: "EDIT_PROJECT",
   itemTypeSelection: "ITEM_TYPE_SELECTION",
+  listProjects: "LIST_PROJECTS",
   modItem: "MOD_ITEM",
   modProject: "MOD_PROJECT",
   modSection: "MOD_SECTION",
