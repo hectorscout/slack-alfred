@@ -46,7 +46,6 @@ const handleSlashCommand = app => async ({
       );
       break;
     default:
-      console.log(body);
       postBlocks({
         app,
         blocks: await getProjectBlocks(command.text, false),
