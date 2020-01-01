@@ -24,6 +24,14 @@ const handleItemMod = (app, convoStore) => async ({
   const command = actionValue.cmd;
   const projectName = actionValue.pn;
   const itemId = actionValue.iId;
+  const postProject = async () =>
+    postBlocks({
+      app,
+      blocks: await getProjectBlocks(projectName),
+      respond,
+      token: context.botToken,
+      userId: body.user.id
+    });
 
   switch (command) {
     case COMMANDS.edit:
@@ -53,13 +61,7 @@ const handleItemMod = (app, convoStore) => async ({
     case COMMANDS.down:
       try {
         await moveItem(itemId, command);
-        postBlocks({
-          app,
-          blocks: await getProjectBlocks(projectName),
-          respond,
-          token: context.botToken,
-          userId: body.user.id
-        });
+        await postProject();
       } catch (err) {
         console.log("error in ACTIONS.modItem (move)", err);
         respond({
@@ -72,13 +74,7 @@ const handleItemMod = (app, convoStore) => async ({
     case COMMANDS.delete:
       try {
         await deleteItem(itemId);
-        postBlocks({
-          app,
-          blocks: await getProjectBlocks(projectName),
-          respond,
-          token: context.botToken,
-          userId: body.user.id
-        });
+        await postProject();
       } catch (err) {
         console.log("error in ACTIONS.modItem (delete)", err);
         respond({
@@ -112,6 +108,7 @@ const saveItem = (app, convoStore) => async ({ ack, body, view, context }) => {
 
   const convo = convoStore.get(body.user.id);
   const postAuditMessage = postAuditMessageMaker(app);
+
   if (itemId) {
     try {
       await updateItem(itemId, itemName, itemUrl, itemDescription, type);
