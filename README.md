@@ -82,7 +82,7 @@ Creating a Slack app (probably want to do this in a testing workspace)
 - Slack Bot
   - Create a slack bot. This is mostly used for its bot token.
 - Install the app to your workspace in the Basic Information section
-- Home Tab (as of Dec 2019 this is in beta)
+- Home Tab (as of Dec 2019 the Home Tab is in beta)
   - Goto `App Home`, sign up for beta, and turn on`Home Tab`
   - Goto `Event Subscriptions`
     - Enable events
