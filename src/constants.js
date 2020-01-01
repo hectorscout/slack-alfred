@@ -30,10 +30,10 @@ const COMMANDS = {
 };
 
 const ICONS = {
-  addNewLink: ":alfred_add_new:",
-  addNewUser: ":alfred_add_new:",
-  addNewChannel: ":alfred_add_new:",
-  addNewSection: ":alfred_add_new:",
+  addNewLink: ":alfred_add_new_link:",
+  addNewUser: ":alfred_add_new_user:",
+  addNewChannel: ":alfred_add_new_channel:",
+  addNewSection: ":alfred_add_new_section:",
   edit: ":alfred_edit:",
   moveUp: ":alfred_move_up:",
   moveDown: ":alfred_move_down:",
