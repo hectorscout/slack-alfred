@@ -1,21 +1,21 @@
 import * as dotenv from "dotenv";
 
 import { App, MemoryStore } from "@slack/bolt";
-import { ACTIONS, SLASH_COMMAND } from "./constants";
+
+import { ACTIONS, SLASH_COMMAND, EVENTS } from "./constants";
 
 import handleSlashCommand from "./slash_command";
-
 import {
   editProject,
   handleProjectMod,
+  listProjects,
   newProjectViewForAction,
   saveProject,
   viewProject
 } from "./projects";
-
 import { handleSectionMod, saveSection } from "./sections";
-
 import { handleItemMod, saveItem } from "./items";
+import openHomeTab from "./home_tab";
 
 dotenv.config();
 
@@ -40,8 +40,11 @@ app.view(ACTIONS.saveSection, saveSection(app, convoStore));
 app.view(ACTIONS.saveProject, saveProject(app, convoStore));
 
 app.action(ACTIONS.openNewProjectDialog, newProjectViewForAction(app));
-app.action(ACTIONS.editProject, editProject);
-app.action(ACTIONS.viewProject, viewProject);
+app.action(ACTIONS.editProject, editProject(app));
+app.action(ACTIONS.viewProject, viewProject(app));
 app.action(ACTIONS.modProject, handleProjectMod(app, convoStore));
 app.action(ACTIONS.modSection, handleSectionMod(app, convoStore));
 app.action(ACTIONS.modItem, handleItemMod(app, convoStore));
+app.action(ACTIONS.listProjects, listProjects(app));
+
+app.event(EVENTS.appHomeOpened, openHomeTab(app));

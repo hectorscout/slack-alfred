@@ -7,7 +7,8 @@ import {
   moveItem,
   updateItem
 } from "./models";
-import { lookupProject } from "./projects";
+import { getProjectBlocks } from "./projects";
+import postBlocks from "./utils";
 import { postAuditMessageMaker } from "./auditing";
 import itemModal from "./messages/item_modal";
 
@@ -23,6 +24,14 @@ const handleItemMod = (app, convoStore) => async ({
   const command = actionValue.cmd;
   const projectName = actionValue.pn;
   const itemId = actionValue.iId;
+  const postProject = async () =>
+    postBlocks({
+      app,
+      blocks: await getProjectBlocks(projectName),
+      respond,
+      token: context.botToken,
+      userId: body.user.id
+    });
 
   switch (command) {
     case COMMANDS.edit:
@@ -52,7 +61,7 @@ const handleItemMod = (app, convoStore) => async ({
     case COMMANDS.down:
       try {
         await moveItem(itemId, command);
-        await lookupProject(projectName, true, respond, context.botToken);
+        await postProject();
       } catch (err) {
         console.log("error in ACTIONS.modItem (move)", err);
         respond({
@@ -65,7 +74,7 @@ const handleItemMod = (app, convoStore) => async ({
     case COMMANDS.delete:
       try {
         await deleteItem(itemId);
-        await lookupProject(projectName, true, respond, context.botToken);
+        await postProject();
       } catch (err) {
         console.log("error in ACTIONS.modItem (delete)", err);
         respond({
@@ -99,6 +108,7 @@ const saveItem = (app, convoStore) => async ({ ack, body, view, context }) => {
 
   const convo = convoStore.get(body.user.id);
   const postAuditMessage = postAuditMessageMaker(app);
+
   if (itemId) {
     try {
       await updateItem(itemId, itemName, itemUrl, itemDescription, type);
@@ -109,7 +119,13 @@ const saveItem = (app, convoStore) => async ({ ack, body, view, context }) => {
           `${itemName}: ${itemUrl}, ${itemDescription}`,
           context.botToken
         );
-        await lookupProject(projectName, true, respond, token);
+        postBlocks({
+          app,
+          blocks: await getProjectBlocks(projectName),
+          respond,
+          token,
+          userId: body.user.id
+        });
       });
     } catch (err) {
       console.log("error in ACTIONS.saveItem (updateItem)", err);
@@ -129,7 +145,13 @@ const saveItem = (app, convoStore) => async ({ ack, body, view, context }) => {
           `${itemName}: ${itemUrl}, ${itemDescription}`,
           context.botToken
         );
-        await lookupProject(projectName, true, respond, token);
+        postBlocks({
+          app,
+          blocks: await getProjectBlocks(projectName),
+          respond,
+          token,
+          userId: body.user.id
+        });
       });
     } catch (err) {
       console.log("error in ACTIONS.saveItem (addItem)", err);

@@ -82,6 +82,13 @@ Creating a Slack app (probably want to do this in a testing workspace)
 - Slack Bot
   - Create a slack bot. This is mostly used for its bot token.
 - Install the app to your workspace in the Basic Information section
+- Home Tab (as of Dec 2019 the Home Tab is in beta)
+  - Goto `App Home`, sign up for beta, and turn on`Home Tab`
+  - Goto `Event Subscriptions`
+    - Enable events
+    - Request URL: `https://24392a0c.ngrok.io/slack/events` (similar ngrok thing)
+    - In `Subscribe to bot events` click `Add Bot User Event` and subscrib e to the `app_home_opened` event
+    - Save them changes
 
 ## Custom Emojis
 
@@ -167,7 +174,7 @@ You can set a slack channel where Alfred will log all changes made to all projec
 
 You'll probably want this to be a small private channel. The point is to make sure nobody puts anything in the Bat Computer they shouldn't (username and passwords, AWS keys, that sort of thing).
 
-To do this create/go to the channel you'd like to use as the audi channel and type:
+To do this create/go to the channel you'd like to use as the audit channel and type:
 
 - `/alfred auditchannel`
 

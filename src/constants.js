@@ -5,6 +5,7 @@ const MAX_TEXT_INPUT_LENGTH = 255;
 const ACTIONS = {
   editProject: "EDIT_PROJECT",
   itemTypeSelection: "ITEM_TYPE_SELECTION",
+  listProjects: "LIST_PROJECTS",
   modItem: "MOD_ITEM",
   modProject: "MOD_PROJECT",
   modSection: "MOD_SECTION",
@@ -13,6 +14,10 @@ const ACTIONS = {
   saveProject: "SAVE_PROJECT",
   saveSection: "SAVE_SECTION",
   viewProject: "VIEW_PROJECT"
+};
+
+const EVENTS = {
+  appHomeOpened: "app_home_opened"
 };
 
 const COMMANDS = {
@@ -140,6 +145,7 @@ export {
   ACTIONS,
   BLOCKS,
   COMMANDS,
+  EVENTS,
   ICONS,
   ITEM_TYPES,
   MAX_TEXT_INPUT_LENGTH,
