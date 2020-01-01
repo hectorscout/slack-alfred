@@ -174,7 +174,7 @@ You can set a slack channel where Alfred will log all changes made to all projec
 
 You'll probably want this to be a small private channel. The point is to make sure nobody puts anything in the Bat Computer they shouldn't (username and passwords, AWS keys, that sort of thing).
 
-To do this create/go to the channel you'd like to use as the audi channel and type:
+To do this create/go to the channel you'd like to use as the audit channel and type:
 
 - `/alfred auditchannel`
 
