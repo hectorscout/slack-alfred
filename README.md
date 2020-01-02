@@ -16,6 +16,6 @@ The Bat Computer's projects are like a wiki. Anyone should feel free to add to/u
 
 ## [Setup Your Slack App](https://github.com/hectorscout/slack-alfred/wiki/Setup-Slack-App)
 
-# [Heroku (for production)](https://github.com/hectorscout/slack-alfred/wiki/Production-With-Heroku)
+## [Heroku (for production)](https://github.com/hectorscout/slack-alfred/wiki/Production-With-Heroku)
 
-# [Auditing Bat Computer Content](https://github.com/hectorscout/slack-alfred/wiki/Auditing)
+## [Auditing Bat Computer Content](https://github.com/hectorscout/slack-alfred/wiki/Auditing)
