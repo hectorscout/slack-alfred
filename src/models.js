@@ -179,7 +179,9 @@ export const getFullProject = async projectName => {
 };
 
 export const getProjects = async () => {
-  const projectResults = await pool.query("SELECT * from projects");
+  const projectResults = await pool.query(
+    "SELECT * from projects ORDER BY name"
+  );
   return projectResults.rows;
 };
 
