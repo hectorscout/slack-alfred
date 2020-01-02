@@ -10,7 +10,7 @@ There are two main use cases for Alfred.
 
 1. What's the current link to that design/spec/environment/etc... for the project I'm working on?
 
-2. Who should I talk to about/where would I ask about/what is that other project I don't work on?
+2. Who should I talk to about/where would I ask about/what _is_ that other project I don't work on?
 
 There are plenty of other scenarios in which Alfred will be useful, but these are the main problems he's trying to solve.
 
