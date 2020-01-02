@@ -10,7 +10,15 @@ There are two main use cases for Alfred.
 
 There are plenty of other scenarios in which Alfred will be useful, but these are the main problems he's trying to solve.
 
-The Bat Computer's projects are like a wiki. Anyone should feel free to add to/update anything in them. In face, Alfred relies on this. The service is only useful if the data in it is kept up to date (_please_ update it).
+The Bat Computer's projects are like a wiki. Anyone should feel free to add to/update anything in them. In fact, Alfred relies on this. The service is only useful if the data in it is kept up to date (_please_ update it).
+
+## Basic Usage
+
+### Slash Command
+![](https://github.com/hectorscout/slack-alfred/blob/master/assets/Alfred-Slash-Command.gif)
+
+### Home Tab
+![](https://github.com/hectorscout/slack-alfred/blob/master/assets/Alfred-Home-Tab.gif)
 
 ## [Getting Started with local development](https://github.com/hectorscout/slack-alfred/wiki/Local-Development)
 
