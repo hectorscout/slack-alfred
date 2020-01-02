@@ -71,6 +71,13 @@ const saveProject = (app, convoStore) => async ({
   } else {
     try {
       await addProject(projectName, description, aliases);
+      postBlocks({
+        app,
+        respond: null,
+        token: context.botToken,
+        userId: body.user.id,
+        blocks: await getProjectBlocks(projectName, true)
+      });
       app.client.chat.postMessage({
         token: context.botToken,
         channel: body.user.id,
