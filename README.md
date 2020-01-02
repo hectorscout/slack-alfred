@@ -1,3 +1,7 @@
+# Alfred
+
+<img src="https://github.com/hectorscout/slack-alfred/blob/master/assets/alfred-logo.png" width=250 height=250 />
+
 Alfred is a Slack App to help organize the various projects in your organization.
 
 Each project in Alfred's Bat Computer consists of a set of links, users, and channels grouped into sections.
