@@ -1,7 +1,6 @@
 import * as R from "ramda";
 import pool from "./config";
 import { COMMANDS } from "./constants";
-import { promises } from "dns";
 
 const updateAliases = async (aliases, projectId, projectName) => {
   try {
@@ -297,13 +296,14 @@ const prepareRankForDelete = async (targetId, table, parentIdField) => {
     [targetRank, parentId]
   );
   const records = toModResults.rows;
+  const updates = [];
   for (let index = 0; index < records.length; index++) {
     const { id, rank } = records[index];
-    await pool.query(`UPDATE ${table} SET rank = $1 WHERE id = $2`, [
-      rank - 1,
-      id
-    ]);
+    updates.push(
+      pool.query(`UPDATE ${table} SET rank = $1 WHERE id = $2`, [rank - 1, id])
+    );
   }
+  await Promise.all(updates);
 };
 
 const deleteById = (id, table, next) => {
