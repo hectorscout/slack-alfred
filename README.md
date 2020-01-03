@@ -30,10 +30,12 @@ Unlike Wikipedia, Alfred's Bat Computer is not meant to contain _all_ the inform
 
 ![](https://github.com/hectorscout/slack-alfred/blob/master/assets/Alfred-Home-Tab.gif)
 
-## [Getting Started with local development](https://github.com/hectorscout/slack-alfred/wiki/Local-Development)
+## Documentation
 
-## [Setup Your Slack App](https://github.com/hectorscout/slack-alfred/wiki/Setup-Slack-App)
+[Getting Started with local development](https://github.com/hectorscout/slack-alfred/wiki/Local-Development)
 
-## [Heroku (for production)](https://github.com/hectorscout/slack-alfred/wiki/Production-With-Heroku)
+[Setup Your Slack App](https://github.com/hectorscout/slack-alfred/wiki/Setup-Slack-App)
 
-## [Auditing Bat Computer Content](https://github.com/hectorscout/slack-alfred/wiki/Auditing)
+[Heroku (for production)](https://github.com/hectorscout/slack-alfred/wiki/Production-With-Heroku)
+
+[Auditing Bat Computer Content](https://github.com/hectorscout/slack-alfred/wiki/Auditing)
