@@ -4,6 +4,8 @@
 
 Alfred is a Slack App to help organize the current state of the various projects in your organization.
 
+You already have lots of information in wikis, design docs, JIRA, specification documents, Alice's brain, etc... Alfred wants to help point to the right places, people, and channels to get that information. 
+
 Each project in Alfred's Bat Computer consists of a set of links, users, and channels grouped into sections.
 
 There are two main use cases for Alfred:
