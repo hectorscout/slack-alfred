@@ -45,7 +45,7 @@ const projectModal = values => {
           {
             type: "mrkdwn",
             text:
-              "If the project has an `:emoji:` feel freed to include it here."
+              "If the project has an `:emoji:` feel free to include it here."
           }
         ]
       },
