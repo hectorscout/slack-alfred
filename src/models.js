@@ -178,18 +178,20 @@ export const getFullProject = async projectName => {
   return R.reduce(projectRowReducer, { sections: [] }, projectResults.rows);
 };
 
+const stripEmoji = name =>
+  name.startsWith(":") && name.match(/:/g).length > 1
+    ? name.split(":")[2].trim()
+    : name;
+
+const ignoreEmojiNameCmp = (a, b) => {
+  const normA = stripEmoji(a.name.toLowerCase());
+  const normB = stripEmoji(b.name.toLowerCase());
+  return normA >= normB ? 1 : -1;
+};
+
 export const getProjects = async () => {
-  const stripEmoji = name =>
-    name.startsWith(":") && name.match(/:/g).length > 1
-      ? name.split(":")[2].trim()
-      : name;
-  const nameCmp = (a, b) => {
-    const normA = stripEmoji(a.name.toLowerCase());
-    const normB = stripEmoji(b.name.toLowerCase());
-    return normA >= normB ? 1 : -1;
-  };
   const projectResults = await pool.query("SELECT * from projects");
-  projectResults.rows.sort(nameCmp);
+  projectResults.rows.sort(ignoreEmojiNameCmp);
   return projectResults.rows;
 };
 
