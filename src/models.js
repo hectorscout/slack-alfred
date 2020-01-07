@@ -179,9 +179,17 @@ export const getFullProject = async projectName => {
 };
 
 export const getProjects = async () => {
-  const projectResults = await pool.query(
-    "SELECT * from projects ORDER BY name"
-  );
+  const stripEmoji = name =>
+    name.startsWith(":") && name.match(/:/g).length > 1
+      ? name.split(":")[2].trim()
+      : name;
+  const nameCmp = (a, b) => {
+    const normA = stripEmoji(a.name.toLowerCase());
+    const normB = stripEmoji(b.name.toLowerCase());
+    return normA >= normB ? 1 : -1;
+  };
+  const projectResults = await pool.query("SELECT * from projects");
+  projectResults.rows.sort(nameCmp);
   return projectResults.rows;
 };
 
