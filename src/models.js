@@ -316,12 +316,13 @@ const prepareRankForDelete = async (targetId, table, parentIdField) => {
   await Promise.all(updates);
 };
 
-const deleteById = (id, table, next) => {
-  pool.query(`DELETE FROM ${table} WHERE ID = $1`, [id], next);
+const deleteById = async (id, table, next) => {
+  // vscode claims you don't need the `await`, but you do...
+  await pool.query(`DELETE FROM ${table} WHERE ID = $1`, [id], next);
 };
 
-export const deleteProject = (projectId, next) => {
-  deleteById(projectId, "projects", next);
+export const deleteProject = async (projectId, next) => {
+  await deleteById(projectId, "projects", next);
   pool.query(`DELETE FROM aliases WHERE projectId = $1`, [projectId], next);
 };
 
