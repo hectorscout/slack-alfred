@@ -2,16 +2,26 @@ import * as R from "ramda";
 import pool from "./config";
 import { COMMANDS } from "./constants";
 
-const updateAliases = async (aliases, projectId, projectName) => {
+const cleanAliases = aliases => {
+  return R.pipe(
+    R.map(alias => alias.trim().toLowerCase()),
+    R.filter(alias => !!alias)
+  )(aliases.split(","));
+};
+
+const clearProjectAliases = async projectId => {
   try {
     await pool.query("DELETE FROM aliases WHERE projectId = $1", [projectId]);
   } catch (err) {
     console.log("handle this error deleting aliases");
   }
+};
 
-  const aliasList = R.map(alias => alias.trim().toLowerCase())(
-    aliases.split(",")
-  );
+const updateAliases = async (aliases, projectId, projectName) => {
+  clearProjectAliases(projectId);
+  const aliasList = cleanAliases(aliases);
+
+  // Ensure the actual project name is in the alias list
   if (!aliasList.includes(projectName.toLowerCase())) {
     aliasList.push(projectName);
   }
