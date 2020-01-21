@@ -67,9 +67,17 @@ const removeAuditChannel = async (respond, token, channelId) => {
   });
 };
 
-const dumpProjects = async (respond, token) => {
+const dumpProjects = async (respond, token, channelId) => {
+  const currentChannelSetting = await getSetting(SETTING_NAMES.auditChannelId);
+  if (currentChannelSetting && currentChannelSetting.value !== channelId) {
+    return respond({
+      token,
+      response_type: "ephemeral",
+      text: MESSAGES.auditChannel.dumpWrongChannel()
+    });
+  }
   const projects = await getProjectsDump();
-  R.map(project => {
+  return R.map(project => {
     return respond({
       token,
       replace_original: false,

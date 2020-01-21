@@ -27,7 +27,7 @@ const handleSlashCommand = app => async ({
     //   });
     //   break;
     case "AUDITDUMP":
-      await dumpProjects(respond, context.botToken);
+      await dumpProjects(respond, context.botToken, body.channel_id);
       break;
     case "AUDITCHANNEL":
       await setAuditChannel(
@@ -38,12 +38,7 @@ const handleSlashCommand = app => async ({
       );
       break;
     case "RELEASEAUDIT":
-      await removeAuditChannel(
-        respond,
-        context.botToken,
-        body.channel_id,
-        body.channel_name
-      );
+      await removeAuditChannel(respond, context.botToken, body.channel_id);
       break;
     default:
       postBlocks({

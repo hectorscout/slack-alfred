@@ -91,6 +91,9 @@ const MESSAGES = {
     },
     dropped: () => {
       return `I've released the audit channel. You're now free to designate another channel as the audit channel. Choose wisely.`;
+    },
+    dumpWrongChannel: () => {
+      return `Sorry Master Bruce, but running the \`\\alfred dump\` command can only be accomplished in the audit channel`;
     }
   }
 };
