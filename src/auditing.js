@@ -9,6 +9,11 @@ import { MESSAGES, SETTING_NAMES } from "./constants";
 import auditPost from "./messages/audit_post";
 import projectMessage from "./messages/project_message";
 
+const isAuditChannel = async channelId => {
+  const currentChannelSetting = await getSetting(SETTING_NAMES.auditChannelId);
+  return currentChannelSetting && currentChannelSetting.value === channelId;
+};
+
 const postAuditMessageMaker = app => async (
   userId,
   projectName,
@@ -33,8 +38,7 @@ const setAuditChannel = async (respond, token, channelId, channelName) => {
       text: MESSAGES.auditChannel.notDM()
     });
   }
-  const currentChannelId = await getSetting(SETTING_NAMES.auditChannelId);
-  if (currentChannelId && currentChannelId !== channelId) {
+  if (!isAuditChannel(channelId)) {
     return respond({
       token,
       response_type: "ephemeral",
@@ -51,8 +55,7 @@ const setAuditChannel = async (respond, token, channelId, channelName) => {
 };
 
 const removeAuditChannel = async (respond, token, channelId) => {
-  const currentChannelSetting = await getSetting(SETTING_NAMES.auditChannelId);
-  if (currentChannelSetting && currentChannelSetting.value !== channelId) {
+  if (!isAuditChannel(channelId)) {
     return respond({
       token,
       response_type: "ephemeral",
@@ -67,9 +70,16 @@ const removeAuditChannel = async (respond, token, channelId) => {
   });
 };
 
-const dumpProjects = async (respond, token) => {
+const dumpProjects = async (respond, token, channelId) => {
+  if (!isAuditChannel(channelId)) {
+    return respond({
+      token,
+      response_type: "ephemeral",
+      text: MESSAGES.auditChannel.dumpWrongChannel()
+    });
+  }
   const projects = await getProjectsDump();
-  R.map(project => {
+  return R.map(project => {
     return respond({
       token,
       replace_original: false,
