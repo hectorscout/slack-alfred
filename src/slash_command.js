@@ -1,6 +1,7 @@
 import { dumpProjects, removeAuditChannel, setAuditChannel } from "./auditing";
 import { getProjectBlocks, newProjectView } from "./projects";
 import postBlocks from "./utils";
+import { SLASH_COMMANDS } from "./constants";
 
 const handleSlashCommand = app => async ({
   command,
@@ -13,7 +14,7 @@ const handleSlashCommand = app => async ({
   const method = command.text.split(" ")[0].toUpperCase();
 
   switch (method) {
-    case "NEW":
+    case SLASH_COMMANDS.NEW:
       newProjectView(app, context.botToken, command.trigger_id);
       break;
     // case "HELP":
@@ -26,10 +27,10 @@ const handleSlashCommand = app => async ({
     //     });
     //   });
     //   break;
-    case "AUDITDUMP":
+    case SLASH_COMMANDS.AUDITDUMP:
       await dumpProjects(respond, context.botToken, body.channel_id);
       break;
-    case "AUDITCHANNEL":
+    case SLASH_COMMANDS.AUDITCHANNEL:
       await setAuditChannel(
         respond,
         context.botToken,
@@ -37,7 +38,7 @@ const handleSlashCommand = app => async ({
         body.channel_name
       );
       break;
-    case "RELEASEAUDIT":
+    case SLASH_COMMANDS.RELEASEAUDIT:
       await removeAuditChannel(respond, context.botToken, body.channel_id);
       break;
     default:
