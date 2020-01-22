@@ -73,9 +73,11 @@ const projectModal = values => {
       {
         type: "input",
         block_id: "project_aliases",
+        optional: true,
         label: {
           type: "plain_text",
-          text: "What names should bring up this project (comma separated)?",
+          text:
+            "What names should bring up this project (comma separated, not case sensitive)?",
           emoji: true
         },
         element: {

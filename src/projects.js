@@ -38,7 +38,7 @@ const saveProject = (app, convoStore) => async ({
   const projectName = view.state.values.project_name.project_name.value;
   const description =
     view.state.values.project_description.project_description.value;
-  const aliases = view.state.values.project_aliases.project_aliases.value;
+  const aliases = view.state.values.project_aliases.project_aliases.value || "";
   const id = view.private_metadata;
 
   if (id) {
