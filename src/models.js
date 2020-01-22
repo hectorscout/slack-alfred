@@ -5,7 +5,8 @@ import { COMMANDS } from "./constants";
 const cleanAliases = aliases => {
   return R.pipe(
     R.map(alias => alias.trim().toLowerCase()),
-    R.filter(alias => !!alias)
+    R.filter(alias => !!alias),
+    R.uniq
   )(aliases.split(","));
 };
 
