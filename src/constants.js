@@ -102,6 +102,9 @@ const MESSAGES = {
     dumpWrongChannel: () => {
       return `Sorry Master Bruce, but running the \`\\alfred dump\` command can only be accomplished in the audit channel`;
     }
+  },
+  invalid_aliases: aliases => {
+    return `There are other projects already using \`${aliases.join(", ")}\``;
   }
 };
 

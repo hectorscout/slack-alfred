@@ -2,6 +2,7 @@ import {
   addProject,
   deleteProject,
   getFullProject,
+  getInvalidAliases,
   getProjectById,
   getProjects,
   updateProject
@@ -33,13 +34,24 @@ const saveProject = (app, convoStore) => async ({
   view,
   context
 }) => {
-  ack();
   const postAuditMessage = postAuditMessageMaker(app);
   const projectName = view.state.values.project_name.project_name.value;
   const description =
     view.state.values.project_description.project_description.value;
   const aliases = view.state.values.project_aliases.project_aliases.value || "";
   const id = view.private_metadata;
+
+  const invalidAliases = await getInvalidAliases(id, aliases);
+  if (invalidAliases.length) {
+    ack({
+      response_action: "errors",
+      errors: {
+        project_aliases: MESSAGES.invalid_aliases(invalidAliases)
+      }
+    });
+  } else {
+    ack();
+  }
 
   if (id) {
     const convo = convoStore.get(body.user.id);

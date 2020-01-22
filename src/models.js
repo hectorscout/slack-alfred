@@ -1,6 +1,6 @@
 import * as R from "ramda";
 import pool from "./config";
-import { COMMANDS } from "./constants";
+import { COMMANDS, SLASH_COMMANDS } from "./constants";
 
 const cleanAliases = aliases => {
   return R.pipe(
@@ -36,6 +36,23 @@ const updateAliases = async (aliases, projectId, projectName) => {
       console.log("handle this error in inserting an alias");
     }
   })(aliasList);
+};
+
+export const getInvalidAliases = async (projectId, aliasString) => {
+  const aliases = cleanAliases(aliasString);
+  const invalidAliases = await pool.query(
+    "SELECT alias FROM aliases WHERE projectId != $1",
+    [projectId]
+  );
+  const existingAliases = R.pluck("alias", invalidAliases.rows);
+  const slashCommands = R.map(
+    command => command.toLowerCase(),
+    R.values(SLASH_COMMANDS)
+  );
+  return R.union(
+    R.intersection(slashCommands, aliases),
+    R.intersection(existingAliases, aliases)
+  );
 };
 
 export const addItem = async (name, sectionId, url, description, type) => {
