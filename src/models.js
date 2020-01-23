@@ -400,3 +400,18 @@ export const addLookup = async ({ projectName, userId, requestType }) => {
     [projectName.toLowerCase(), userId, requestType, new Date()]
   );
 };
+
+export const getProjectsStats = async () => {
+  const stats = await pool.query(`
+    SELECT
+      projects.name as project_name,
+      COUNT(lookups.id) as lookup_count,
+      COUNT(DISTINCT(lookups.userId)) as lookup_user_count
+    FROM lookups
+    LEFT JOIN aliases ON lookups.projectName = aliases.alias
+    RIGHT JOIN projects ON aliases.projectId = projects.id
+    GROUP BY projects.name
+  `);
+
+  return stats.rows;
+};
