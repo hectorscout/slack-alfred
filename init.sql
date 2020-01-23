@@ -45,4 +45,4 @@ CREATE TABLE lookups
   userId VARCHAR(255) NOT NULL,
   requestType VARCHAR(255) NOT NULL,
   dateTime TIMESTAMPTZ
-)
+);
