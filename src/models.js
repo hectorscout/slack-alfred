@@ -397,6 +397,6 @@ export const deleteSetting = async name => {
 export const addLookup = async ({ projectName, userId, requestType }) => {
   await pool.query(
     `INSERT INTO lookups (projectName, userId, requestType, dateTime) VALUES ($1, $2, $3, $4)`,
-    [projectName, userId, requestType, new Date()]
+    [projectName.toLowerCase(), userId, requestType, new Date()]
   );
 };
