@@ -37,3 +37,12 @@ CREATE TABLE settings
   name VARCHAR(255),
   value VARCHAR(255)
 );
+
+CREATE TABLE lookups
+(
+  ID SERIAL PRIMARY KEY,
+  projectName VARCHAR(255) NOT NULL,
+  userId VARCHAR(255) NOT NULL,
+  requestType VARCHAR(255) NOT NULL,
+  dateTime TIMESTAMPTZ
+)
