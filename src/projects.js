@@ -5,7 +5,8 @@ import {
   getInvalidAliases,
   getProjectById,
   getProjects,
-  updateProject
+  updateProject,
+  addLookup
 } from "./models";
 import { COMMANDS, MESSAGES } from "./constants";
 import { postAuditMessageMaker } from "./auditing";
@@ -165,6 +166,11 @@ const listProjects = app => async ({ ack, respond, context, body }) => {
 
 const viewProject = app => async ({ action, ack, respond, context, body }) => {
   ack();
+  addLookup({
+    projectName: action.value,
+    userId: body.user.id,
+    requestType: "VIEW_PROJECT"
+  });
   try {
     postBlocks({
       app,

@@ -2,6 +2,7 @@ import { dumpProjects, removeAuditChannel, setAuditChannel } from "./auditing";
 import { getProjectBlocks, newProjectView } from "./projects";
 import postBlocks from "./utils";
 import { SLASH_COMMANDS } from "./constants";
+import { addLookup } from "./models";
 
 const handleSlashCommand = app => async ({
   command,
@@ -42,6 +43,11 @@ const handleSlashCommand = app => async ({
       await removeAuditChannel(respond, context.botToken, body.channel_id);
       break;
     default:
+      addLookup({
+        projectName: command.text.toLowerCase(),
+        userId: body.user_id,
+        requestType: "SLASH_COMMAND"
+      });
       postBlocks({
         app,
         blocks: await getProjectBlocks(command.text, false),
