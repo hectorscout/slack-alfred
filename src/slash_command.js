@@ -2,7 +2,7 @@ import { dumpProjects, removeAuditChannel, setAuditChannel } from "./auditing";
 import { getProjectBlocks, newProjectView } from "./projects";
 import { getStatsBlocks } from "./stats";
 import postBlocks from "./utils";
-import { SLASH_COMMANDS } from "./constants";
+import { SLASH_COMMANDS, STATS_RANGES } from "./constants";
 import { addLookup } from "./models";
 
 const handleSlashCommand = app => async ({
@@ -46,7 +46,7 @@ const handleSlashCommand = app => async ({
     case SLASH_COMMANDS.STATS:
       postBlocks({
         app,
-        blocks: await getStatsBlocks(),
+        blocks: await getStatsBlocks(STATS_RANGES.TODAY),
         respond,
         token: context.botToken,
         userId: body.user_id

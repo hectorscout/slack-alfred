@@ -1,6 +1,6 @@
 import * as R from "ramda";
 import pool from "./config";
-import { COMMANDS, SLASH_COMMANDS } from "./constants";
+import { COMMANDS, SLASH_COMMANDS, STATS_RANGES } from "./constants";
 
 const cleanAliases = aliases => {
   return R.pipe(
@@ -401,8 +401,19 @@ export const addLookup = async ({ projectName, userId, requestType }) => {
   );
 };
 
-export const getProjectsStats = async () => {
-  const stats = await pool.query(`
+const getDateFromRange = range => {
+  const oneDay = 1000 * 60 * 60 * 24;
+  const now = new Date().getTime();
+  if (range) {
+    return new Date(now - oneDay * range);
+  }
+  return new Date(1979, 1, 1);
+};
+
+export const getProjectsStats = async range => {
+  const sinceDate = getDateFromRange(range);
+  const stats = await pool.query(
+    `
     SELECT
       projects.name as project_name,
       COUNT(lookups.id) as lookup_count,
@@ -410,8 +421,11 @@ export const getProjectsStats = async () => {
     FROM lookups
     LEFT JOIN aliases ON lookups.projectName = aliases.alias
     RIGHT JOIN projects ON aliases.projectId = projects.id
+    WHERE lookups.dateTime >= $1 OR lookups.dateTime IS NULL
     GROUP BY projects.name
-  `);
+  `,
+    [sinceDate]
+  );
 
   return stats.rows;
 };

@@ -21,6 +21,7 @@ const ACTIONS = {
   saveItem: "SAVE_ITEM",
   saveProject: "SAVE_PROJECT",
   saveSection: "SAVE_SECTION",
+  setStatsRange: "SET_STATS_RANGE",
   viewProject: "VIEW_PROJECT"
 };
 
@@ -53,6 +54,16 @@ const ITEM_TYPES = {
   url: "URL",
   user: "USER",
   channel: "CHANNEL"
+};
+
+const STATS_RANGES = {
+  TODAY: 1,
+  WEEK: 7,
+  THIRTY: 30,
+  SIXTY: 60,
+  NINETY: 90,
+  YEAR: 365,
+  ALLTIME: 365 * 100 // I know this is lame...
 };
 
 const MESSAGES = {
@@ -152,6 +163,24 @@ const BLOCKS = {
       emoji: true,
       text: `${placeholder}`
     }
+  }),
+  select: (actionId, text, placeholder, options, initialOption) => ({
+    type: "section",
+    text: {
+      type: "mrkdwn",
+      text
+    },
+    accessory: {
+      type: "static_select",
+      action_id: actionId,
+      placeholder: {
+        type: "plain_text",
+        text: placeholder,
+        emoji: true
+      },
+      initial_option: initialOption,
+      options
+    }
   })
 };
 
@@ -166,5 +195,6 @@ export {
   MESSAGES,
   SETTING_NAMES,
   SLASH_COMMAND,
-  SLASH_COMMANDS
+  SLASH_COMMANDS,
+  STATS_RANGES
 };
