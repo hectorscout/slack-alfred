@@ -1,6 +1,6 @@
 import * as R from "ramda";
 import pool from "./config";
-import { COMMANDS, SLASH_COMMANDS, STATS_RANGES } from "./constants";
+import { COMMANDS, SLASH_COMMANDS } from "./constants";
 
 const cleanAliases = aliases => {
   return R.pipe(
@@ -42,7 +42,7 @@ export const getInvalidAliases = async (projectId, aliasString) => {
   const aliases = cleanAliases(aliasString);
   const invalidAliases = await pool.query(
     "SELECT alias FROM aliases WHERE projectId != $1",
-    [projectId]
+    [projectId || -1]
   );
   const existingAliases = R.pluck("alias", invalidAliases.rows);
   const slashCommands = R.map(
