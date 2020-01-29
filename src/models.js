@@ -1,6 +1,6 @@
 import * as R from "ramda";
 import pool from "./config";
-import { COMMANDS, SLASH_COMMANDS } from "./constants";
+import { COMMANDS, SLASH_COMMANDS, STATS_RANGES } from "./constants";
 
 const cleanAliases = aliases => {
   return R.pipe(
@@ -399,4 +399,73 @@ export const addLookup = async ({ projectName, userId, requestType }) => {
     `INSERT INTO lookups (projectName, userId, requestType, dateTime) VALUES ($1, $2, $3, $4)`,
     [projectName.toLowerCase(), userId, requestType, new Date()]
   );
+};
+
+const getDateFromRange = range => {
+  const oneDay = 1000 * 60 * 60 * 24;
+  const now = new Date().getTime();
+  if (range) {
+    return new Date(now - oneDay * range);
+  }
+  return new Date(1979, 1, 1);
+};
+
+export const getListingLookups = async range => {
+  const sinceDate = getDateFromRange(range);
+  const stats = await pool.query(
+    `
+    SELECT
+      COUNT(lookups.id) as lookup_count,
+      COUNT(DISTINCT(lookups.userId)) as user_count
+    FROM lookups
+    WHERE lookups.dateTime >= $1 AND lookups.projectname = ''
+  `,
+    [sinceDate]
+  );
+
+  return stats.rows[0];
+};
+
+export const getProjectsStats = async range => {
+  const sinceDate = getDateFromRange(range);
+  const stats = await pool.query(
+    `
+    SELECT
+      projects.name as project_name,
+      COUNT(lookups.id) as lookup_count,
+      COUNT(DISTINCT(lookups.userId)) as user_count
+    FROM projects
+    LEFT JOIN aliases ON aliases.projectId = projects.id
+    LEFT JOIN lookups ON lookups.projectName = aliases.alias AND lookups.dateTime >= $2
+    WHERE (lookups.dateTime >= $1 OR lookups.dateTime IS NULL)
+      AND projects.name IS NOT NULL
+    GROUP BY project_name
+  `,
+    [sinceDate, sinceDate]
+  );
+  return stats.rows;
+};
+
+export const getUserStats = async range => {
+  const sinceDate = getDateFromRange(range);
+  const stats = await pool.query(
+    `
+    SELECT
+      lookups.userId as user_id,
+      COUNT(lookups.id) as lookup_count,
+      COUNT(DISTINCT(projects.id)) as project_count
+    FROM lookups
+    LEFT JOIN aliases ON lookups.projectName = aliases.alias
+    LEFT JOIN projects ON aliases.projectId = projects.id
+    WHERE
+      (lookups.dateTime >= $1 OR lookups.dateTime IS NULL)
+      AND projects.name IS NOT NULL
+    GROUP BY lookups.userId
+    ORDER BY lookup_count DESC
+    LIMIT 20
+  `,
+    [sinceDate]
+  );
+
+  return stats.rows;
 };

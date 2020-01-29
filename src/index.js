@@ -16,6 +16,7 @@ import {
 import { handleSectionMod, saveSection } from "./sections";
 import { handleItemMod, saveItem } from "./items";
 import openHomeTab from "./home_tab";
+import { setStatsRange } from "./stats";
 
 dotenv.config();
 
@@ -46,5 +47,6 @@ app.action(ACTIONS.modProject, handleProjectMod(app, convoStore));
 app.action(ACTIONS.modSection, handleSectionMod(app, convoStore));
 app.action(ACTIONS.modItem, handleItemMod(app, convoStore));
 app.action(ACTIONS.listProjects, listProjects(app));
+app.action(ACTIONS.setStatsRange, setStatsRange(app));
 
 app.event(EVENTS.appHomeOpened, openHomeTab(app));
