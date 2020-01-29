@@ -11,9 +11,21 @@ const RANGE_OPTION_BLOCKS = {
   [STATS_RANGES.ALLTIME]: BLOCKS.option("All Time", STATS_RANGES.ALLTIME)
 };
 
+export const listingsStats = ({ lookup_count, user_count }) => {
+  return [
+    BLOCKS.text(
+      `\`/alfred\` was used ${lookup_count} time${
+        lookup_count === 1 ? "" : "s"
+      } by ${user_count} ${
+        user_count === "1" ? "person" : "people"
+      } to list the available projects.`
+    )
+  ];
+};
+
 export const projectsStats = projects => {
   const blocks = [
-    BLOCKS.text("Here's how the Bat Family has been using the Bat Computer"),
+    BLOCKS.text("*:alfred_batsymbol: Bat Computer access by project:*"),
     BLOCKS.divider()
   ];
 
@@ -34,7 +46,9 @@ export const projectsStats = projects => {
 
 export const usersStats = users => {
   const blocks = [
-    BLOCKS.text("Here's who in the Bat Family has been using the Bat Computer"),
+    BLOCKS.text(
+      "*:alfred_batsymbol: Bat Computer access by Bat Family member:*"
+    ),
     BLOCKS.divider()
   ];
 

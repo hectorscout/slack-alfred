@@ -410,6 +410,22 @@ const getDateFromRange = range => {
   return new Date(1979, 1, 1);
 };
 
+export const getListingLookups = async range => {
+  const sinceDate = getDateFromRange(range);
+  const stats = await pool.query(
+    `
+    SELECT
+      COUNT(lookups.id) as lookup_count,
+      COUNT(DISTINCT(lookups.userId)) as user_count
+    FROM lookups
+    WHERE lookups.dateTime >= $1 AND lookups.projectname = ''
+  `,
+    [sinceDate]
+  );
+
+  return stats.rows[0];
+};
+
 export const getProjectsStats = async range => {
   const sinceDate = getDateFromRange(range);
   const stats = await pool.query(

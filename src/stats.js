@@ -1,16 +1,19 @@
 import {
+  listingsStats,
   projectsStats,
   usersStats,
   rangeSelector
 } from "./messages/projects_stats";
-import { getProjectsStats, getUserStats } from "./models";
+import { getProjectsStats, getUserStats, getListingLookups } from "./models";
 import postBlocks from "./utils";
 import { MESSAGES } from "./constants";
 
 export const getStatsBlocks = async range => {
+  const listingStats = await getListingLookups(range);
   const projectStats = await getProjectsStats(range);
   const userStats = await getUserStats(range);
   return [
+    ...listingsStats(listingStats),
     ...projectsStats(projectStats),
     ...usersStats(userStats),
     ...rangeSelector(range)
