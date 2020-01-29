@@ -24,7 +24,7 @@ const updateAliases = async (aliases, projectId, projectName) => {
 
   // Ensure the actual project name is in the alias list
   if (!aliasList.includes(projectName.toLowerCase())) {
-    aliasList.push(projectName);
+    aliasList.push(projectName.toLowerCase());
   }
   R.forEach(async alias => {
     try {
