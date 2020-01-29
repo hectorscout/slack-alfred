@@ -11,27 +11,50 @@ const RANGE_OPTION_BLOCKS = {
   [STATS_RANGES.ALLTIME]: BLOCKS.option("All Time", STATS_RANGES.ALLTIME)
 };
 
-const projectsStats = (projects, range) => {
+export const projectsStats = projects => {
   const blocks = [
     BLOCKS.text("Here's how the Bat Family has been using the Bat Computer"),
     BLOCKS.divider()
   ];
 
-  R.forEach(({ project_name, lookup_count, lookup_user_count }) => {
+  R.forEach(({ project_name, lookup_count, user_count }) => {
     blocks.push(
       BLOCKS.text(
         `*${project_name}*
         Looked up ${lookup_count} time${
           lookup_count === "1" ? "" : "s"
-        } by ${lookup_user_count} ${
-          lookup_user_count === "1" ? "person" : "people"
-        }.`
+        } by ${user_count} ${user_count === "1" ? "person" : "people"}.`
       )
     );
     blocks.push(BLOCKS.divider());
   }, projects);
 
-  blocks.push(
+  return blocks;
+};
+
+export const usersStats = users => {
+  const blocks = [
+    BLOCKS.text("Here's who in the Bat Family has been using the Bat Computer"),
+    BLOCKS.divider()
+  ];
+
+  R.forEach(({ user_id, lookup_count, project_count }) => {
+    blocks.push(
+      BLOCKS.text(
+        `<@${user_id}>:
+        Looked up ${project_count} project${
+          project_count === "1" ? "" : "s"
+        } ${lookup_count} ${lookup_count === "1" ? "time" : "times"}.`
+      )
+    );
+    blocks.push(BLOCKS.divider());
+  }, users);
+
+  return blocks;
+};
+
+export const rangeSelector = range => {
+  return [
     BLOCKS.select(
       ACTIONS.setStatsRange,
       "How far would you like to go back sir?",
@@ -47,9 +70,5 @@ const projectsStats = (projects, range) => {
       ],
       RANGE_OPTION_BLOCKS[range]
     )
-  );
-
-  return blocks;
+  ];
 };
-
-export default projectsStats;

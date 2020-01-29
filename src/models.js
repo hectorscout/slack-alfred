@@ -417,12 +417,36 @@ export const getProjectsStats = async range => {
     SELECT
       projects.name as project_name,
       COUNT(lookups.id) as lookup_count,
-      COUNT(DISTINCT(lookups.userId)) as lookup_user_count
+      COUNT(DISTINCT(lookups.userId)) as user_count
+    FROM projects
+    LEFT JOIN aliases ON aliases.projectId = projects.id
+    LEFT JOIN lookups ON lookups.projectName = aliases.alias AND lookups.dateTime >= $2
+    WHERE (lookups.dateTime >= $1 OR lookups.dateTime IS NULL)
+      AND projects.name IS NOT NULL
+    GROUP BY project_name
+  `,
+    [sinceDate, sinceDate]
+  );
+  return stats.rows;
+};
+
+export const getUserStats = async range => {
+  const sinceDate = getDateFromRange(range);
+  const stats = await pool.query(
+    `
+    SELECT
+      lookups.userId as user_id,
+      COUNT(lookups.id) as lookup_count,
+      COUNT(DISTINCT(projects.id)) as project_count
     FROM lookups
     LEFT JOIN aliases ON lookups.projectName = aliases.alias
-    RIGHT JOIN projects ON aliases.projectId = projects.id
-    WHERE lookups.dateTime >= $1 OR lookups.dateTime IS NULL
-    GROUP BY projects.name
+    LEFT JOIN projects ON aliases.projectId = projects.id
+    WHERE
+      (lookups.dateTime >= $1 OR lookups.dateTime IS NULL)
+      AND projects.name IS NOT NULL
+    GROUP BY lookups.userId
+    ORDER BY lookup_count DESC
+    LIMIT 20
   `,
     [sinceDate]
   );

@@ -1,11 +1,20 @@
-import projectsStats from "./messages/projects_stats";
-import { getProjectsStats } from "./models";
+import {
+  projectsStats,
+  usersStats,
+  rangeSelector
+} from "./messages/projects_stats";
+import { getProjectsStats, getUserStats } from "./models";
 import postBlocks from "./utils";
 import { MESSAGES } from "./constants";
 
 export const getStatsBlocks = async range => {
-  const stats = await getProjectsStats(range);
-  return projectsStats(stats, range);
+  const projectStats = await getProjectsStats(range);
+  const userStats = await getUserStats(range);
+  return [
+    ...projectsStats(projectStats),
+    ...usersStats(userStats),
+    ...rangeSelector(range)
+  ];
 };
 
 export const setStatsRange = app => async ({
@@ -22,10 +31,7 @@ export const setStatsRange = app => async ({
       respond,
       token: context.botToken,
       userId: body.user.id,
-      blocks: projectsStats(
-        await getProjectsStats(action.selected_option.value),
-        action.selected_option.value
-      )
+      blocks: await getStatsBlocks(action.selected_option.value)
     });
   } catch (err) {
     respond({
