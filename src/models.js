@@ -440,6 +440,7 @@ export const getProjectsStats = async range => {
     WHERE (lookups.dateTime >= $1 OR lookups.dateTime IS NULL)
       AND projects.name IS NOT NULL
     GROUP BY project_name
+    ORDER BY lookup_count DESC
   `,
     [sinceDate, sinceDate]
   );
