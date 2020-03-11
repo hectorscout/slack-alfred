@@ -463,7 +463,7 @@ export const getUserStats = async range => {
       AND projects.name IS NOT NULL
     GROUP BY lookups.userId
     ORDER BY lookup_count DESC
-    LIMIT 10
+    LIMIT 5
   `,
     [sinceDate]
   );
