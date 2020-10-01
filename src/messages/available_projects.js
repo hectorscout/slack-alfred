@@ -1,75 +1,75 @@
-import * as R from "ramda";
-import { ACTIONS, MESSAGES } from "../constants";
+import * as R from 'ramda'
+import { ACTIONS, MESSAGES } from '../constants'
 
 const availableProjects = (unfoundProjectName, projects) => {
   const introText = unfoundProjectName
     ? MESSAGES.unfoundProject(unfoundProjectName)
-    : MESSAGES.basicIntro();
+    : MESSAGES.basicIntro()
 
   const blocks = [
     {
-      type: "section",
+      type: 'section',
       text: {
-        type: "mrkdwn",
-        text: introText
-      }
+        type: 'mrkdwn',
+        text: introText,
+      },
     },
     {
-      type: "divider"
-    }
-  ];
+      type: 'divider',
+    },
+  ]
 
   R.forEach(project => {
     blocks.push({
-      type: "section",
+      type: 'section',
       text: {
-        type: "mrkdwn",
-        text: `*${project.name}*\n${project.description}`
+        type: 'mrkdwn',
+        text: `*${project.name}*\n${project.description}`,
       },
       accessory: {
-        type: "button",
+        type: 'button',
         action_id: ACTIONS.viewProject,
         text: {
-          type: "plain_text",
+          type: 'plain_text',
           emoji: true,
-          text: "View"
+          text: 'View',
         },
-        value: project.name
-      }
-    });
+        value: project.name,
+      },
+    })
     blocks.push({
-      type: "divider"
-    });
-  })(projects);
+      type: 'divider',
+    })
+  })(projects)
 
   if (unfoundProjectName) {
-    blocks.push({ type: "divider" });
+    blocks.push({ type: 'divider' })
     blocks.push({
-      type: "section",
+      type: 'section',
       text: {
-        type: "mrkdwn",
-        text: MESSAGES.addAliasPrompt(unfoundProjectName)
-      }
-    });
+        type: 'mrkdwn',
+        text: MESSAGES.addAliasPrompt(unfoundProjectName),
+      },
+    })
   }
   blocks.push({
-    type: "section",
+    type: 'section',
     text: {
-      type: "mrkdwn",
-      text: MESSAGES.addNew()
+      type: 'mrkdwn',
+      text: MESSAGES.addNew(),
     },
     accessory: {
-      type: "button",
+      type: 'button',
       action_id: ACTIONS.openNewProjectDialog,
       text: {
-        type: "plain_text",
+        type: 'plain_text',
         emoji: true,
-        text: "New Project"
-      }
-    }
-  });
+        text: 'New Project',
+      },
+    },
+  })
 
-  return blocks;
-};
+  return blocks
+}
 
-export default availableProjects;
+export default availableProjects

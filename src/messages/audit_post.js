@@ -1,32 +1,32 @@
 const auditPost = (userId, projectName, newStuff) => {
   const blocks = [
     {
-      type: "section",
+      type: 'section',
       text: {
-        type: "mrkdwn",
-        text: `*Project:* ${projectName}`
-      }
+        type: 'mrkdwn',
+        text: `*Project:* ${projectName}`,
+      },
     },
     {
-      type: "section",
+      type: 'section',
       text: {
-        type: "mrkdwn",
-        text: `*By:* <@${userId}>\n`
-      }
+        type: 'mrkdwn',
+        text: `*By:* <@${userId}>\n`,
+      },
     },
     {
-      type: "section",
+      type: 'section',
       text: {
-        type: "mrkdwn",
-        text: `*Updated Content:* ${newStuff}`
-      }
+        type: 'mrkdwn',
+        text: `*Updated Content:* ${newStuff}`,
+      },
     },
     {
-      type: "divider"
-    }
-  ];
+      type: 'divider',
+    },
+  ]
 
-  return blocks;
-};
+  return blocks
+}
 
-export default auditPost;
+export default auditPost

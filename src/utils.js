@@ -4,27 +4,27 @@ const postBlocks = ({
   token,
   blocks,
   userId,
-  responseType = "ephemeral",
-  replaceOriginal = true
+  responseType = 'ephemeral',
+  replaceOriginal = true,
 }) => {
   if (respond) {
     respond({
       token,
       replace_original: replaceOriginal,
       response_type: responseType,
-      blocks
-    });
+      blocks,
+    })
   } else {
     app.client.views.publish({
       token,
       user_id: userId,
       view: {
-        type: "home",
-        blocks
-      }
-    });
+        type: 'home',
+        blocks,
+      },
+    })
   }
-};
+}
 
 // const postText =
-export default postBlocks;
+export default postBlocks

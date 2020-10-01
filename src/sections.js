@@ -3,176 +3,176 @@ import {
   deleteSection,
   getSectionById,
   moveSection,
-  updateSection
-} from "./models";
-import { postAuditMessageMaker } from "./auditing";
-import { getProjectBlocks } from "./projects";
-import postBlocks from "./utils";
-import { COMMANDS, MESSAGES } from "./constants";
-import itemModal from "./messages/item_modal";
-import sectionModal from "./messages/section_modal";
+  updateSection,
+} from './models'
+import { postAuditMessageMaker } from './auditing'
+import { getProjectBlocks } from './projects'
+import postBlocks from './utils'
+import { COMMANDS, MESSAGES } from './constants'
+import itemModal from './messages/item_modal'
+import sectionModal from './messages/section_modal'
 
 const handleSectionMod = (app, convoStore) => async ({
   action,
   ack,
   context,
   body,
-  respond
+  respond,
 }) => {
-  ack();
-  const actionValue = JSON.parse(action.selected_option.value);
-  const command = actionValue.cmd;
-  const projectName = actionValue.pn;
-  const sectionId = actionValue.sId;
+  ack()
+  const actionValue = JSON.parse(action.selected_option.value)
+  const command = actionValue.cmd
+  const projectName = actionValue.pn
+  const sectionId = actionValue.sId
 
   switch (command) {
     case COMMANDS.edit:
       convoStore.set(body.user.id, {
         respond,
         token: context.botToken,
-        projectName
-      });
+        projectName,
+      })
       try {
-        const section = await getSectionById(sectionId);
-        const blocks = sectionModal(section);
+        const section = await getSectionById(sectionId)
+        const blocks = sectionModal(section)
         app.client.views.open({
           token: context.botToken,
           view: blocks,
-          trigger_id: body.trigger_id
-        });
+          trigger_id: body.trigger_id,
+        })
       } catch (err) {
-        console.log("error in ACTIONS.modSection (edit)", err);
+        console.log('error in ACTIONS.modSection (edit)', err)
         app.client.chat.postMessage({
           token: context.botToken,
           channel: body.user.id,
-          text: MESSAGES.genericError("edit that section")
-        });
+          text: MESSAGES.genericError('edit that section'),
+        })
       }
-      break;
+      break
     case COMMANDS.new:
       convoStore.set(body.user.id, {
         respond,
         token: context.botToken,
-        projectName
-      });
+        projectName,
+      })
       app.client.views.open({
         token: context.botToken,
         view: itemModal({ sectionId, type: actionValue.type }),
-        trigger_id: body.trigger_id
-      });
-      break;
+        trigger_id: body.trigger_id,
+      })
+      break
     case COMMANDS.up:
     case COMMANDS.down:
       try {
-        await moveSection(sectionId, command);
+        await moveSection(sectionId, command)
         postBlocks({
           app,
           blocks: await getProjectBlocks(projectName),
           respond,
           token: context.botToken,
-          userId: body.user.id
-        });
+          userId: body.user.id,
+        })
       } catch (err) {
-        console.log("error in ACTIONS.modSection (move)", err);
+        console.log('error in ACTIONS.modSection (move)', err)
         respond({
           token: context.botToken,
-          response_type: "ephemeral",
-          text: MESSAGES.genericError("move that")
-        });
+          response_type: 'ephemeral',
+          text: MESSAGES.genericError('move that'),
+        })
       }
-      break;
+      break
     case COMMANDS.delete:
       try {
-        await deleteSection(sectionId);
+        await deleteSection(sectionId)
         postBlocks({
           app,
           blocks: await getProjectBlocks(projectName),
           respond,
           token: context.botToken,
-          userId: body.user.id
-        });
+          userId: body.user.id,
+        })
       } catch (err) {
-        console.log("error in ACTIONS.modSection (delete)", err);
+        console.log('error in ACTIONS.modSection (delete)', err)
         respond({
           token: context.botToken,
-          response_type: "ephemeral",
-          text: MESSAGES.genericError("remove that")
-        });
+          response_type: 'ephemeral',
+          text: MESSAGES.genericError('remove that'),
+        })
       }
-      break;
+      break
     case COMMANDS.noop:
-      break;
+      break
     default:
-      console.log("Shouldn't be able to do this...");
+      console.log("Shouldn't be able to do this...")
   }
-};
+}
 
 const saveSection = (app, convoStore) => async ({
   ack,
   body,
   view,
-  context
+  context,
 }) => {
-  ack();
-  const sectionName = view.state.values.section_name.section_name.value;
-  const { id, projectId } = JSON.parse(view.private_metadata);
-  const sectionId = id;
+  ack()
+  const sectionName = view.state.values.section_name.section_name.value
+  const { id, projectId } = JSON.parse(view.private_metadata)
+  const sectionId = id
 
-  const convo = convoStore.get(body.user.id);
-  const postAuditMessage = postAuditMessageMaker(app);
+  const convo = convoStore.get(body.user.id)
+  const postAuditMessage = postAuditMessageMaker(app)
   if (sectionId) {
     try {
-      await updateSection(sectionId, sectionName);
+      await updateSection(sectionId, sectionName)
       convo.then(async ({ respond, token, projectName }) => {
         postAuditMessage(
           body.user.id,
           projectName,
           sectionName,
           context.botToken
-        );
+        )
         postBlocks({
           app,
           blocks: await getProjectBlocks(projectName),
           respond,
           token,
-          userId: body.user.id
-        });
-      });
+          userId: body.user.id,
+        })
+      })
     } catch (err) {
-      console.log("error in ACTIONS.saveSection (updateSection)", err);
+      console.log('error in ACTIONS.saveSection (updateSection)', err)
       app.client.chat.postMessage({
         token: context.botToken,
         channel: body.user.id,
-        text: MESSAGES.genericError("update that section")
-      });
+        text: MESSAGES.genericError('update that section'),
+      })
     }
   } else {
     try {
-      await addSection(sectionName, projectId);
+      await addSection(sectionName, projectId)
       convo.then(async ({ respond, token, projectName }) => {
         postAuditMessage(
           body.user.id,
           projectName,
           sectionName,
           context.botToken
-        );
+        )
         postBlocks({
           app,
           blocks: await getProjectBlocks(projectName),
           respond,
           token,
-          userId: body.user.id
-        });
-      });
+          userId: body.user.id,
+        })
+      })
     } catch (err) {
-      console.log("error in ACTIONS.saveSection (addSection)", err);
+      console.log('error in ACTIONS.saveSection (addSection)', err)
       app.client.chat.postMessage({
         token: context.botToken,
         channel: body.user.id,
-        text: MESSAGES.genericError("add that new section")
-      });
+        text: MESSAGES.genericError('add that new section'),
+      })
     }
   }
-};
+}
 
-export { handleSectionMod, saveSection };
+export { handleSectionMod, saveSection }
